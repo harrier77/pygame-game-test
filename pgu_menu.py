@@ -1,6 +1,6 @@
 import pygame
 
-from motore_gioco import *
+#from motore_gioco import *
 
 from pygame.locals import*
 from sys import exit
@@ -66,7 +66,7 @@ class miopgumenu():
         def mio_open_mappa(self,filemappa='filemappa'):
                 self.ripristina_menu()
                 miog=giocatore_animato()
-                miog.file_mappa="D:\\games\\tmwa\\maps\\001-2.tmx"
+                miog.file_mappa="..\\tmwa\\maps\\001-2.tmx"
                 miog.playerpos=(722,722)
                 miog.cam_world_pos_x=600
                 miog.cam_world_pos_y=700

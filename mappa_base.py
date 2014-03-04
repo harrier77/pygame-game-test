@@ -27,6 +27,7 @@ class mio_poligono:
                 self.start_pos_x=250
                 self.start_pos_y=250
                 self.layer=1
+		
                 self.lista_poligoni=[]
                
 
@@ -55,6 +56,7 @@ class mappa_base(schermo_base):
 		schermo_base.__init__(self)
 		print "Inzializzazione oggetto mappa_base..."
 		self.renderer = tiledtmxloader.helperspygame.RendererPygame()
+		self.layer_giocatore=1
 		self.corsa=False
 		self.cammina=False
 		self.speed=4
@@ -150,9 +152,11 @@ class mappa_base(schermo_base):
 						self.scrivi_frase_sprite()
 						self.scrivi_trasparente_sprite()
 					elif event.key == pygame.K_F9:
-						print self.layer_giocatore
+						#print self.layer_giocatore
 						self.sprite_layers[self.layer_giocatore].remove_sprite(self.giocatore_sprite)
 						self.layer_giocatore=self.layer_giocatore+1
+						self.scritta_cruscotto.pop(1)
+						self.scritta_cruscotto.insert(1,"Livello giocatore:"+str(self.layer_giocatore))
 
 			if event.type == pygame.KEYUP:
 				self.cammina=False
@@ -246,7 +250,7 @@ class mappa_base(schermo_base):
 def main():
 	oggetto = mappa_base()
 
-	oggetto.file_mappa="D:\\games\\tmwa\\maps\\004-2.tmx"
+	oggetto.file_mappa="..\\tmwa\\maps\\004-2.tmx"
 	world_map = tiledtmxloader.tmxreader.TileMapParser().parse_decode(oggetto.file_mappa)
 	
 	#world_map=oggetto.togli_collisioni(world_map)

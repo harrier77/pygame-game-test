@@ -92,7 +92,7 @@ class giocatore_animato(giocatore_con_collisioni):
 		y=0
 		for r in testi:
 			b=self.scritta_trasparente(r)[1]
-			y=y+15
+			y=y+20
 			self.screen.blit(b,(10,y))
 
 		
@@ -118,10 +118,10 @@ class giocatore_animato(giocatore_con_collisioni):
 		self.clock = pygame.time.Clock()
 		self.running_loop = True
 		self.metti_giocatore()
+		self.scritta_cruscotto=[]
+		self.scritta_cruscotto.append("Livello giocatore:"+str(self.layer_giocatore))
 		if not self.vedi_collisioni:
-			#self.bg_scritta_trasp_rect.top=20
-			scritta_cruscotto=['Collisioni disattivate, livello '+str(self.idx_coll_layer),' ']
-			#self.scrivi_trasparente_sprite(scritta_cruscotto)
+			self.scritta_cruscotto.insert(0,'(Collisioni disattivate) livello: '+str(self.idx_coll_layer))
 	
 
 		#Inizio while loop
@@ -135,7 +135,7 @@ class giocatore_animato(giocatore_con_collisioni):
 			# clear screen, might be left out if every pixel is redrawn anyway
 			self.screen.fill((0, 0, 0))
 			self.render_the_map()
-			self.scrivi_cruscotto_blit(scritta_cruscotto)
+			self.scrivi_cruscotto_blit(self.scritta_cruscotto)
 			pygame.display.flip()
 			self.clock.tick(500)
 		
@@ -149,5 +149,5 @@ if __name__ == '__main__':
 	oggetto = giocatore_animato()
 	oggetto.playerpos=(100,100)
 
-	oggetto.file_mappa="D:\\games\\tmwa\\maps\\001-2.tmx"
+	oggetto.file_mappa="..\\tmwa\\maps\\001-2.tmx"
 	oggetto.main()
