@@ -117,6 +117,19 @@ class schermo_base:
 		bgrect.top=self.screen.get_size()[1]-self.text_altezza
 		b=tiledtmxloader.helperspygame.SpriteLayer.Sprite(background_txt,bgrect)
 		return b
+
+	def scritta_trasparente(self,testo):
+		sfondo = pygame.Surface([800,50], pygame.SRCALPHA, 32)
+		sfondo = sfondo.convert_alpha()
+		font = pygame.font.Font(None, 16)
+		text = font.render(testo, 1, (200, 200, 200))
+		sfondo.blit(text,(0,0))
+		
+		bgrect=sfondo.get_rect()
+		bgrect.top=10
+		b=tiledtmxloader.helperspygame.SpriteLayer.Sprite(sfondo,bgrect)
+		return b
+
 #------------------------------------------------------------------
 		
 	def scrivi_frase_blit(self,testo="Hello There"):
@@ -169,14 +182,17 @@ def main():
 
 	screen_width = 900
 	screen_height = 600
-	oggetto.screen=oggetto.cambia_pieno_schermo('fullscr')
+	oggetto.screen=oggetto.cambia_pieno_schermo('0')
+	
 	
 
 	while oggetto.running_loop:
 		oggetto.screen.fill(0)
+
 		
+		oggetto.scrivi_frase_blit()
 		oggetto.disegna_frecce()
-		oggetto.scrivi_frase_blit("prova di frase")
+		
 		pygame.display.flip()
 		
 		oggetto.gestione_eventi()

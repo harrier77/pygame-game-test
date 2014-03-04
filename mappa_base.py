@@ -91,6 +91,11 @@ class mappa_base(schermo_base):
 		b=self.scrivi_frase(testo)
 		self.sprite_layers[2].add_sprite(b)
 		
+#  -----------------------------------------------------------------------------
+	def scrivi_trasparente_sprite(self,testo="Hello There"):
+		b=self.scritta_trasparente(testo)
+		self.sprite_layers[1].add_sprite(b)
+		
 #------------------------------------------------------------------
 	def disegna_frecce_sprite(self):
 		#print len(self.arrows)
@@ -143,6 +148,11 @@ class mappa_base(schermo_base):
 						self.collisioni=False
 					elif event.key == pygame.K_F3:
 						self.scrivi_frase_sprite()
+						self.scrivi_trasparente_sprite()
+					elif event.key == pygame.K_F9:
+						print self.layer_giocatore
+						self.sprite_layers[self.layer_giocatore].remove_sprite(self.giocatore_sprite)
+						self.layer_giocatore=self.layer_giocatore+1
 
 			if event.type == pygame.KEYUP:
 				self.cammina=False
@@ -222,6 +232,8 @@ class mappa_base(schermo_base):
 		i=0
 		for mio in world_map.layers:
 			if mio.name=="Collision":
+				#print "layer collisioni="+str(i)
+				self.idx_coll_layer=i
 				world_map.layers.pop(i)
 			i=i+1
 		return world_map
@@ -245,6 +257,7 @@ def main():
 	screen_height = min(600, world_map.pixel_height)
 	oggetto.screen=oggetto.cambia_pieno_schermo('0')
 	oggetto.carica_mattonelle_in_layers(world_map)
+
 	#oggetto.setta_posizione_camera_iniz()
 	# variables for the main loop
 	oggetto.clock = pygame.time.Clock()

@@ -65,23 +65,32 @@ class giocatore_animato(giocatore_con_collisioni):
 		
 
 	def main(self):		
-		#self.vedi_collisioni=False
-		world_map = tiledtmxloader.tmxreader.TileMapParser().parse_decode(self.file_mappa)
-		if not self.vedi_collisioni:
-			world_map=self.togli_collisioni(world_map)
+		
 			
-		assert world_map.orientation == "orthogonal"
+			
+		
 		# init pygame and set up a screen
+		world_map = tiledtmxloader.tmxreader.TileMapParser().parse_decode(self.file_mappa)
+		assert world_map.orientation == "orthogonal"
 
 		self.screen_width = min(900, world_map.pixel_width)
 		self.screen_height = min(600, world_map.pixel_height)
 		self.screen=self.cambia_pieno_schermo('0')
+		
+		self.vedi_collisioni=False
+		
+		if not self.vedi_collisioni:
+			world_map=self.togli_collisioni(world_map)
+		
 		self.carica_mattonelle_in_layers(world_map)
 
 		# variables for the main loop
 		self.clock = pygame.time.Clock()
 		self.running_loop = True
 		self.metti_giocatore()
+		if not self.vedi_collisioni:
+			self.scrivi_trasparente_sprite('Collisioni disattivate, livello '+str(self.idx_coll_layer))
+		
 
 		
 

@@ -25,7 +25,7 @@ class giocatore_con_collisioni(giocatore_base):
 		try:
 			coll_layer=self.sprite_layers[self.idx_coll_layer]
 		except:
-			print "livello collisioni" 
+			#print "livello collisioni" 
 			return True
 		pos_x=self.giocatore_sprite.rect.x 
 		pos_y=self.giocatore_sprite.rect.y 
