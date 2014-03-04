@@ -1,12 +1,10 @@
 import pygame
 
-#from motore_gioco import *
+
 
 from pygame.locals import*
 from sys import exit
-#sys.path.insert(0,"..\\pgu-0.16")
-#from pgu import gui
-#from pgu import html
+
 from miefunzioni import html
 from miefunzioni import gui
 import os

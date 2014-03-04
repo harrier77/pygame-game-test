@@ -64,6 +64,8 @@ class giocatore_animato(giocatore_con_collisioni):
 			self.giocatore_sprite=tiledtmxloader.helperspygame.SpriteLayer.Sprite(animated_image, self.image_rect)
 			self.sprite_layers[self.layer_giocatore].add_sprite(self.giocatore_sprite)
 		self.playerpos=(self.giocatore_sprite.rect.x-25,self.giocatore_sprite.rect.y-5)
+		self.scritta_cruscotto.pop(3)
+		self.scritta_cruscotto.insert(3,"Posizione personaggio:"+str(self.playerpos))
 	
 	#  -----------------------------------------------------------------------------
 	def scrivi_trasparente_sprite(self,testo="Hello There"):
@@ -120,8 +122,12 @@ class giocatore_animato(giocatore_con_collisioni):
 		self.metti_giocatore()
 		self.scritta_cruscotto=[]
 		self.scritta_cruscotto.append("Livello giocatore:"+str(self.layer_giocatore))
+		self.scritta_cruscotto.append("File mappa:"+str(self.file_mappa))
+		self.scritta_cruscotto.append("Posizione personaggio:"+str(self.playerpos))
+		self.scritta_cruscotto.append("Dimensione mappa:"+str(world_map.pixel_width)+"X"+str(world_map.pixel_height))
+		
 		if not self.vedi_collisioni:
-			self.scritta_cruscotto.insert(0,'(Collisioni disattivate) livello: '+str(self.idx_coll_layer))
+			self.scritta_cruscotto.insert(0,'Collisioni livello '+str(self.idx_coll_layer) +' disattivate' )
 	
 
 		#Inizio while loop
