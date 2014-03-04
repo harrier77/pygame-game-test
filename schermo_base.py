@@ -121,8 +121,8 @@ class schermo_base:
 	def scritta_trasparente(self,testo):
 		sfondo = pygame.Surface([800,50], pygame.SRCALPHA, 32)
 		sfondo = sfondo.convert_alpha()
-		font = pygame.font.Font(None, 16)
-		text = font.render(testo, 1, (200, 200, 200))
+		font = pygame.font.Font(None, 32)
+		text = font.render(testo, 1, (250, 250, 250))
 		sfondo.blit(text,(0,0))
 		
 		bgrect=sfondo.get_rect()

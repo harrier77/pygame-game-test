@@ -94,7 +94,8 @@ class mappa_base(schermo_base):
 #  -----------------------------------------------------------------------------
 	def scrivi_trasparente_sprite(self,testo="Hello There"):
 		b=self.scritta_trasparente(testo)
-		self.sprite_layers[1].add_sprite(b)
+		livello=self.idx_coll_layer-1
+		self.sprite_layers[livello].add_sprite(b)
 		
 #------------------------------------------------------------------
 	def disegna_frecce_sprite(self):
