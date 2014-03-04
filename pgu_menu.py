@@ -24,7 +24,9 @@ class miopgumenu():
                 elif param=="apri":
                         self.open_file_browser(None)
                 elif param=="uno":
-                        self.scrivi_html()
+                        self.scrivi_html("episod1.html")
+		elif param=="due":
+                        self.scrivi_html("episod2.html")
 		elif param=="anteprima":
 			scroll.main()
         
@@ -42,9 +44,9 @@ class miopgumenu():
                         miog.file_mappa=dlg.value
                         miog.main()
                         
-        def scrivi_html(self):
+        def scrivi_html(self,file):
                 font = pygame.font.SysFont("Verdana", 28)
-                with open ("storia/episod1.html", "r") as myfile:
+                with open ("storia/"+file, "r") as myfile:
                     data_html=myfile.read().replace('\n', '')
                 self.doc = html.HTML(data=data_html,width=500,font=font,globals={'menuchiamante':self})
                 self.contenitore.remove(self.voci_menu_contenitore)
@@ -63,13 +65,13 @@ class miopgumenu():
                 self.ripristina_menu()
 
                 
-        def mio_open_mappa(self,filemappa='filemappa'):
+        def mio_open_mappa(self,filemappa='001-1.tmx',playerpos=(10,10)):
                 self.ripristina_menu()
                 miog=giocatore_animato()
-                miog.file_mappa="..\\tmwa\\maps\\001-2.tmx"
-                miog.playerpos=(722,722)
-                miog.cam_world_pos_x=600
-                miog.cam_world_pos_y=700
+                miog.file_mappa="..\\tmwa\\maps\\"+filemappa
+		miog.playerpos=playerpos
+                miog.cam_world_pos_x=playerpos[0]
+                miog.cam_world_pos_y=playerpos[1]
 		
                 miog.main()
 
@@ -81,7 +83,7 @@ class miopgumenu():
                 self.voci_menu_contenitore.add(link2,120,150)
                 
                 link3 = gui.Link("Episodio II: la foresta")
-                link3.connect(gui.CLICK,self.cliccato,None)
+                link3.connect(gui.CLICK,self.cliccato,'due')
                 self.voci_menu_contenitore.add(link3,120,200)
                 
                 link4 = gui.Link("Episodio III: l'ignoto")
