@@ -66,6 +66,9 @@ class mappa_base(schermo_base):
 		self.file_mappa='mappe/mappa_x25.tmx'
                 #self.nocollisioni=False
                 self.cisonopoligoni=False
+		
+		self.cam_world_pos_x = 350
+		self.cam_world_pos_y = 220
 
 #---------------------------------------------------------
 	def load_sound(filename, volume=0.5):
@@ -91,11 +94,7 @@ class mappa_base(schermo_base):
 		b=self.scrivi_frase(testo)
 		self.sprite_layers[2].add_sprite(b)
 		
-#  -----------------------------------------------------------------------------
-	def scrivi_trasparente_sprite(self,testo="Hello There"):
-		b=self.scritta_trasparente(testo)
-		livello=self.idx_coll_layer-1
-		self.sprite_layers[livello].add_sprite(b)
+
 		
 #------------------------------------------------------------------
 	def disegna_frecce_sprite(self):
@@ -163,6 +162,7 @@ class mappa_base(schermo_base):
 			if event.type==pygame.MOUSEBUTTONDOWN:
 				self.lancia_frecce()
 				self.load_sound('suoni/fireball.ogg')
+				print pygame.mouse.get_pos()
 			
 		if self.puoi_andare:	
 			if self.cammina:
@@ -193,7 +193,7 @@ class mappa_base(schermo_base):
 		resources = tiledtmxloader.helperspygame.ResourceLoaderPygame()
                 resources.load(world_map)
                 self.sprite_layers = tiledtmxloader.helperspygame.get_layers_from_map(resources)
-		
+
                 # filter layers
                 #self.sprite_layers = [layer for layer in self.sprite_layers if not layer.is_object_group]
                 if not self.cisonopoligoni:
@@ -204,8 +204,8 @@ class mappa_base(schermo_base):
 #------------------------------------------------------------------
 	def setta_posizione_camera_iniz(self):
 		# initial cam_offset is for scrolling
-		self.cam_world_pos_x = 350
-		self.cam_world_pos_y = 220
+		#self.cam_world_pos_x = 350
+		#self.cam_world_pos_y = 220
 		# set initial cam position and size
 		self.screen_width=pygame.display.Info().current_w
 		self.screen_height=pygame.display.Info().current_h

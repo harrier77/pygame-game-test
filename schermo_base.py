@@ -125,9 +125,10 @@ class schermo_base:
 		text = font.render(testo, 1, (250, 250, 250))
 		sfondo.blit(text,(0,0))
 		
-		bgrect=sfondo.get_rect()
-		bgrect.top=10
-		b=tiledtmxloader.helperspygame.SpriteLayer.Sprite(sfondo,bgrect)
+		bg_scritta_trasp_rect=sfondo.get_rect()
+		bg_scritta_trasp_rect.x=self.pos_cruscotto[0]
+		bg_scritta_trasp_rect.y=self.pos_cruscotto[1]
+		b=tiledtmxloader.helperspygame.SpriteLayer.Sprite(sfondo,bg_scritta_trasp_rect)
 		return b
 
 #------------------------------------------------------------------

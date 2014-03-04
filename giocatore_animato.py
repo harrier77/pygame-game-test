@@ -7,6 +7,8 @@ class giocatore_animato(giocatore_con_collisioni):
 		self.animated_object=self.crea_giocatore_animato()
 		self.file_mappa='mappe/mappa_x25.tmx'
 		self.vedi_collisioni=True
+		self.pos_cruscotto=[1,1]
+		
 #-----------------------------------------------------------------------------------	
 
 	def crea_giocatore_animato(self):
@@ -62,12 +64,40 @@ class giocatore_animato(giocatore_con_collisioni):
 			self.giocatore_sprite=tiledtmxloader.helperspygame.SpriteLayer.Sprite(animated_image, self.image_rect)
 			self.sprite_layers[self.layer_giocatore].add_sprite(self.giocatore_sprite)
 		self.playerpos=(self.giocatore_sprite.rect.x-25,self.giocatore_sprite.rect.y-5)
+	
+	#  -----------------------------------------------------------------------------
+	def scrivi_trasparente_sprite(self,testo="Hello There"):
+		b=self.scritta_trasparente(testo)[0]
+		livello=self.idx_coll_layer-1
+		self.sprite_layers[livello].add_sprite(b)
+	
+	def scritta_trasparente(self,testo):
+		sfondo = pygame.Surface([800,50], pygame.SRCALPHA, 32)
+		sfondo = sfondo.convert_alpha()
+		font = pygame.font.Font(None, 22)
+		text = font.render(testo, 1, (250, 250, 250))
+		sfondo.blit(text,(0,0))
+		self.pos_cruscotto[0]=self.playerpos[0]*0.70
+		self.pos_cruscotto[1]=self.playerpos[1]*0.70
+		#self.pos_cruscotto[0]=self.cam_world_pos_x*0.10
+		#self.pos_cruscotto[1]=self.cam_world_pos_y*0.10
+		
+		bg_scritta_trasp_rect=sfondo.get_rect()
+		bg_scritta_trasp_rect.x=self.pos_cruscotto[0]
+		bg_scritta_trasp_rect.y=self.pos_cruscotto[1]
+		b=tiledtmxloader.helperspygame.SpriteLayer.Sprite(sfondo,bg_scritta_trasp_rect)
+		return b,sfondo
+	
+	def scrivi_cruscotto_blit(self,testi=("hello")):
+		y=0
+		for r in testi:
+			b=self.scritta_trasparente(r)[1]
+			y=y+15
+			self.screen.blit(b,(10,y))
+
 		
 
 	def main(self):		
-		
-			
-			
 		
 		# init pygame and set up a screen
 		world_map = tiledtmxloader.tmxreader.TileMapParser().parse_decode(self.file_mappa)
@@ -89,10 +119,10 @@ class giocatore_animato(giocatore_con_collisioni):
 		self.running_loop = True
 		self.metti_giocatore()
 		if not self.vedi_collisioni:
-			self.scrivi_trasparente_sprite('Collisioni disattivate, livello '+str(self.idx_coll_layer))
-		
-
-		
+			#self.bg_scritta_trasp_rect.top=20
+			scritta_cruscotto=['Collisioni disattivate, livello '+str(self.idx_coll_layer),' ']
+			#self.scrivi_trasparente_sprite(scritta_cruscotto)
+	
 
 		#Inizio while loop
 		while self.running_loop:
@@ -105,6 +135,7 @@ class giocatore_animato(giocatore_con_collisioni):
 			# clear screen, might be left out if every pixel is redrawn anyway
 			self.screen.fill((0, 0, 0))
 			self.render_the_map()
+			self.scrivi_cruscotto_blit(scritta_cruscotto)
 			pygame.display.flip()
 			self.clock.tick(500)
 		
@@ -116,6 +147,7 @@ class giocatore_animato(giocatore_con_collisioni):
 if __name__ == '__main__':
 	pygame.init()
 	oggetto = giocatore_animato()
+	oggetto.playerpos=(100,100)
 
 	oggetto.file_mappa="D:\\games\\tmwa\\maps\\001-2.tmx"
 	oggetto.main()

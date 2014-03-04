@@ -16,6 +16,7 @@ class giocatore_base(mappa_base):
 		self.screen_width=800
 		self.screen_height=600
 		self.layer_giocatore=1
+		self.playerpos=(150,150)
 
 	#  -----------------------------------------------------------------------------
 	def crea_giocatore(self):
@@ -34,8 +35,8 @@ class giocatore_base(mappa_base):
 		self.image_rect=fermo_image.get_rect()
 		self.giocatore_sprite=tiledtmxloader.helperspygame.SpriteLayer.Sprite(fermo_image,self.image_rect)
 		self.sprite_layers[self.layer_giocatore].add_sprite(self.giocatore_sprite)
-		self.giocatore_sprite.rect.x=250
-		self.giocatore_sprite.rect.y=150		
+		self.giocatore_sprite.rect.x=self.playerpos[0]
+		self.giocatore_sprite.rect.y=self.playerpos[1]		
 	#-------------------------------------------------------------------------------
 	def muovi_giocatore(self):
 		if self.cammina:
