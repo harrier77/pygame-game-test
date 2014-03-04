@@ -42,7 +42,7 @@ class miopgumenu():
                         
         def scrivi_html(self):
                 font = pygame.font.SysFont("Verdana", 28)
-                with open ("episod1.html", "r") as myfile:
+                with open ("storia/episod1.html", "r") as myfile:
                     data_html=myfile.read().replace('\n', '')
                 self.doc = html.HTML(data=data_html,width=500,font=font,globals={'menuchiamante':self})
                 self.contenitore.remove(self.voci_menu_contenitore)
