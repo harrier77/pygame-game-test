@@ -8,6 +8,7 @@ class giocatore_animato(giocatore_con_collisioni):
 		self.file_mappa='mappe/mappa_x25.tmx'
 		self.vedi_collisioni=True
 		self.pos_cruscotto=[1,1]
+		self.numero_fps=0
 		
 #-----------------------------------------------------------------------------------	
 
@@ -107,7 +108,7 @@ class giocatore_animato(giocatore_con_collisioni):
 
 		self.screen_width = min(900, world_map.pixel_width)
 		self.screen_height = min(600, world_map.pixel_height)
-		self.screen=self.cambia_pieno_schermo('0')
+		self.screen=self.cambia_pieno_schermo('fullscr')
 		
 		self.vedi_collisioni=False
 		
@@ -126,6 +127,7 @@ class giocatore_animato(giocatore_con_collisioni):
 		self.scritta_cruscotto.append("Posizione personaggio:"+str(self.playerpos))
 		self.scritta_cruscotto.append("Dimensione mappa:"+str(world_map.pixel_width)+"X"+str(world_map.pixel_height))
 		
+		
 		if not self.vedi_collisioni:
 			self.scritta_cruscotto.insert(0,'Collisioni livello '+str(self.idx_coll_layer) +' disattivate' )
 	
@@ -141,9 +143,13 @@ class giocatore_animato(giocatore_con_collisioni):
 			# clear screen, might be left out if every pixel is redrawn anyway
 			self.screen.fill((0, 0, 0))
 			self.render_the_map()
+			numero_fps=self.clock.get_fps()
+			self.scritta_cruscotto.pop(4)
+			self.scritta_cruscotto.insert(4,"Frame per secondo (fps):"+str(int(numero_fps)))
 			self.scrivi_cruscotto_blit(self.scritta_cruscotto)
 			pygame.display.flip()
-			self.clock.tick(500)
+			self.clock.tick(100)
+			
 		
 #EndofCLass------------------------
 

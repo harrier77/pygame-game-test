@@ -114,7 +114,7 @@ class miopgumenu():
                 pygame.init()
                 giallo=255,255,128
                 video=pygame.display.Info()
-                screen_width= video.current_w-3
+                screen_width= video.current_w-2
                 screen_height= video.current_h-2
                 self.screen = pygame.display.set_mode((screen_width,screen_height))
                 background = pygame.Surface(self.screen.get_size())
@@ -164,7 +164,7 @@ class miopgumenu():
                                 app.paint()
                                 
                                 pygame.display.flip()
-                                clock.tick(400)
+                                clock.tick(60)
 
 
 if __name__ == '__main__':

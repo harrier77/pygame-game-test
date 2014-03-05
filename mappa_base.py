@@ -116,6 +116,9 @@ class mappa_base(schermo_base):
 
 #------------------------------------------------------------------
 	def gestione_eventi(self):
+		mousemotions = pygame.event.get(MOUSEMOTION)
+		if mousemotions: #checks if the list is nonempty
+			mousemotion = mousemotions[-1]
 		if not hasattr(self, 'cam_world_pos_x'):
 			self.setta_posizione_camera_iniz()
 			
@@ -130,7 +133,7 @@ class mappa_base(schermo_base):
 					self.running_loop = False
 				elif event.type == pygame.KEYDOWN:
 					self.cammina=True
-					self.fps=round(self.clock.get_fps(),2)
+					#self.fps=round(self.clock.get_fps(),2)
 
 					if event.key == pygame.K_LEFT:
 						self.direction_x =-1
