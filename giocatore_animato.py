@@ -1,4 +1,5 @@
 from giocatore_con_collisioni import *
+from dialogo_base import *
 
 class giocatore_animato(giocatore_con_collisioni):
 	def __init__(self):
@@ -97,8 +98,16 @@ class giocatore_animato(giocatore_con_collisioni):
 			b=self.scritta_trasparente(r)[1]
 			y=y+20
 			self.screen.blit(b,(10,y))
-
-		
+	
+	
+	def predisponi_cruscotto(self,world_map):
+		self.scritta_cruscotto=[]
+		self.scritta_cruscotto.append("Livello giocatore:"+str(self.layer_giocatore))
+		self.scritta_cruscotto.append("File mappa:"+str(self.file_mappa))
+		self.scritta_cruscotto.append("Posizione personaggio:"+str(self.playerpos))
+		self.scritta_cruscotto.append("Dimensione mappa:"+str(world_map.pixel_width)+"X"+str(world_map.pixel_height))
+		if not self.vedi_collisioni:
+			self.scritta_cruscotto.insert(0,'Collisioni livello '+str(self.idx_coll_layer) +' disattivate' )
 
 	def main(self):		
 		
@@ -108,7 +117,7 @@ class giocatore_animato(giocatore_con_collisioni):
 
 		self.screen_width = min(900, world_map.pixel_width)
 		self.screen_height = min(600, world_map.pixel_height)
-		self.screen=self.cambia_pieno_schermo('fullscr')
+		self.screen=self.cambia_pieno_schermo('0')
 		
 		self.vedi_collisioni=False
 		
@@ -121,17 +130,11 @@ class giocatore_animato(giocatore_con_collisioni):
 		self.clock = pygame.time.Clock()
 		self.running_loop = True
 		self.metti_giocatore()
-		self.scritta_cruscotto=[]
-		self.scritta_cruscotto.append("Livello giocatore:"+str(self.layer_giocatore))
-		self.scritta_cruscotto.append("File mappa:"+str(self.file_mappa))
-		self.scritta_cruscotto.append("Posizione personaggio:"+str(self.playerpos))
-		self.scritta_cruscotto.append("Dimensione mappa:"+str(world_map.pixel_width)+"X"+str(world_map.pixel_height))
+		self.predisponi_cruscotto(world_map)
 		
-		
-		if not self.vedi_collisioni:
-			self.scritta_cruscotto.insert(0,'Collisioni livello '+str(self.idx_coll_layer) +' disattivate' )
-	
 
+	
+		mio_dialogo_ogg=mio_dialogo()
 		#Inizio while loop
 		while self.running_loop:
 			self.is_walkable()
@@ -139,7 +142,6 @@ class giocatore_animato(giocatore_con_collisioni):
 			self.muovi_giocatore()
 			self.metti_fotogrammi_giocatore_animato()
 			self.disegna_frecce('sprite')
-			
 			# clear screen, might be left out if every pixel is redrawn anyway
 			self.screen.fill((0, 0, 0))
 			self.render_the_map()
@@ -147,6 +149,12 @@ class giocatore_animato(giocatore_con_collisioni):
 			self.scritta_cruscotto.pop(4)
 			self.scritta_cruscotto.insert(4,"Frame per secondo (fps):"+str(int(numero_fps)))
 			self.scrivi_cruscotto_blit(self.scritta_cruscotto)
+			for event in self.coda_eventi:
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_F4:
+						mio_dialogo_ogg.dialog.open()
+				mio_dialogo_ogg.app.event(event)
+			mio_dialogo_ogg.app.paint()
 			pygame.display.flip()
 			self.clock.tick(100)
 			
