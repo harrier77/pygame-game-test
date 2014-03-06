@@ -20,7 +20,7 @@ class giocatore_con_collisioni(giocatore_base):
 	
 	def is_walkable(self):
 		
-                """
+		"""
 		Just checks if a position in world coordinates is walkable.
 		"""
 		try:
@@ -34,7 +34,7 @@ class giocatore_con_collisioni(giocatore_base):
 		tile_x = int(pos_x // coll_layer.tilewidth)
 		tile_y = int(pos_y // coll_layer.tileheight)
 		
-                if self.ignora_collisioni:
+		if self.ignora_collisioni:
 			return True
 
 		if ((coll_layer.content2D[tile_y][tile_x]) or (coll_layer.content2D[tile_y+3][tile_x] )  or (coll_layer.content2D[tile_y][tile_x+1] )):

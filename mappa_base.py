@@ -216,10 +216,10 @@ class mappa_base(schermo_base):
                 for mio in world_map.layers:
                         if mio.name=="Collision":
                                 self.idx_coll_layer=i
-                                print mio.visible
+                                #print mio.visible
 
                         i=i+1
-                print "layer collisioni ="+str(self.idx_coll_layer)
+                #print "layer collisioni ="+str(self.idx_coll_layer)
 		resources = tiledtmxloader.helperspygame.ResourceLoaderPygame()
 		resources.load(world_map)
 		self.sprite_layers = tiledtmxloader.helperspygame.get_layers_from_map(resources)
