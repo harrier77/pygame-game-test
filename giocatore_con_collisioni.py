@@ -7,10 +7,10 @@ from giocatore_base import *
 
 class giocatore_con_collisioni(giocatore_base):
 	def __init__(self):
-		print "Inizializzazione oggetto giocatore_con_collisioni..."
+		#print "Inizializzazione oggetto giocatore_con_collisioni..."
 		giocatore_base.__init__(self)
-		self.idx_coll_layer=3
-		self.collisioni=True
+		#self.idx_coll_layer=3
+		self.ignora_collisioni=False
 
 	
 	def mybeep(self):
@@ -19,11 +19,13 @@ class giocatore_con_collisioni(giocatore_base):
 		winsound.Beep(Freq,Dur)
 	
 	def is_walkable(self):
-		"""
+		
+                """
 		Just checks if a position in world coordinates is walkable.
 		"""
 		try:
 			coll_layer=self.sprite_layers[self.idx_coll_layer]
+
 		except:
 			#print "livello collisioni" 
 			return True
@@ -31,7 +33,8 @@ class giocatore_con_collisioni(giocatore_base):
 		pos_y=self.giocatore_sprite.rect.y 
 		tile_x = int(pos_x // coll_layer.tilewidth)
 		tile_y = int(pos_y // coll_layer.tileheight)
-		if not self.collisioni:
+		
+                if self.ignora_collisioni:
 			return True
 
 		if ((coll_layer.content2D[tile_y][tile_x]) or (coll_layer.content2D[tile_y+3][tile_x] )  or (coll_layer.content2D[tile_y][tile_x+1] )):
@@ -66,8 +69,8 @@ def main():
 	oggetto = giocatore_con_collisioni()
 
 	giocatore=oggetto.crea_giocatore()
-	
-	world_map = tiledtmxloader.tmxreader.TileMapParser().parse_decode('mappe/mappa_x25.tmx')
+	#oggetto.file_mappa="..\\tmwa\\maps\\001-1.tmx"
+	world_map = tiledtmxloader.tmxreader.TileMapParser().parse_decode('..\\tmwa\\maps\\001-2bis.tmx')
 	assert world_map.orientation == "orthogonal"
 	# init pygame and set up a screen
 

@@ -1,10 +1,6 @@
 import pygame
-
-
-
 from pygame.locals import*
 from sys import exit
-
 from miefunzioni import html
 from miefunzioni import gui
 import os
@@ -23,10 +19,10 @@ class miopgumenu():
                         self.open_file_browser(None)
                 elif param=="uno":
                         self.scrivi_html("episod1.html")
-		elif param=="due":
+                elif param=="due":
                         self.scrivi_html("episod2.html")
-		elif param=="anteprima":
-			scroll.main()
+                elif param=="anteprima":
+                        scroll.main()
         
         def open_file_browser(self,arg):
                 self.schermata=self.screen.copy()
@@ -36,9 +32,7 @@ class miopgumenu():
                 if dlg.value: 
                         self.screen.blit(self.schermata, (0,0))
                         miog=giocatore_animato()
-
-
-                        miog.vedi_collisioni=False
+                        miog.vedi_collisioni=True
                         miog.file_mappa=dlg.value
                         miog.main()
                         
@@ -67,10 +61,10 @@ class miopgumenu():
                 self.ripristina_menu()
                 miog=giocatore_animato()
                 miog.file_mappa="..\\tmwa\\maps\\"+filemappa
-		miog.playerpos=playerpos
+                miog.playerpos=playerpos
                 miog.cam_world_pos_x=playerpos[0]
                 miog.cam_world_pos_y=playerpos[1]
-		
+                
                 miog.main()
 
         def aggiungi_voci_menu(self):
@@ -96,8 +90,8 @@ class miopgumenu():
                 link1 = gui.Link("Apri file")
                 link1.connect(gui.CLICK,self.cliccato,"apri")
                 self.voci_menu_contenitore.add(link1,120,350)
-		
-		link7 = gui.Link("Anteprima mappe")
+
+                link7 = gui.Link("Anteprima mappe")
                 link7.connect(gui.CLICK,self.cliccato,"anteprima")
                 self.voci_menu_contenitore.add(link7,120,400)
                 

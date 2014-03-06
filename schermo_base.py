@@ -48,7 +48,7 @@ def printer(obj, ident=''):
 # --------------------------------------------------------------------------------
 class schermo_base:
 	def __init__(self):
-		print "Inzializzazione oggetto schermo_base..."
+		#print "Inzializzazione oggetto schermo_base..."
 		self.screen_width=800
 		self.screen_height=500
 		self.running_loop=True
@@ -183,7 +183,7 @@ def main():
 
 	screen_width = 900
 	screen_height = 600
-	oggetto.screen=oggetto.cambia_pieno_schermo('0')
+	oggetto.screen=oggetto.cambia_pieno_schermo('fullscr')
 	
 	
 

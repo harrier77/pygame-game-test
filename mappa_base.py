@@ -7,12 +7,12 @@
 
 from schermo_base import *
 
-import winsound
+#import winsound
 from miefunzioni import pyganim
 from pygame.locals import*
 from pygame.time import Clock
 import tiledtmxloader
-import pprint
+#import pprint
 
 #--------------------------
 # Classe ausiliaria per gli oggetti 
@@ -27,7 +27,7 @@ class mio_poligono:
                 self.start_pos_x=250
                 self.start_pos_y=250
                 self.layer=1
-		
+                
                 self.lista_poligoni=[]
                
 
@@ -54,7 +54,7 @@ class mio_poligono:
 class mappa_base(schermo_base):
 	def __init__(self):
 		schermo_base.__init__(self)
-		print "Inzializzazione oggetto mappa_base..."
+		#print "Inzializzazione oggetto mappa_base..."
 		self.renderer = tiledtmxloader.helperspygame.RendererPygame()
 		self.layer_giocatore=1
 		self.corsa=False
@@ -66,8 +66,8 @@ class mappa_base(schermo_base):
 		self.puoi_andare=True
 		self.lista_proiettili=['']
 		self.file_mappa='mappe/mappa_x25.tmx'
-                #self.nocollisioni=False
-                self.cisonopoligoni=False
+		self.nascondi_collisioni=False
+		self.cisonopoligoni=False
 		
 		self.cam_world_pos_x = 350
 		self.cam_world_pos_y = 220
@@ -113,6 +113,24 @@ class mappa_base(schermo_base):
 			self.arrow_new=tiledtmxloader.helperspygame.SpriteLayer.Sprite(arrow1,arrow_rect)
 			self.sprite_layers[1].add_sprite(self.arrow_new)
 			self.lista_proiettili.append(self.arrow_new)
+		
+#------------------------------------------------------------------
+	def verifica_residuale_tasti_premuti(self):
+		keys = pygame.key.get_pressed()
+		if (keys[K_LEFT]):
+			self.cammina=True
+			self.direction_x =-1
+		if (keys[K_RIGHT]):
+			self.cammina=True
+			self.direction_x =1
+		if (keys[K_DOWN]):
+			self.cammina=True
+			self.direction_y =1
+		if (keys[K_UP]):
+			self.cammina=True
+			self.direction_y =-1
+			
+			
 
 #------------------------------------------------------------------
 	def gestione_eventi(self):
@@ -129,12 +147,11 @@ class mappa_base(schermo_base):
 			elif event.type == pygame.USEREVENT:
 				continue
 			elif event.type == pygame.KEYDOWN:
+				#print pygame.key.get_pressed()
 				if event.key == pygame.K_ESCAPE:
 					self.running_loop = False
 				elif event.type == pygame.KEYDOWN:
 					self.cammina=True
-					#self.fps=round(self.clock.get_fps(),2)
-
 					if event.key == pygame.K_LEFT:
 						self.direction_x =-1
 					elif event.key == pygame.K_RIGHT:
@@ -146,9 +163,7 @@ class mappa_base(schermo_base):
 					if event.key in (pygame.K_LSHIFT, pygame.K_RSHIFT):
 						self.corsa=True
 					if event.key == pygame.K_F1:
-						self.mybeep()
-						world_map = tiledtmxloader.tmxreader.TileMapParser().parse_decode('mappe/001-1.tmx')                                        
-						self.carica_mattonelle_in_layers(world_map)
+						pass
 					elif event.key == pygame.K_F2:
 						self.collisioni=False
 					elif event.key == pygame.K_F3:
@@ -166,10 +181,11 @@ class mappa_base(schermo_base):
 				self.corsa=False                
 				self.direction_x=0
 				self.direction_y=0
+			self.verifica_residuale_tasti_premuti()
 			if event.type==pygame.MOUSEBUTTONDOWN:
-				self.lancia_frecce()
-				self.load_sound('suoni/fireball.ogg')
-				print pygame.mouse.get_pos()
+				if pygame.mouse.get_pressed()[2]==1:
+					self.lancia_frecce()
+					self.load_sound('suoni/fireball.ogg')
 			
 		if self.puoi_andare:	
 			if self.cammina:
@@ -196,16 +212,29 @@ class mappa_base(schermo_base):
         def carica_mattonelle_in_layers(self,world_map):
                 #self.setta_posizione_camera_iniz()
                 # load the images of tiles using tiledtmxloader 
+                i=0
+                for mio in world_map.layers:
+                        if mio.name=="Collision":
+                                self.idx_coll_layer=i
+                                print mio.visible
 
+                        i=i+1
+                print "layer collisioni ="+str(self.idx_coll_layer)
 		resources = tiledtmxloader.helperspygame.ResourceLoaderPygame()
-                resources.load(world_map)
-                self.sprite_layers = tiledtmxloader.helperspygame.get_layers_from_map(resources)
+		resources.load(world_map)
+		self.sprite_layers = tiledtmxloader.helperspygame.get_layers_from_map(resources)
 
                 # filter layers
                 #self.sprite_layers = [layer for layer in self.sprite_layers if not layer.is_object_group]
                 if not self.cisonopoligoni:
                         self.sprite_layers = [layer for layer in self.sprite_layers if not layer.is_object_group]
-                
+               
+                if self.nascondi_collisioni:
+                        self.sprite_layers=[layer for layer in self.sprite_layers if not layer.layer_idx==self.idx_coll_layer]
+
+                       
+                    
+                        
                 if self.cisonopoligoni:         
                         self.carica_poligoni()
 #------------------------------------------------------------------
@@ -253,7 +282,7 @@ class mappa_base(schermo_base):
 def main():
 	oggetto = mappa_base()
 
-	oggetto.file_mappa="..\\tmwa\\maps\\004-2.tmx"
+	oggetto.file_mappa="..\\tmwa\\maps\\001-1.tmx"
 	world_map = tiledtmxloader.tmxreader.TileMapParser().parse_decode(oggetto.file_mappa)
 	
 	#world_map=oggetto.togli_collisioni(world_map)

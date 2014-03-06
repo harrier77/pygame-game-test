@@ -3,7 +3,7 @@ from dialogo_base import *
 
 class giocatore_animato(giocatore_con_collisioni):
 	def __init__(self):
-		print "Inizializzazione oggetto giocatore_animato..."
+		#print "Inizializzazione oggetto giocatore_animato..."
 		giocatore_con_collisioni.__init__(self)
 		self.animated_object=self.crea_giocatore_animato()
 		self.file_mappa='mappe/mappa_x25.tmx'
@@ -83,9 +83,6 @@ class giocatore_animato(giocatore_con_collisioni):
 		sfondo.blit(text,(0,0))
 		self.pos_cruscotto[0]=self.playerpos[0]*0.70
 		self.pos_cruscotto[1]=self.playerpos[1]*0.70
-		#self.pos_cruscotto[0]=self.cam_world_pos_x*0.10
-		#self.pos_cruscotto[1]=self.cam_world_pos_y*0.10
-		
 		bg_scritta_trasp_rect=sfondo.get_rect()
 		bg_scritta_trasp_rect.x=self.pos_cruscotto[0]
 		bg_scritta_trasp_rect.y=self.pos_cruscotto[1]
@@ -106,37 +103,50 @@ class giocatore_animato(giocatore_con_collisioni):
 		self.scritta_cruscotto.append("File mappa:"+str(self.file_mappa))
 		self.scritta_cruscotto.append("Posizione personaggio:"+str(self.playerpos))
 		self.scritta_cruscotto.append("Dimensione mappa:"+str(world_map.pixel_width)+"X"+str(world_map.pixel_height))
+		self.scritta_cruscotto.append("Rettangolo giocatore:"+str(self.giocatore_sprite.rect))
 		if not self.vedi_collisioni:
 			self.scritta_cruscotto.insert(0,'Collisioni livello '+str(self.idx_coll_layer) +' disattivate' )
+		else:
+			self.scritta_cruscotto.insert(0,'Collisioni attive su livello '+str(self.idx_coll_layer) +' ')
+
+	def aggiorna_cruscotto(self):
+		numero_fps=self.clock.get_fps()
+		self.scritta_cruscotto.pop(4)
+		self.scritta_cruscotto.insert(4,"Frame per secondo (fps):"+str(int(numero_fps)))
+		self.scritta_cruscotto.pop(5)
+		self.scritta_cruscotto.insert(5,"Rettangolo giocatore:"+str(self.giocatore_sprite.rect))
+		self.scrivi_cruscotto_blit(self.scritta_cruscotto)
+		
 
 	def main(self):		
 		
 		# init pygame and set up a screen
 		world_map = tiledtmxloader.tmxreader.TileMapParser().parse_decode(self.file_mappa)
+		
+		#self.ignora_collisioni=True
+		#self.nascondi_collisioni=True
 		assert world_map.orientation == "orthogonal"
-
 		self.screen_width = min(900, world_map.pixel_width)
 		self.screen_height = min(600, world_map.pixel_height)
 		self.screen=self.cambia_pieno_schermo('0')
-		
-		self.vedi_collisioni=False
-		
+		#self.vedi_collisioni=False
 		if not self.vedi_collisioni:
 			world_map=self.togli_collisioni(world_map)
-		
 		self.carica_mattonelle_in_layers(world_map)
+		#self.sprite_layers[self.idx_coll_layer].visible=False
 
 		# variables for the main loop
 		self.clock = pygame.time.Clock()
 		self.running_loop = True
 		self.metti_giocatore()
 		self.predisponi_cruscotto(world_map)
-		
-
-	
-		mio_dialogo_ogg=mio_dialogo()
+		self.is_cruscotto=False
+		rect=pygame.Rect(100,self.screen_height-50,600,30)
+		mio_dialogo_ogg=mio_dialogo(oggetto_chiamante=self,rect=rect)
 		#Inizio while loop
+		#pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 		while self.running_loop:
+			
 			self.is_walkable()
 			self.gestione_eventi()
 			self.muovi_giocatore()
@@ -145,10 +155,7 @@ class giocatore_animato(giocatore_con_collisioni):
 			# clear screen, might be left out if every pixel is redrawn anyway
 			self.screen.fill((0, 0, 0))
 			self.render_the_map()
-			numero_fps=self.clock.get_fps()
-			self.scritta_cruscotto.pop(4)
-			self.scritta_cruscotto.insert(4,"Frame per secondo (fps):"+str(int(numero_fps)))
-			self.scrivi_cruscotto_blit(self.scritta_cruscotto)
+			if self.is_cruscotto: self.aggiorna_cruscotto()
 			for event in self.coda_eventi:
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_F4:
@@ -159,7 +166,7 @@ class giocatore_animato(giocatore_con_collisioni):
 			self.clock.tick(100)
 			
 		
-#EndofCLass------------------------
+	#EndofCLass------------------------
 
 
 #-----------------------------------------------------------------------------------			
@@ -169,5 +176,5 @@ if __name__ == '__main__':
 	oggetto = giocatore_animato()
 	oggetto.playerpos=(100,100)
 
-	oggetto.file_mappa="..\\tmwa\\maps\\001-2.tmx"
+	oggetto.file_mappa="..\\tmwa\\maps\\001-2bis.tmx"
 	oggetto.main()

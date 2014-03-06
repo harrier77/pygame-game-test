@@ -10,7 +10,7 @@ from mappa_base import *
 
 class giocatore_base(mappa_base):
 	def __init__(self):
-		print "Inizializzazione oggetto giocatore_base..."
+		#print "Inizializzazione oggetto giocatore_base..."
 		mappa_base.__init__(self)
 		# renderer
 		self.screen_width=800

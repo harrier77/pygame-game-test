@@ -10,7 +10,7 @@ import os
 def apri_mappa(nomefile):
 	print nomefile
 	miog=giocatore_animato()
-	miog.vedi_collisioni=False
+	#miog.vedi_collisioni=False
 	miog.file_mappa="..\\tmwa\\maps\\"+nomefile
 	miog.main()
 
