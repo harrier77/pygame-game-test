@@ -1,6 +1,11 @@
 import pygame
 from pygame.locals import*
+import sys
+#sys.path.append("..\\miogummworld") 
+#sys.path.append("..\\miogummworld\\gamelib") 
+sys.path.append("..\\") 
 from sys import exit
+import miefunzioni
 from miefunzioni import html
 from miefunzioni import gui
 from giocatore_animato import *
