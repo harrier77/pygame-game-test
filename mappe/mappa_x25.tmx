@@ -3630,7 +3630,7 @@
    <tile gid="0"/>
   </data>
  </layer>
- <layer name="collisioni" width="60" height="20" visible="0">
+ <layer name="collisioni" width="60" height="20">
   <data>
    <tile gid="65"/>
    <tile gid="65"/>
@@ -4835,7 +4835,8 @@
   </data>
  </layer>
  <objectgroup name="mieioggetti" width="60" height="20">
-  <object name="rettangolo" type="miaprova" x="450" y="225" width="50" height="100"/>
+  <object name="rettangolo1" type="miaprova" x="450" y="225" width="50" height="100"/>
   <object name="quadrato" x="525" y="350" width="75" height="75"/>
+  <object name="Rettangolo" x="45" y="30" width="63" height="41"/>
  </objectgroup>
 </map>
