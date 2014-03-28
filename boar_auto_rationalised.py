@@ -50,9 +50,7 @@ class Cinghiale():
                 self.animObjs['NE'] = self.animObjs['NW'].getCopy()
                 self.animObjs['NE'].flip(True, False)
                 self.animObjs['NE'].makeTransformsPermanent()
-                
-                
-                
+
                 #animObjs['right_run'] = animObjs['left_run'].getCopy()
                 #animObjs['right_run'].flip(True, False)
                 #animObjs['right_run'].makeTransformsPermanent()
@@ -63,9 +61,9 @@ class Cinghiale():
                 # other.
                 self.moveConductor = pyganim.PygConductor(self.animObjs)
 
-               
+#Classe               
 
-class Ciclo():
+class Ciclo(object):
         
         def miotimer(self):
                 print "timer lanciato"
@@ -80,58 +78,85 @@ class Ciclo():
             angolo= geometry.angle_of(pos,mousepos)
             ore=(angolo*100/360)*12
             if ore>100 and ore<200:
-                    print 'NE'
+                    #print 'NE'
                     direzione='NE'
             elif ore>400 and ore<500:
-                    print "SE"
+                    #print "SE"
                     direzione='SE'
             elif ore>700 and ore<800:
-                    print "SW"
+                    #print "SW"
                     direzione='SW'
             elif ore>1000 and ore<1100:
-                    print "NW"
+                    #print "NW"
                     direzione='NW'
             elif ore>1100 or ore<100:
-                    print "N"
+                    #print "N"
                     direzione='back'
             elif ore>500 and ore<700:
-                    print "S"
+                    #print "S"
                     direzione='front'
             elif ore>200 and ore<400:
-                    print "E"
+                    #print "E"
                     direzione='right'
             elif ore>800 and ore<1000:
-                    print "W"
+                    #print "W"
                     direzione='left'
             return direzione
         
         
         def scegli_fotogramma_animazione(self,miocing,direzione):
-                """
-                if len(self.listap)>0:  ##inizia la camminata
-                        pos= self.listap.pop(0)
-                        x,y=pos
-                        miocing.moveConductor.play()"""
+            if len(self.listap)>0:  ##inizia la camminata
+                pos= self.listap.pop(0)
+                self.x,self.y=pos
+                miocing.moveConductor.play()
                 if direzione=='left':
-                    fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()
+                    self.fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()
                 elif direzione=='front':
-                    fotogramma=miocing.animObjs['front_walk'].ritorna_fotogramma()
+                    self.fotogramma=miocing.animObjs['front_walk'].ritorna_fotogramma()
                 elif direzione=='right':
                     #miocing.animObjs['right_walk'].blit(windowSurface, (x, y))
-                    fotogramma=miocing.animObjs['right_walk'].ritorna_fotogramma()
+                    self.fotogramma=miocing.animObjs['right_walk'].ritorna_fotogramma()
                 elif direzione=='back':
                     #miocing.animObjs['back_walk'].blit(windowSurface, (x, y))
-                    fotogramma=miocing.animObjs['back_walk'].ritorna_fotogramma()
+                    self.fotogramma=miocing.animObjs['back_walk'].ritorna_fotogramma()
                 elif direzione=='SW':
-                    fotogramma=miocing.animObjs['SW'].ritorna_fotogramma()
+                    self.fotogramma=miocing.animObjs['SW'].ritorna_fotogramma()
                 elif direzione=='NW':
-                    fotogramma=miocing.animObjs['NW'].ritorna_fotogramma()
+                    self.fotogramma=miocing.animObjs['NW'].ritorna_fotogramma()
                 elif direzione=='SE':
-                    fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
+                    self.fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
                 elif direzione=='NE':
-                    fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
-                return fotogramma
+                    self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
+                return self.fotogramma
         
+        @property
+        def is_walking(self):
+            if len(self.listap)>0:
+                return True
+            else:
+                return False
+        
+        def imposta_posizione_via_mouse(self,event):
+            if event.type==pygame.MOUSEBUTTONDOWN:
+                mousepos=pygame.mouse.get_pos()
+                self.direzione=self.calcola_direzione((self.x,self.y),mousepos)
+                self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=mousepos)
+        
+        def muovi_cinghiale(self,miocing):
+            if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
+                        if self.contatore_destinazioni>len(self.lista_destinazioni)-1: self.contatore_destinazioni=0 ##resetta il contatore della lista delle destinazioni automatiche
+                        self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[self.contatore_destinazioni])
+                        tpos=self.listap[len(self.listap)-1] ##calcola la direzione della destinazione da raggiungere
+                        self.direzione=self.calcola_direzione((self.x,self.y),tpos)
+                        self.contatore_destinazioni=self.contatore_destinazioni+1 ##incrementa il contatore delle destinazioni
+                        self.auto=False ##arresta il cinghiale quando ha fatto una singola camminata
+
+            if self.is_walking: self.scegli_fotogramma_animazione(miocing,self.direzione)
+            if self.lanciato==False: self.miotimer()
+            return self.fotogramma
+            
+            
+            
         def main(self):
                 pygame.init()
                 screen = pygame.display.set_mode((800, 600), 0, 32)
@@ -139,23 +164,21 @@ class Ciclo():
                 miocing=Cinghiale()
                 BGCOLOR = (180, 180, 180)
                 mainClock = pygame.time.Clock()
-                lst_t_pos=[(400,200),(400,300),(500,300),(350,300)]
-                x=100
-                y=100
+                self.lista_destinazioni=[(400,200),(400,300),(500,300),(350,300)]
+                self.x=100
+                self.y=100
                 i_luoghi=0
                 i=0
-                self.listap=calcola_passi(or_pos=(x,y),target_pos=lst_t_pos[i])
+                self.contatore_destinazioni=0
+                self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[i])
                 angolo=1
                 fotogramma=pygame.image.load('animation/boar/boar_left_walk.000.gif')
                 self.auto=True
-                self.is_walking=False
                 self.lanciato=False
-
                 while True:
                     screen.fill(BGCOLOR)
-                    screen.blit(fotogramma, (x, y))
+                    screen.blit(fotogramma, (self.x, self.y))
                     pygame.display.flip()
-                    
                     for event in pygame.event.get(): # event handling loop
                         # handle ending the program
                         if event.type == QUIT:
@@ -169,35 +192,11 @@ class Ciclo():
                                 self.auto=True
                         elif event.type == KEYUP:
                                 pass
-                   
-                        if event.type==pygame.MOUSEBUTTONDOWN:
-                                mousepos=pygame.mouse.get_pos()
-                                print mousepos
-                                direzione=self.calcola_direzione((x,y),mousepos)
-                                self.listap=calcola_passi(or_pos=(x,y),target_pos=mousepos)
-                    if self.auto:
-                        if i>len(lst_t_pos)-1:
-                            i=0
-                        self.listap=calcola_passi(or_pos=(x,y),target_pos=lst_t_pos[i])
-                        tpos=self.listap[len(self.listap)-1]
-                        direzione=self.calcola_direzione((x,y),tpos)
-                        i=i+1
-                        self.auto=False
-                    if len(self.listap)>0:  ##inizia la camminata
-                        pos= self.listap.pop(0)
-                        x,y=pos
-                        miocing.moveConductor.play()
-                        fotogramma=self.scegli_fotogramma_animazione(miocing,direzione)
-                    else:
-                        self.is_walking=False ##segnala finita
-                    
-                    
-                    if self.is_walking==False:
-                        if self.lanciato!=True: self.miotimer()
-                    
+                        self.imposta_posizione_via_mouse(event)
+                    fotogramma=self.muovi_cinghiale(miocing)
                     mainClock.tick(50) # Feel free to experiment with any FPS setting.
 
-    
+#fine della Classe
                     
                     
               
