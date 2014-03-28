@@ -111,6 +111,7 @@ class App_gum(Engine):
                 if coll_invis:self.rendi_invisibili_collisioni()
                 #con questa proprietà le collisioni vengono ignorate
                 self.ignora_collisioni=ign_coll
+                self.corsa=False
                 
                 ## Create the renderer.
                 self.renderer = BasicMapRenderer(tiled_map, max_scroll_speed=State.speed)
@@ -160,7 +161,6 @@ class App_gum(Engine):
         #------------------------------------------------------------------ 
         def draw(self, interp):
                 State.screen.clear()
-               
                 self.renderer.draw_tiles()
                 if State.show_grid:
                     toolkit.draw_grid(self.grid_cache)
@@ -228,30 +228,60 @@ class App_gum(Engine):
                 if (keys[K_UP]):
                         self.camera.target.giocatore_animato=self.animato['back_walk']
                         self.cammina=True
+                
+                self.corsa=False
+                if (keys[K_LSHIFT]):
+                        self.corsa=True
+                        
+                        
+
 
                 #self.cammina=False        
         #------------------------------------------------------------------ 
         
         
         def on_key_down(self, unicode, key, mod):
-                self.cammina=True
-                self.camera_target.moveConductor.play()
+                #print self.corsa
+                
+                #self.camera_target.moveConductor.play()
+
                 if key == K_DOWN:               
+                        self.cammina=True
                         self.camera.target.giocatore_animato=self.animato['front_walk']
                         self.movey += State.speed
+                        if self.corsa: 
+                                self.movey += State.speed
+                                self.camera.target.giocatore_animato=self.animato['front_run']
                 elif key == K_UP: 
+                        self.cammina=True
                         self.camera.target.giocatore_animato=self.animato['back_walk']
                         self.movey += -State.speed
+                        if self.corsa:
+                                self.movey += -State.speed
+                                self.camera.target.giocatore_animato=self.animato['back_run']
                 elif key == K_RIGHT: 
+                        self.cammina=True
                         self.camera.target.giocatore_animato=self.animato['right_walk']
                         self.movex += State.speed
+                        if self.corsa: 
+                                self.camera.target.giocatore_animato=self.animato['right_run']
+                                self.movex += State.speed
                 elif key == K_LEFT: 
+                        self.cammina=True
                         self.camera.target.giocatore_animato=self.animato['left_walk']
                         self.movex += -State.speed
+                        if self.corsa:
+                                self.movex += -State.speed
+                                self.camera.target.giocatore_animato=self.animato['left_run']
+                                
+                
+                        
+                
+                
                 elif key == pygame.K_F4:
                         self.rendi_invisibili_collisioni()
-                        context.pop()
-                        self.__init__()
+                        #context.pop()
+                        #self.__init__()
                         #miodialogo=Mio_dialogo(screen=State.screen,oggetto_chiamante=self)
                         #miodialogo.main(open=True)
                         #pygame.key.set_repeat()
@@ -274,19 +304,17 @@ class App_gum(Engine):
         #------------------------------------------------------------------ 
         def on_key_up(self, key, mod):
                 self.cammina=False
-                #self.camera_target.moveConductor.stop()
+                self.movey =0
+                self.movex =0
                 if key == K_DOWN: 
-                    self.movey -= State.speed
                     self.imm_fermo=Miohero.front_standing
                 elif key == K_UP: 
-                    self.movey -= -State.speed
                     self.imm_fermo=Miohero.back_standing
                 elif key == K_RIGHT: 
-                    self.movex -= State.speed
                     self.imm_fermo=Miohero.right_standing
                 elif key == K_LEFT: 
-                    self.movex -= -State.speed
                     self.imm_fermo=Miohero.left_standing
+
         #------------------------------------------------------------------ 
         def on_quit(self):
                 context.pop()
