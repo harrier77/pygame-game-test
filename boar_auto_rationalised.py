@@ -66,6 +66,18 @@ class Cinghiale():
 
 class MovingBeast(object):
         
+        def __init__(self):
+            self.miocing=Cinghiale()
+            self.lista_destinazioni=[(400,400),(600,200),(500,300),(350,300)]
+            self.x=300
+            self.y=300
+            self.contatore_destinazioni=0
+            self.listap=[]
+            self.auto=False
+            self.lanciato=False
+            fotogramma=pygame.image.load('animation/boar/boar_left_walk.000.gif')
+            self.fotogramma=fotogramma
+        
         def miotimer(self):
                 self.lanciato=True
                 self.auto=False
@@ -151,7 +163,7 @@ class MovingBeast(object):
                 self.direzione=self.calcola_direzione((self.x,self.y),mousepos)
                 self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=mousepos)
         
-        def muovi_cinghiale(self,miocing):
+        def muovi_cinghiale(self):
             if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
                         if self.contatore_destinazioni>len(self.lista_destinazioni)-1: self.contatore_destinazioni=0 ##resetta il contatore della lista delle destinazioni automatiche
                         self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[self.contatore_destinazioni])
@@ -161,13 +173,12 @@ class MovingBeast(object):
                         self.auto=False ##arresta il cinghiale quando ha fatto una singola camminata
                         self.lanciato=False
 
-            if self.is_walking: self.scegli_fotogramma_animazione(miocing,self.direzione)
+            if self.is_walking: self.scegli_fotogramma_animazione(self.miocing,self.direzione)
             #print "lanciato "+str(self.lanciato)
             #print "auto "+str(self.auto)
             #print "is walking "+str(self.is_walking)
             if (self.lanciato==False) and (self.is_walking==False): 
                     self.miotimer()
-
             return self.fotogramma
             
             
@@ -176,26 +187,13 @@ class MovingBeast(object):
                 pygame.init()
                 screen = pygame.display.set_mode((800, 600), 0, 32)
                 pygame.display.set_caption('Cinghiale in movimento')
-                miocing=Cinghiale()
                 BGCOLOR = (180, 180, 180)
                 mainClock = pygame.time.Clock()
-                self.lista_destinazioni=[(400,400),(600,200),(500,300),(350,300)]
-                self.x=300
-                self.y=300
-                i_luoghi=0
-                i=0
-                self.contatore_destinazioni=0
-                #self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[i])
-                self.listap=[]
-                angolo=1
-                fotogramma=pygame.image.load('animation/boar/boar_left_walk.000.gif')
-                self.fotogramma=fotogramma
-                self.auto=False
-                self.lanciato=False
                 while True:
                     screen.fill(BGCOLOR)
+                    fotogramma=self.muovi_cinghiale()
                     screen.blit(fotogramma, (self.x, self.y))
-                    pygame.display.flip()
+
                     for event in pygame.event.get(): # event handling loop
                         # handle ending the program
                         if event.type == QUIT:
@@ -210,15 +208,38 @@ class MovingBeast(object):
                         elif event.type == KEYUP:
                                 pass
                         self.imposta_posizione_via_mouse(event)
-                    fotogramma=self.muovi_cinghiale(miocing)
-                    
+                                        
+                    pygame.display.flip()
                     mainClock.tick(50) # Feel free to experiment with any FPS setting.
 
 #fine della Classe
                     
-                    
+def main():
+    ogg=MovingBeast()
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600), 0, 32)
+    pygame.display.set_caption('Cinghiale in movimento')
+    BGCOLOR = (180, 180, 180)
+    mainClock = pygame.time.Clock()
+    while True:
+        screen.fill(BGCOLOR)
+        fotogramma=ogg.muovi_cinghiale()
+        screen.blit(fotogramma, (ogg.x, ogg.y))
+
+        for event in pygame.event.get(): # event handling loop
+            # handle ending the program
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+                            
+        pygame.display.flip()
+        mainClock.tick(50) # Feel free to experiment with any FPS setting.
               
                     
-
-ciclo=MovingBeast()
-ciclo.main()
+if __name__ == '__main__':
+    ciclo=MovingBeast()
+    main()
