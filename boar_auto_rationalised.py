@@ -10,6 +10,7 @@ from miefunzioni import pyganim
 import gummworld2
 from gummworld2 import geometry
 import threading
+import datetime
 
 def calcola_passi(or_pos=(300,200),target_pos=(200,200)):
 
@@ -63,16 +64,24 @@ class Cinghiale():
 
 #Classe               
 
-class Ciclo(object):
+class MovingBeast(object):
         
         def miotimer(self):
-                print "timer lanciato"
                 self.lanciato=True
-                threading.Timer(10.0, self.avvia).start()
+                self.auto=False
+                adesso= datetime.datetime.time(datetime.datetime.now())
+                print "timer per la pausa del cinghiale partito "+str(adesso)
+                self.timer=threading.Timer(5.0, self.avvia)
+                self.timer.daemon=True  
+                self.timer.start() ##parte il timer che tiene fermo il cinghiale
 
         def avvia(self):
                 self.auto=True
-                self.lanciato=False
+                #self.lanciato=False
+                self.timer.cancel()
+                adesso= datetime.datetime.time(datetime.datetime.now())
+                print "finita pausa del cinghiale..."+str(adesso)
+                
                 
         def calcola_direzione(self,pos,mousepos):
             angolo= geometry.angle_of(pos,mousepos)
@@ -150,9 +159,15 @@ class Ciclo(object):
                         self.direzione=self.calcola_direzione((self.x,self.y),tpos)
                         self.contatore_destinazioni=self.contatore_destinazioni+1 ##incrementa il contatore delle destinazioni
                         self.auto=False ##arresta il cinghiale quando ha fatto una singola camminata
+                        self.lanciato=False
 
             if self.is_walking: self.scegli_fotogramma_animazione(miocing,self.direzione)
-            if self.lanciato==False: self.miotimer()
+            #print "lanciato "+str(self.lanciato)
+            #print "auto "+str(self.auto)
+            #print "is walking "+str(self.is_walking)
+            if (self.lanciato==False) and (self.is_walking==False): 
+                    self.miotimer()
+
             return self.fotogramma
             
             
@@ -164,16 +179,18 @@ class Ciclo(object):
                 miocing=Cinghiale()
                 BGCOLOR = (180, 180, 180)
                 mainClock = pygame.time.Clock()
-                self.lista_destinazioni=[(400,200),(400,300),(500,300),(350,300)]
-                self.x=100
-                self.y=100
+                self.lista_destinazioni=[(400,400),(600,200),(500,300),(350,300)]
+                self.x=300
+                self.y=300
                 i_luoghi=0
                 i=0
                 self.contatore_destinazioni=0
-                self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[i])
+                #self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[i])
+                self.listap=[]
                 angolo=1
                 fotogramma=pygame.image.load('animation/boar/boar_left_walk.000.gif')
-                self.auto=True
+                self.fotogramma=fotogramma
+                self.auto=False
                 self.lanciato=False
                 while True:
                     screen.fill(BGCOLOR)
@@ -194,6 +211,7 @@ class Ciclo(object):
                                 pass
                         self.imposta_posizione_via_mouse(event)
                     fotogramma=self.muovi_cinghiale(miocing)
+                    
                     mainClock.tick(50) # Feel free to experiment with any FPS setting.
 
 #fine della Classe
@@ -202,5 +220,5 @@ class Ciclo(object):
               
                     
 
-ciclo=Ciclo()
+ciclo=MovingBeast()
 ciclo.main()
