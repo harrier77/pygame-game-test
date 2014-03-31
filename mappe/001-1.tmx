@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="10" height="10" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="minimap" value="graphics/minimaps/001-1.png"/>
+  <property name="music" value="Faith.ogg"/>
+  <property name="name" value="Tulimshar"/>
+ </properties>
+ <tileset firstgid="1" name="Desert1" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/desert1.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="257" name="Desert2" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/desert2.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="513" name="Desert x2" tilewidth="32" tileheight="64">
+  <image source="graphics/tiles/desert_x2.png" width="512" height="64"/>
+ </tileset>
+ <tileset firstgid="529" name="Desert x3" tilewidth="32" tileheight="96">
+  <image source="graphics/tiles/desert_x3.png" width="512" height="96"/>
+ </tileset>
+ <tileset firstgid="545" name="Desert x5" tilewidth="32" tileheight="160">
+  <image source="graphics/tiles/desert_x5.png" width="192" height="160"/>
+ </tileset>
+ <tileset firstgid="551" name="Tulimshar1" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/tulimshar1.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="807" name="Trans woodland desert" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/trans_woodland-desert.png" width="512" height="256"/>
+ </tileset>
+ <tileset firstgid="935" name="Tic-Tac-Toe" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/tictactoe.png" width="128" height="96"/>
+ </tileset>
+ <tileset firstgid="947" name="Collision" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/collision.png" width="64" height="32"/>
+ </tileset>
+ <layer name="Ground" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxLY2RgACKCOG2A1E0BEqFE4BYgLiUCD5Q/yohUBwB4UwvX
+  </data>
+ </layer>
+ <layer name="Fringe" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYMANOJkgdDkTHkVIoB1NnSKQr4RFrzsTQk6ZAJtYIARUK8xEmFYBYlUgViPApgQwAvUzkWAGst0A7soF0w==
+  </data>
+ </layer>
+ <layer name="Over" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYKA9UGaigyXDBAAALOoAJg==
+  </data>
+ </layer>
+ <layer name="Collision" width="10" height="10" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJzbwszAsIVITAiQqw6XHlrai8t+WvqXGAwAPIocmQ==
+  </data>
+ </layer>
+ <objectgroup name="Objects" width="10" height="10">
+  <object name="Pozzo" x="179" y="243" width="31" height="19">
+   <properties>
+    <property name="proprieta" value="12"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
