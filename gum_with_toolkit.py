@@ -55,7 +55,7 @@ class Avatar(model.Object):
 
 class App(Engine):
     
-    def __init__(self, resolution=(1200,600)):
+    def __init__(self, resolution=(800,600)):
         resolution = Vec2d(resolution)
         
         ## Load Tiled TMX map, then update the world's dimensions.

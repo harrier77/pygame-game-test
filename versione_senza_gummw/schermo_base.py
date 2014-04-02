@@ -185,7 +185,7 @@ def main():
 
 	screen_width = 900
 	screen_height = 600
-	oggetto.screen=oggetto.cambia_pieno_schermo('fullscr')
+	oggetto.screen=oggetto.cambia_pieno_schermo('0')
 	
 	
 

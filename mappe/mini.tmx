@@ -61,5 +61,33 @@
   <object name="inizio" x="103" y="139" width="24" height="22">
    <ellipse/>
   </object>
+  <object name="cinghiale" type="linea" x="164" y="166">
+   <properties>
+    <property name="durata_pausa" value="5000"/>
+    <property name="id" value="1"/>
+   </properties>
+   <polyline points="-9,18 -16,65 34,73"/>
+  </object>
+  <object name="cinghiale" type="linea" x="115" y="330">
+   <properties>
+    <property name="durata_pausa" value="2500"/>
+    <property name="id" value="2"/>
+   </properties>
+   <polyline points="-9,18 -16,65 34,73"/>
+  </object>
+  <object name="cinghiale" type="linea" x="509" y="81">
+   <properties>
+    <property name="durata_pausa" value="1500"/>
+    <property name="id" value="3"/>
+   </properties>
+   <polyline points="-9,18 -16,65 34,73"/>
+  </object>
+  <object name="cinghiale" type="linea" x="526" y="469">
+   <properties>
+    <property name="durata_pausa" value="5500"/>
+    <property name="id" value="4"/>
+   </properties>
+   <polyline points="-9,18 -16,65 34,73"/>
+  </object>
  </objectgroup>
 </map>

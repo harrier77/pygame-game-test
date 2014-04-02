@@ -32,7 +32,7 @@ module there is a pygame specific loader and renderer.
 #     * 1.2.3.5 instead of 1.2-r5 (commercial distribution with many bug fixes)
 
 
-__revision__ = "$Rev: 115 $"
+__revision__ = "$Rev$"
 __version__ = "3.0.0." + __revision__[6:-2]
 __author__ = 'DR0ID @ 2009-2011'
 
@@ -92,12 +92,16 @@ class ResourceLoaderPygame(tmxreader.AbstractResourceLoader):
         # if the image size does not match a multiple of tile_width or
         # tile_height it will mess up the number of tiles resulting in
         # wrong GID's for the tiles
-        width = (width // tile_width) * tile_width
-        height = (height // tile_height) * tile_height
+        # ISSUE 19
+        # considering spacing too
+        tile_width_spacing = tile_width + spacing
+        width = (width // tile_width_spacing) * tile_width_spacing
+        tile_height_spacing = tile_height + spacing
+        height = (height // tile_height_spacing) * tile_height_spacing
         images = []
-        for ypos in range(margin, height, tile_height + spacing):
-            for xpos in range(margin, width, tile_width + spacing):
-                img_part = self._load_image_part(filename, xpos, ypos, \
+        for y_pos in range(margin, height, tile_height_spacing):
+            for x_pos in range(margin, width, tile_width_spacing):
+                img_part = self._load_image_part(filename, x_pos, y_pos, \
                                             tile_width, tile_height, colorkey)
                 images.append(img_part)
         return images
@@ -270,9 +274,9 @@ class SpriteLayer(object):
 
                     self.content2D[ypos_new][xpos_new] = sprite
         self.bottom_margin = self._bottom_margin
-        #if __debug__:
-            #print('%s: Sprite Cache hits: %d' % \
-                                #(self.__class__.__name__, _img_cache["hits"]))
+        if __debug__:
+            print('%s: Sprite Cache hits: %d' % \
+                                (self.__class__.__name__, _img_cache["hits"]))
         del _img_cache
 
     def get_collapse_level(self):
@@ -963,11 +967,7 @@ class RendererPygame(object):
 
             tile_h = layer.tileheight
 
-                        # self.paralax_factor_y = 1.0
-            # self.paralax_center_x = 0.0
             cam_rect = self._render_cam_rect
-            # print 'cam rect:', self._cam_rect
-            # print 'render r:', self._render_cam_rect
 
             cam_world_pos_x = cam_rect.left * layer.paralax_factor_x + \
                                                                 layer.position_x
@@ -1057,7 +1057,7 @@ class RendererPygame(object):
             pass
         else:
             world_pos_x, world_pos_y = \
-                                   self.get_world_pos(layer, screen_x, screen_y)
+                                   self.screen_to_world(layer, screen_x, screen_y)
 
             tile_x = int(world_pos_x / layer.tilewidth)
             tile_y = int(world_pos_y / layer.tileheight)
@@ -1091,14 +1091,14 @@ class RendererPygame(object):
             pass
         else:
             world_pos_x, world_pos_y = \
-                                self.get_world_pos(layer, screen_x, screen_y)
+                                self.screen_to_world(layer, screen_x, screen_y)
 
             r = pygame.Rect(world_pos_x, world_pos_y, 1, 1)
             indices = r.collidelistall(layer.sprites)
             return [layer.sprites[idx] for idx in indices]
         return []
 
-    def get_world_pos(self, layer, screen_x, screen_y):
+    def screen_to_world(self, layer, screen_x, screen_y):
         """
         Returns the world coordinates for the given screen location and layer.
 
@@ -1124,7 +1124,257 @@ class RendererPygame(object):
 
 #  -----------------------------------------------------------------------------
 
+class IsometricRendererPygame(RendererPygame):
+    """
+    Isometric renderer.
+    
+    :Warning: !!EXPERIMENTAL!!
+    """
 
 
+    def render_layer(self, surf, layer, clip_sprites=True, \
+                                    sort_key=lambda spr: spr.get_draw_cond()):
+        """
+        Renders a layer onto the given surface.
+
+        :Parameters:
+            surf : Surface
+                Surface to render onto.
+            layer : SpriteLayer
+                The layer to render. Invisible layers will be skipped.
+            clip_sprites : boolean
+                Optional, defaults to True. Clip the sprites of this layer to
+                only draw the ones intersecting the visible part of the world.
+            sort_key : function
+                Optional: The sort function for the parameter 'key' of the sort
+                method of the list.
+
+        """
+        if layer.visible:
+
+            if layer.is_object_group:
+                return
+
+            if layer.bottom_margin > self._margin[3]:
+                left, right, top, bottom = self._margin
+                self.set_camera_margin(left, right, top, layer.bottom_margin)
+
+            # optimizations
+            surf_blit = surf.blit
+            layer_content2D = layer.content2D
+
+            tile_h = layer.tileheight
+
+                        # self.paralax_factor_y = 1.0
+            # self.paralax_center_x = 0.0
+            cam_rect = self._render_cam_rect
+            # print 'cam rect:', self._cam_rect
+            # print 'render r:', self._render_cam_rect
+
+            cam_world_pos_x = cam_rect.centerx * layer.paralax_factor_x + \
+                                                                layer.position_x
+            cam_world_pos_y = cam_rect.centery * layer.paralax_factor_y + \
+                                                                layer.position_y
+
+            # cam_world_pos_x, cam_world_pos_y = 0, 0
+            cam_world_pos_x, cam_world_pos_y = self.world_to_screen(layer, cam_world_pos_x / layer.tilewidth, cam_world_pos_y / layer.tileheight, surf.get_size(), cam_world_pos_x, cam_world_pos_y)
+            cam_world_pos_x -= surf.get_size()[0] // 2
+            cam_world_pos_y -= surf.get_size()[1] // 2
+
+            # cam_world_pos_x -= cam_rect.width // 2
+            # cam_world_pos_y -= cam_rect.height // 2
+            # print("0,0", self.world_to_screen(layer, 0, 0))
+            # cam_world_pos_x = 0
+            # cam_world_pos_y = 0
+            print("cam pos:", cam_world_pos_x, cam_world_pos_y, cam_rect, cam_rect.center)
+
+            # camera bounds, restricting number of tiles to draw
+            # left = int(round(float(cam_world_pos_x) // layer.tilewidth))
+            # right = int(round(float(cam_world_pos_x + cam_rect.width) // \
+                                            # layer.tilewidth)) + 1
+            # top = int(round(float(cam_world_pos_y) // tile_h))
+            # bottom = int(round(float(cam_world_pos_y + cam_rect.height) // \
+                                            # tile_h)) + 1
+
+            # left = left if left > 0 else 0
+            # right = right if right < layer.num_tiles_x else layer.num_tiles_x
+            # top = top if top > 0 else 0
+            # bottom = bottom if bottom < layer.num_tiles_y else layer.num_tiles_y
+
+            left = 0
+            right = layer.num_tiles_x
+            top = 0
+            bottom = layer.num_tiles_y
+
+            # sprites
+            spr_idx = 0
+            len_sprites = 0
+            all_sprites = layer.sprites
+            if all_sprites:
+                # TODO: make filter visible sprites optional (maybe sorting too)
+                # use a marging around it
+                if clip_sprites:
+                    sprites = [all_sprites[idx] \
+                                for idx in cam_rect.collidelistall(all_sprites)]
+                else:
+                    sprites = all_sprites
+
+                # could happend that all sprites are not visible by the camera
+                if sprites:
+                    if sort_key:
+                        sprites.sort(key=sort_key)
+                    sprite = sprites[0]
+                    len_sprites = len(sprites)
+
+            half_tile_width = layer.tilewidth // 2
+            half_tile_height = tile_h // 2
+
+            # render
+            for ypos in range(top, bottom):
+                # draw sprites in this layer
+                # (skip the ones outside visible area/map)
+                y = ypos + 1
+                while spr_idx < len_sprites and sprite.get_draw_cond() <= \
+                                                                    y * tile_h:
+                    # surf_blit(sprite.image, \
+                                # ( sprite.rect.left // 2 - ypos * half_tile_width - cam_world_pos_x, \
+                                  # sprite.rect.top // 2 + sprite.rect.left // half_tile_width * half_tile_height - cam_world_pos_y), \
+                                  # # sprite.rect.top // 2 + sprite.rect.left // half_tile_width * half_tile_height - cam_world_pos_y), \
+                                # sprite.source_rect, \
+                                # sprite.flags)
+                    sx, sy = self.world_to_screen(layer, 1.0 * sprite.rect.left / layer.tilewidth, \
+                                                         # 1.0 * (sprite.rect.top - sprite.z) / layer.tileheight, surf.get_size(), cam_world_pos_x, cam_world_pos_y)
+                                                         1.0 * (sprite.rect.bottom) / layer.tileheight, surf.get_size(), cam_world_pos_x, cam_world_pos_y)
+                    print("hero: ", sx, sy, sprite.rect, sprite.z)
+                    surf_blit(sprite.image, \
+                                # (sx, sy), \
+                                (sx - cam_world_pos_x, \
+                                 sy - cam_world_pos_y - sprite.z - sprite.rect.height), \
+                                sprite.source_rect, \
+                                sprite.flags)
+                    spr_idx += 1
+                    if spr_idx < len_sprites:
+                        sprite = sprites[spr_idx]
+                # next line of the map
+                for xpos in range(left, right):
+                    tile_sprite = layer_content2D[ypos][xpos]
+                    # print '?', xpos, ypos, tile_sprite
+                    if tile_sprite:
+                        # surf_blit(tile_sprite.image, \
+                                    # ( tile_sprite.rect.left // 2 - ypos * half_tile_width - cam_world_pos_x, \
+                                      # tile_sprite.rect.top // 2 + xpos * half_tile_height - cam_world_pos_y), \
+                                      # tile_sprite.source_rect, \
+                                    # tile_sprite.flags)
+                        sx, sy = self.world_to_screen(layer, xpos, ypos, surf.get_size(), cam_world_pos_x, cam_world_pos_y)
+                        # sx, sy = self.world_to_screen(layer, tile_sprite.rect.left, tile_sprite.rect.top)
+                        surf_blit(tile_sprite.image, \
+                                    ( sx - cam_world_pos_x, \
+                                      sy - cam_world_pos_y), \
+                                      tile_sprite.source_rect, \
+                                    tile_sprite.flags)
+        pygame.draw.line(surf, (255, 255, 0), (surf.get_size()[0] // 2, 0), (surf.get_size()[0] // 2, surf.get_size()[1]), 1)
+        pygame.draw.line(surf, (255, 255, 0), (0, surf.get_size()[1] // 2), (surf.get_size()[0], surf.get_size()[1] // 2), 1)
+
+        pygame.draw.line(surf, (255, 0, 0), (self._render_cam_rect.centerx // 2, 0), (self._render_cam_rect.centerx // 2, surf.get_size()[1]), 1)
+        pygame.draw.line(surf, (255, 0, 0), (0, self._render_cam_rect.centery // 2), (surf.get_size()[0], self._render_cam_rect.centery // 2), 1)
+
+    def pick_layer(self, layer, screen_x, screen_y):
+        """
+        Returns the sprite at the given screen position or None regardless of
+        the layers visibility.
+
+        :Note: This does not work wir object group layers.
+
+        :Parameters:
+            layer : SpriteLayer
+                the layer to pick from
+            screen_x : int
+                The screen position in x direction.
+            screen_y : int
+                The screen position in y direction.
+
+        :Returns:
+            None if there is no sprite or the sprite
+            (SpriteLayer.Sprite instance).
+        """
+        if layer.is_object_group:
+            pass
+        else:
+            world_pos_x, world_pos_y = \
+                                   self.screen_to_world(layer, screen_x, screen_y)
+
+            tile_x = int(world_pos_x / layer.tilewidth)
+            tile_y = int(world_pos_y / layer.tileheight)
+
+            if 0 <= tile_x < layer.num_tiles_x and \
+               0 <= tile_y < layer.num_tiles_y:
+                sprite = layer.content2D[tile_y][tile_x]
+                if sprite:
+                    return sprite
+        return None
+
+    def pick_layers_sprites(self, layer, screen_x, screen_y):
+        """
+        Returns the sprites at the given screen positions or an empty list.
+        The sprites are the same order as in the layers.sprites list.
+
+        :Note: This does not work wir object group layers.
+
+        :Parameters:
+            layer : SpriteLayer
+                the layer to pick from
+            screen_x : int
+                The screen position in x direction.
+            screen_y : int
+                The screen position in y direction.
+
+        :Returns:
+            A list of sprites or an empty list.
+        """
+        if layer.is_object_group:
+            pass
+        else:
+            world_pos_x, world_pos_y = \
+                                self.screen_to_world(layer, screen_x, screen_y)
+
+            r = pygame.Rect(world_pos_x, world_pos_y, 1, 1)
+            indices = r.collidelistall(layer.sprites)
+            return [layer.sprites[idx] for idx in indices]
+        return []
+
+    def screen_to_world(self, layer, screen_x, screen_y):
+        """
+        Returns the world coordinates for the given screen location and layer.
+
+        :Note:
+            this is important so one can check which entity is there in the
+            model (knowing which sprite is there does not help much)
+
+        :Parameters:
+            layer : SpriteLayer
+                the layer to pick from
+            screen_x : int
+                The screen position in x direction.
+            screen_y : int
+                The screen position in y direction.
+
+        :Returns:
+            Tuple of world coordinates: (world_x, world_y)
+
+        """
+        # TODO: also use layer.x and layer.y offset
+        return (screen_x + self._render_cam_rect.x * layer.paralax_factor_x, \
+                screen_y + self._render_cam_rect.y * layer.paralax_factor_y)
+
+    def world_to_screen(self, layer, world_x, world_y, screen_size, cam_w_pos_x, cam_w_pos_y):
+        """
+        TODO:
+        """
+        origin_x = 0 * layer.tileheight * layer.tilewidth // 2
+        # origin_x -= layer.tilewidth // 2
+        # print("world -> screen", world_x, world_y, ( (world_x - world_y) * layer.tilewidth / 2.0 + origin_x, \
+                 # (world_x + world_y) * layer.tileheight / 2.0))
+        return ( (world_x - world_y) * layer.tilewidth / 2.0 + origin_x, \
+                 (world_x + world_y) * layer.tileheight / 2.0)
 
 
