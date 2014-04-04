@@ -27,7 +27,7 @@ It loads the \*.tmx files produced by Tiled.
 #     * 1.2.3.0 instead of 1.2-r (commercial distribution)
 #     * 1.2.3.5 instead of 1.2-r5 (commercial distribution with many bug fixes)
 
-__revision__ = "$Rev: 397 $"
+__revision__ = "$Rev: 115 $"
 __version__ = "3.1.0." + __revision__[6:-2]
 __author__ = 'DR0ID @ 2009-2011'
 
@@ -53,6 +53,7 @@ except:
 import os.path
 import struct
 import array
+from miovar_dump import miovar_dump
 
 #  -----------------------------------------------------------------------------
 class TileMap(object):
@@ -120,6 +121,7 @@ class TileMap(object):
         self.named_layers = {} # {name: layer}
         self.named_tile_sets = {} # {name: tile_set}
         self.map_file_name = ""
+
 
     def convert(self):
         """
@@ -507,6 +509,7 @@ class MapObject(object):
         self.image_source = None
         self.image = None
         self.properties = {} # {name: value}
+        self.mypoints_list=[]
 
 #  -----------------------------------------------------------------------------
 def decode_base64(in_str):
@@ -700,12 +703,24 @@ class TileMapParser(object):
         object_group = MapObjectGroupLayer()
         self._set_attributes(object_group_node,  object_group)
         for node in self._get_nodes(object_group_node.childNodes, 'object'):
+            
+            #small hack to add points of polyline to tiled_object stored in world_map 
+            try: 
+                mypoints= node.getElementsByTagName('polyline')[0].attributes['points'].value
+                mypoints_list=mypoints.split()
+            except:
+                #print "not a line"
+                mypoints_list=[]
             tiled_object = MapObject()
+            tiled_object.mypoints_list=mypoints_list
+            #end of code change
+            
             self._set_attributes(node, tiled_object)
             for img_node in self._get_nodes(node.childNodes, 'image'):
                 tiled_object.image_source = \
                                         img_node.attributes['source'].nodeValue
             object_group.objects.append(tiled_object)
+
         # ISSUE 9
         world_map.layers.append(object_group)
 
@@ -731,6 +746,7 @@ class TileMapParser(object):
                 except KeyError:
                     props[property_node.attributes['name'].nodeValue] = \
                                             property_node.lastChild.nodeValue
+        
         obj.properties.update(props)
 
 

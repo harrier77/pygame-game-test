@@ -17,6 +17,7 @@ from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim
 from librerie import miovar_dump
 from boar_auto_no_thread import calcola_passi,Beast,MovingBeast
+from miovar_dump import *
 
 #-------------------------------------------------------------------------------
 class Miohero(model.Object):
@@ -102,10 +103,14 @@ class App_gum(Engine):
                 tiled_map = TiledMap(dir+mappa)
                 
                 ##carica in una lista i lvelli degli oggetti 
+                i=0
                 self.lista_oggetti=list()
                 for L in tiled_map.layers: 
-                        if L.is_object_group : 
+                        if L.is_object_group :
+                                for polig in tiled_map.raw_map.layers[i].objects:
+                                        L.objects.objects[i].properties['points']=polig.mypoints_list
                                 self.lista_oggetti.append(L)
+                        i=i+1
                 ##fine
                 
                 ## Save special layers.
