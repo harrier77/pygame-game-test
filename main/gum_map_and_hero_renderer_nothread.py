@@ -15,9 +15,10 @@ import cProfile, pstats
 from gummworld2 import context, data, model, geometry, toolkit
 from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim
-from librerie import miovar_dump
+
 from boar_auto_no_thread import calcola_passi,Beast,MovingBeast
 from miovar_dump import *
+DEBUG=False
 
 #-------------------------------------------------------------------------------
 class Miohero(model.Object):
@@ -103,16 +104,15 @@ class App_gum(Engine):
                 tiled_map = TiledMap(dir+mappa)
                 
                 ##carica in una lista i lvelli degli oggetti 
-                i=0
                 self.lista_oggetti=list()
+                
                 for L in tiled_map.layers: 
                         if L.is_object_group :
-                                for polig in tiled_map.raw_map.layers[i].objects:
-                                        L.objects.objects[i].properties['points']=polig.mypoints_list
                                 self.lista_oggetti.append(L)
-                        i=i+1
                 ##fine
-                
+                ##l'attr lista_oggetti in realtà è una lista dei layer con oggetti, che spesso è uno solo
+                self.prima_lista_ogg=self.lista_oggetti[0].objects.objects
+
                 ## Save special layers.
                 self.all_groups = tiled_map.layers[:]
                 self.avatar_group = tiled_map.layers[1]
@@ -126,16 +126,17 @@ class App_gum(Engine):
                 hero_ini_pos=100,100
                 cinghiale_ini_pos=(251,483)
                 dict_cinghiali={}
-                for O in self.lista_oggetti[0].objects.objects:
+                for O in self.prima_lista_ogg:
                         if O.name=="Inizio":
                                 hero_ini_pos= O.rect.x,O.rect.y
                         if O.name=="cinghiale":
                                 cinghiale_ini_pos=O.rect.x,O.rect.y
                                 cinghiale = {'pos': cinghiale_ini_pos, 'id': O.properties['id'],'durata_pausa':int(O.properties['durata_pausa'])}
+                                cinghiale['points']=O.properties['points']
                                 id= int(cinghiale.get('id'))
                                 pos=cinghiale['pos']
                                 dict_cinghiali[id]=cinghiale
-                
+   
                 self.cammina=False        
                 ## The avatar is also the camera target.
                 self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self)
@@ -144,7 +145,8 @@ class App_gum(Engine):
                        pos_beast= dict_cinghiali[i]['pos']
                        durata_pausa=dict_cinghiali[i]['durata_pausa']
                        id=dict_cinghiali[i]['id']
-                       beast=MovingBeast(pos_beast,durata_pausa,id)
+                       points=dict_cinghiali[i]['points']
+                       beast=MovingBeast(pos_beast,durata_pausa,id,points)
                        beast.debug=miodebug
                        self.lista_beast.append(beast)
                 #self.beast=MovingBeast(cinghiale_ini_pos)
@@ -370,14 +372,14 @@ class App_gum(Engine):
         #------------------------------------------------------------------ 
         def on_mouse_button_up(self, pos, button):
                 self.mouse_down = False
-        
+        """
         def on_user_event(self,e):
             print "evento in main"
             #self.beast.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale()
             for beast in self.lista_beast:
                 if e.type==USEREVENT+1:
                     beast.auto=True
-
+        """
         #------------------------------------------------------------------ 
         def on_key_up(self, key, mod):
                 self.cammina=False
@@ -415,6 +417,6 @@ def miomain(debug=True):
         
 
 if __name__ == '__main__':
-        miomain()
+        miomain(debug=DEBUG)
         
      

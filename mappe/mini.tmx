@@ -52,6 +52,7 @@
    eJxjYBh8YAvz0DZ/pAHk8CTEJibsiTGPkD56AFL9Sor7SfH3QACQm2jpxoGMy+EMAC3HESk=
   </data>
  </layer>
+ 
  <objectgroup name="Objects" width="20" height="19">
   <object name="Pozzo" x="339" y="403" width="31" height="19">
    <properties>
@@ -61,33 +62,41 @@
   <object name="inizio" x="103" y="139" width="24" height="22">
    <ellipse/>
   </object>
-  <object name="cinghiale" type="linea" x="164" y="166">
+  
+  <object name="cinghiale" type="linea" x="111" y="188">
    <properties>
-    <property name="durata_pausa" value="5000"/>
+    <property name="durata_pausa" value="2000"/>
     <property name="id" value="1"/>
    </properties>
-   <polyline points="-9,18 -16,65 34,73"/>
+   <polyline points="100,100 0,344 484,343 371,229 466,133 369,38 492,11 303,-91 19,-94 0,-1"/>
   </object>
-  <object name="cinghiale" type="linea" x="115" y="330">
-   <properties>
-    <property name="durata_pausa" value="2500"/>
+  <object name="cinghiale" x="17" y="254">
+  <properties>
+    <property name="durata_pausa" value="2000"/>
     <property name="id" value="2"/>
    </properties>
-   <polyline points="-9,18 -16,65 34,73"/>
+   <polyline points="3,3 15,122 126,118 119,0 53,-98 70,68 3,-148 117,-217 324,-214"/>
   </object>
-  <object name="cinghiale" type="linea" x="509" y="81">
-   <properties>
-    <property name="durata_pausa" value="1500"/>
+  <object name="cinghiale" x="75" y="577">
+  <properties>
+    <property name="durata_pausa" value="2000"/>
     <property name="id" value="3"/>
    </properties>
-   <polyline points="-9,18 -16,65 34,73"/>
+   <polyline points="3,3 478,4"/>
   </object>
-  <object name="cinghiale" type="linea" x="526" y="469">
-   <properties>
-    <property name="durata_pausa" value="5500"/>
+  <object name="cinghiale" x="606" y="51">
+  <properties>
+    <property name="durata_pausa" value="2000"/>
     <property name="id" value="4"/>
    </properties>
-   <polyline points="-9,18 -16,65 34,73"/>
+   <polyline points="3,3 -2,397"/>
+  </object>
+  <object name="cinghiale" x="202" y="480">
+  <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="7"/>
+   </properties>
+   <polyline points="3,3 211,-3"/>
   </object>
  </objectgroup>
 </map>

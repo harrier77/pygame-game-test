@@ -709,10 +709,12 @@ class TileMapParser(object):
                 mypoints= node.getElementsByTagName('polyline')[0].attributes['points'].value
                 mypoints_list=mypoints.split()
             except:
-                #print "not a line"
                 mypoints_list=[]
             tiled_object = MapObject()
-            tiled_object.mypoints_list=mypoints_list
+            mypoints_tup_list=[]
+            for couple in mypoints_list:
+                    mypoints_tup_list.append(eval("("+couple+")"))
+            tiled_object.properties['points']=mypoints_tup_list
             #end of code change
             
             self._set_attributes(node, tiled_object)

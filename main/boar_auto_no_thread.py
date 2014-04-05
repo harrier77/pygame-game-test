@@ -20,10 +20,11 @@ import datetime
 from pygame.sprite import Sprite
 
 
-evento_timer = USEREVENT
+#evento_timer = USEREVENT
+
 
 def calcola_passi(or_pos=(300,200),target_pos=(200,200)):
-
+        
         distanza=int(geometry.distance(or_pos,target_pos))
         lista_posizioni=[]
         for progress_distance in range(1,distanza):  
@@ -78,13 +79,17 @@ class Beast():
 #Inizio Classe               
 class MovingBeast(model.Object):
         debug=True
-        def __init__(self,position=(100,100),durata_pausa=4000,id=1,):
+        def __init__(self,position=(100,100),durata_pausa=4000,id=1,points=(())):
                 model.Object.__init__(self)
                 self.miocing=Beast()
                 self.id=id
                 self.x=position[0]
                 self.y=position[1]
-                self.lista_destinazioni=self.comp_lista_destinazioni(self.x,self.y)
+                #points = [(3,3), (200,200)]
+                if points:
+                    self.lista_destinazioni=self.calcola_points(points,position)
+                else:
+                    self.lista_destinazioni=self.comp_lista_destinazioni(self.x,self.y)
                 self.contatore_destinazioni=0
                 self.listap=[]
                 self.auto=True
@@ -94,6 +99,16 @@ class MovingBeast(model.Object):
                 self.miocing.moveConductor.play()
                 self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
                 self.durata_pausa=durata_pausa
+        
+        def calcola_points(self,points,position):
+                real_points=[]
+                for singlepos in points:
+                    newx=position[0]+singlepos[0]
+                    newy=position[1]+singlepos[1]
+                    couple=(newx,newy)
+                    real_points.append(couple)
+                return real_points
+
  
         def comp_lista_destinazioni(self,x,y):
                 lista_destinazioni=[]
@@ -121,13 +136,15 @@ class MovingBeast(model.Object):
                 #self.timer.daemon=True  
                 #self.timer.start() ##parte il timer che tiene fermo il cinghiale
                 pygame.time.set_timer(USEREVENT+int(self.id), self.durata_pausa)
+                #pygame.time.set_timer(USEREVENT+1, self.durata_pausa)
                 
 
         def fine_pausa(self): ##questa procedura si avvia ogni n secondi e fa muovere il cinghiale e poi fermarsi
                 self.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale()
                 self.lanciato=False
                 #self.timer.cancel()
-                pygame.time.set_timer(evento_timer+int(self.id), 0)
+                pygame.time.set_timer(USEREVENT+int(self.id), 0)
+                #pygame.time.set_timer(USEREVENT+1, 0)
                 self.inpausa=False
                 adesso= datetime.datetime.time(datetime.datetime.now())
                 evento_scat='evento '+ str(USEREVENT+int(self.id))+ '   '
@@ -211,7 +228,11 @@ class MovingBeast(model.Object):
         #----------------------------------------
         def muovi_cinghiale(self):
             if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
+        
                         if self.contatore_destinazioni>len(self.lista_destinazioni)-1: self.contatore_destinazioni=0 ##resetta il contatore della lista delle destinazioni automatiche
+                        if (self.x,self.y)==self.lista_destinazioni[self.contatore_destinazioni]:
+                                print "errore, destinazione uguale a partenza"
+                                exit()
                         self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[self.contatore_destinazioni])  ##qui viene compilata la lista dei passi da seguire per camminare nel percorso
                         pos_da_raggiungere=self.listap[len(self.listap)-1] ##legge la posizione finale di destinazione dalla lista delle destinazioni
                         self.direzione=self.calcola_direzione((self.x,self.y),pos_da_raggiungere) ##calcola la direzione della destinazione da raggiungere
