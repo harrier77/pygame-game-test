@@ -1,8 +1,6 @@
 # coding: utf-8                     
 import sys
 import os
-#sys.path.append(".\\miogummworld") 
-#sys.path.append(".\\miogummworld\\gamelib") 
 import __builtin__
 import pygame
 from pygame.locals import *
@@ -35,30 +33,33 @@ def calcola_passi(or_pos=(300,200),target_pos=(200,200)):
 
 #inizio classe
 class Beast():
-        def __init__(self):
+        def __init__(self,dir_name="boar"):
                 # load the "standing" sprites (these are single images, not animations)
                 try:
                         os.stat('animazioni')
                 except:
                         print 'cambio dir a ..\\'
                         os.chdir('..\\') 
-                self.front_standing = pygame.image.load('animazioni/animation/boar/boar_front_walk.001.gif')
-                self.back_standing = pygame.image.load('animazioni/animation/boar/boar_back_walk.001.gif')
-                self.left_standing = pygame.image.load('animazioni/animation/boar/boar_left_walk.001.gif')
+                anim_file_name=dir_name
+                variable_path_name=dir_name+"/"+anim_file_name
+                self.front_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'_front_walk.001.gif')
+                self.back_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'_back_walk.001.gif')
+                self.left_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'_left_walk.001.gif')
                 self.right_standing = pygame.transform.flip(self.left_standing, True, False)
                 self.playerWidth, self.playerHeight = self.front_standing.get_size()
                 # creating the PygAnimation objects for walking/running in all directions
                 animTypes = 'left_walk back_walk front_walk NW SW'.split()
+                #animTypes = 'back_walk front_walk left_walk'.split()
                 self.animObjs = {}
                 for animType in animTypes:
-                    imagesAndDurations = [('animazioni/animation/boar/boar_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
+                    imagesAndDurations = [('animazioni/animation/'+variable_path_name+'_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
                     self.animObjs[animType] = pyganim.PygAnimation(imagesAndDurations)
                 my_aniType=['left_stand']
                 for animType in my_aniType:
-                    imagesAndDurations1 = [('animazioni/animation/boar/boar_%s.%s.png' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(12)]
+                    imagesAndDurations1 = [('animazioni/animation/'+variable_path_name+'_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
                     self.animObjs[animType] = pyganim.PygAnimation(imagesAndDurations1)
 
-                # create the right-facing sprites by copying and flipping the left-facing sprites
+                #create the right-facing sprites by copying and flipping the left-facing sprites
                 self.animObjs['right_walk'] = self.animObjs['left_walk'].getCopy()
                 self.animObjs['right_walk'].flip(True, False)
                 self.animObjs['right_walk'].makeTransformsPermanent()
@@ -79,9 +80,9 @@ class Beast():
 #Inizio Classe               
 class MovingBeast(model.Object):
         debug=True
-        def __init__(self,position=(100,100),durata_pausa=4000,id=1,points=(())):
+        def __init__(self,position=(100,100),durata_pausa=4000,id=1,points=(()),dir_name='boar'):
                 model.Object.__init__(self)
-                self.miocing=Beast()
+                self.miocing=Beast(dir_name=dir_name)
                 self.id=id
                 self.x=position[0]
                 self.y=position[1]
@@ -264,7 +265,9 @@ class MovingBeast(model.Object):
 
                     
 def main():
-    ogg=MovingBeast()
+    bestia=MovingBeast(dir_name="caliph")
+    
+    
     pygame.init()
     screen = pygame.display.set_mode((600, 300))
     pygame.display.set_caption('Cinghiale in movimento')
@@ -273,9 +276,9 @@ def main():
     #print ogg.sprite_fotogramma.rect
     while True:
         screen.fill(BGCOLOR)
-        ogg.muovi_cinghiale()
+        bestia.muovi_cinghiale()
 
-        screen.blit(ogg.sprite_fotogramma.image, (ogg.rect.x, ogg.rect.y))
+        screen.blit(bestia.sprite_fotogramma.image, (bestia.rect.x, bestia.rect.y))
 
         for event in pygame.event.get(): # event handling loop
             # handle ending the program

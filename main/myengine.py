@@ -16,7 +16,7 @@ from gummworld2 import context, data, model, geometry, toolkit
 from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim
 
-from boar_auto_no_thread import calcola_passi,Beast,MovingBeast
+from beast import calcola_passi,Beast,MovingBeast
 from miovar_dump import *
 DEBUG=False
 
@@ -241,6 +241,9 @@ class App_gum(Engine):
                 pygame.draw.rect(camera.surface, Color('red'), rect.move(-cx,-cy))
                 pygame.draw.polygon(camera.surface, Color('white'), self.speed_box.corners, 1)
         
+
+        
+        
         #------------------------------------------------------------------ 
         def draw(self, interp):
                 State.screen.clear()
@@ -256,7 +259,6 @@ class App_gum(Engine):
                 #self.beast.muovi_cinghiale()
                 for beast in self.lista_beast:
                     beast.muovi_cinghiale()
-                    
                 self.draw_detail()
                 State.screen.flip()
         #---------------------------------------------------
@@ -305,26 +307,27 @@ class App_gum(Engine):
                 return is_walkable       
         
         #------------------------------------------------------------------
-        def verifica_residuale_tasti_premuti(self):
+        def verifica_residuale_tasti_premuti(self,mio_keydown):
                 keys = pygame.key.get_pressed()
                 #print keys[K_LEFT]
                 #self.camera_target.moveConductor.play()
                 if (keys[K_LEFT]):
                         self.camera.target.giocatore_animato=self.animato['left_walk']
                         self.cammina=True
+                        self.movex += -State.speed
                 if (keys[K_RIGHT]):
                         self.camera.target.giocatore_animato=self.animato['right_walk']
                         self.cammina=True
+                        self.movex += State.speed
                 if (keys[K_DOWN]):
                         self.camera.target.giocatore_animato=self.animato['front_walk']
                         self.cammina=True
+                        self.movey += State.speed
                 if (keys[K_UP]):
-                        self.camera.target.giocatore_animato=self.animato['back_walk']
-                        self.cammina=True
-                
-                self.corsa=False
-                if (keys[K_LSHIFT]):
-                        self.corsa=True
+                    self.camera.target.giocatore_animato=self.animato['back_walk']
+                    self.cammina=True
+                    self.movey += -State.speed
+
         #------------------------------------------------------------------ 
         def on_key_down(self, unicode, key, mod):
                 if key == K_DOWN:               
@@ -382,17 +385,18 @@ class App_gum(Engine):
         """
         #------------------------------------------------------------------ 
         def on_key_up(self, key, mod):
-                self.cammina=False
-                self.movey =0
-                self.movex =0
-                if key == K_DOWN: 
-                    self.imm_fermo=Miohero.front_standing
-                elif key == K_UP: 
-                    self.imm_fermo=Miohero.back_standing
-                elif key == K_RIGHT: 
-                    self.imm_fermo=Miohero.right_standing
-                elif key == K_LEFT: 
-                    self.imm_fermo=Miohero.left_standing
+                    self.cammina=False
+                    self.movey =0
+                    self.movex =0
+                    if key == K_DOWN: 
+                        self.imm_fermo=Miohero.front_standing
+                    elif key == K_UP: 
+                        self.imm_fermo=Miohero.back_standing
+                    elif key == K_RIGHT: 
+                        self.imm_fermo=Miohero.right_standing
+                    elif key == K_LEFT: 
+                        self.imm_fermo=Miohero.left_standing
+                    self.verifica_residuale_tasti_premuti(key)
         #------------------------------------------------------------------ 
         def toggle_layer(self, i):
             """toggle visibility of layer i"""
