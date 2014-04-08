@@ -39,7 +39,7 @@
  </layer>
  <layer name="Fringe" width="20" height="19">
   <data encoding="base64" compression="zlib">
-   eJxjYBh8gItpaJuPDQgB7RQeAHvpDRSBflTC4k8OqBgxYQ8zQ5kJNxsboFe8wuISFw0DLGjuweU+FaC4KhCrMeFmDzbACHQTEw3cNZj9PBwAAKfsBIA=
+   eJxjYGBgaGNkYGgH4g4gphSoAPE0oDnTgXgGmeZxMSHYJkC8DGjOciBeQQX3uQDxNqA524F4BxCzMBHUQhUgBLRHmE52DSRQBPpRCYs/OaBiXESEAcwMZSbcbGyAGLOpAWBxiYuGAfS0hct9KkBxVSBWY8LNHmyAEegmJhq4azD7eTgAADvkDJY=
   </data>
  </layer>
  <layer name="Over" width="20" height="19">
@@ -49,54 +49,49 @@
  </layer>
  <layer name="Collision" width="20" height="19">
   <data encoding="base64" compression="zlib">
-   eJxjYBh8YAvz0DZ/pAHk8CTEJibsiTGPkD56AFL9Sor7SfH3QACQm2jpxoGMy+EMAC3HESk=
+   eJxjYICALcy0xaQAmHp0/aSag81cctxDyDxqgaFqHrIYITa6GLnmkeI+cgEh80jxKzXMI9V9pAJSzENXiyseyXUftc3DZQe1yhZ086gBaFEOAwCjIEg0
   </data>
  </layer>
- 
  <objectgroup name="Objects" width="20" height="19">
-  <object name="Pozzo" x="339" y="403" width="31" height="19">
-   <properties>
-    <property name="proprieta" value="12"/>
-   </properties>
-  </object>
   <object name="inizio" x="103" y="139" width="24" height="22">
    <ellipse/>
   </object>
-  
-  <object name="cinghiale" type="linea" x="111" y="188">
+  <object name="cinghiale" x="69" y="352">
    <properties>
-    <property name="durata_pausa" value="2000"/>
-    <property name="id" value="1"/>
-   </properties>
-   <polyline points="100,100 0,344 484,343 371,229 466,133 369,38 492,11 303,-91 19,-94 0,-1"/>
-  </object>
-  <object name="cinghiale" x="17" y="254">
-  <properties>
     <property name="durata_pausa" value="2000"/>
     <property name="id" value="2"/>
    </properties>
    <polyline points="3,3 15,122 126,118 119,0 53,-98 70,68 3,-148 117,-217 324,-214"/>
   </object>
-  <object name="cinghiale" x="75" y="577">
-  <properties>
+  <object name="cinghiale" x="149" y="501">
+   <properties>
     <property name="durata_pausa" value="2000"/>
     <property name="id" value="3"/>
    </properties>
    <polyline points="3,3 478,4"/>
   </object>
   <object name="cinghiale" x="606" y="51">
-  <properties>
+   <properties>
     <property name="durata_pausa" value="2000"/>
     <property name="id" value="4"/>
    </properties>
    <polyline points="3,3 -2,397"/>
   </object>
-  <object name="cinghiale" x="202" y="480">
-  <properties>
+  <object name="cinghiale" x="273" y="58">
+   <properties>
     <property name="durata_pausa" value="2000"/>
     <property name="id" value="7"/>
    </properties>
    <polyline points="3,3 211,-3"/>
+  </object>
+  <object name="To South Tullimshar" type="warp" x="63" y="60" width="34" height="39">
+   <properties>
+    <property name="dest_map" value="001-1"/>
+    <property name="dest_tile_x" value="10"/>
+    <property name="dest_tile_y" value="10"/>
+    <property name="dir" value=".\\mappe\\mappe_da_unire\\"/>
+   </properties>
+   <ellipse/>
   </object>
  </objectgroup>
 </map>

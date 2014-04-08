@@ -36,6 +36,7 @@ class Miohero(model.Object):
         back_standing = pygame.image.load('animazioni/gameimages/crono_back.gif')
         left_standing = pygame.image.load('animazioni/gameimages/crono_left.gif')
         right_standing = pygame.transform.flip(left_standing, True, False)
+        standing_scelta=sit_standing
         #------------------------------------
         def __init__(self,map_pos,screen_pos,parentob):
                 model.Object.__init__(self)
@@ -76,7 +77,8 @@ class Miohero(model.Object):
             if self.parent.cammina:
                 image= self.giocatore_animato.ritorna_fotogramma()
             else:
-                image=self.front_standing
+                #image=self.front_standing
+                image=self.standing_scelta
             return image
         #------------------------------------ 
         @property
@@ -95,14 +97,18 @@ class Miohero(model.Object):
 
 #-------------------------------------------------------------------------------
 class App_gum(Engine):
-        def __init__(self,resolution=(400,200),dir=".\\mappe\\",mappa="mini.tmx",coll_invis=False,ign_coll=False,miodebug=True):
+        
+        def __init__(self,resolution=(400,200),dir=".\\mappe\\",mappa="mini.tmx",\
+                                coll_invis=True,ign_coll=False,miodebug=True,hero_ini_pos=(100,100)):
                 #necessario per resettare la condizione messa dalla libreria PGU
                 pygame.key.set_repeat()
                 #---------------
-                
+                #self.warping=False
                 resolution = Vec2d(resolution)
                 tiled_map = TiledMap(dir+mappa)
-                
+                for mylayer in tiled_map.layers:
+                        if mylayer.name=="Collision":
+                                self.collision_group_i= mylayer.layeri
                 ##carica in una lista i lvelli degli oggetti 
                 self.lista_oggetti=list()
                 
@@ -116,17 +122,21 @@ class App_gum(Engine):
                 ## Save special layers.
                 self.all_groups = tiled_map.layers[:]
                 self.avatar_group = tiled_map.layers[1]
-                self.collision_group = tiled_map.layers[3]
-                self.overlays = tiled_map.layers[1:4]
+                self.collision_group = tiled_map.layers[self.collision_group_i]
+                num_layers=len(self.all_groups)-1
+                self.overlays = tiled_map.layers[1:num_layers]
                 ## Hide the busy Collision layer. Player can show it by hitting K_3.
-                self.collision_group.visible = False
+                self.collision_group.visible = not coll_invis
                 ## Remove above-ground layers so we can give map to the renderer.
                 del tiled_map.layers[1:]
                 
-                hero_ini_pos=100,100
+
                 cinghiale_ini_pos=(251,483)
                 dict_cinghiali={}
+                self.warps=[]
                 for O in self.prima_lista_ogg:
+                        if O.type=="warp":
+                                self.warps.append(O)
                         if O.name=="Inizio":
                                 hero_ini_pos= O.rect.x,O.rect.y
                         if O.name=="cinghiale":
@@ -152,17 +162,18 @@ class App_gum(Engine):
                 #self.beast=MovingBeast(cinghiale_ini_pos)
       
                 Engine.__init__(self,
-                    caption='Tiled Map with Renderer',
+                    caption='Tiled Map with Renderer '+mappa,
                     resolution=resolution,
                     camera_target=self.avatar,
                     map=tiled_map,
                     frame_speed=0)
                 
                 ## Insert avatar into the Fringe layer.
+                self.avatar.rect.x=hero_ini_pos[0]
+                self.avatar.rect.y=hero_ini_pos[1]
                 self.avatar_group.add(self.avatar)
                 for beast in self.lista_beast:
                         self.avatar_group.add(beast)
-                        #print beast.auto
                 
                 State.camera.position=Vec2d(State.camera.position)
          
@@ -180,20 +191,20 @@ class App_gum(Engine):
                 self.grid_cache = {}
                 self.label_cache = {}
                 
-                State.speed = 4.33
+                State.speed = 10
                 self.movex=0
                 self.movey=0
                 self.cammina=False
                 self.imm_fermo=Miohero.sit_standing
                 self.animato=self.camera.target.animated_object
                 
-                #if coll_invis:self.rendi_invisibili_collisioni()
                 #con questa proprietà le collisioni vengono ignorate
                 self.ignora_collisioni=ign_coll
                 self.corsa=False
                 #self.collision_dummy = Miohero((0,0),resolution//2,parentob=self)
                 ## Create the renderer.
                 self.renderer = BasicMapRenderer(tiled_map, max_scroll_speed=State.speed)
+
                 
         #------------------------------------------------------------------ 
         def update(self, dt):
@@ -205,6 +216,7 @@ class App_gum(Engine):
                             self.camera.target.herosprite.rect.x=wx
                             self.camera.target.herosprite.rect.y=wy
                             self.move_to = State.camera.screen_to_world((wx,wy))
+                        self.is_warp()
 
 
                 self.update_camera_position()
@@ -241,22 +253,17 @@ class App_gum(Engine):
                 pygame.draw.rect(camera.surface, Color('red'), rect.move(-cx,-cy))
                 pygame.draw.polygon(camera.surface, Color('white'), self.speed_box.corners, 1)
         
-
-        
         
         #------------------------------------------------------------------ 
         def draw(self, interp):
                 State.screen.clear()
+                #if self.warping:return "warping"
                 self.renderer.draw_tiles()
                 if State.show_grid:
                     toolkit.draw_grid(self.grid_cache)
                 if State.show_labels:
                     toolkit.draw_labels(self.label_cache)
-                #State.hud.draw()
-                #self.draw_avatar()
-                #self.miodialogo.app.paint()
-                if self.all_groups[3].visible: self.draw_debug()
-                #self.beast.muovi_cinghiale()
+                if self.all_groups[self.collision_group_i].visible: self.draw_debug()
                 for beast in self.lista_beast:
                     beast.muovi_cinghiale()
                 self.draw_detail()
@@ -283,6 +290,29 @@ class App_gum(Engine):
                         else:
                             blit(s.image, s.rect.move(-cx,-cy))
   
+        
+        def is_warp(self):
+                dummy = self.avatar
+                newhitbox=dummy.hitbox.copy()
+                newhitbox.x=dummy.hitbox.x+self.movex
+                for warp in self.warps:
+                        if warp.rect.colliderect(newhitbox):
+                                scrittaor=pygame.image.load('immagini/loading4.gif').convert()
+                                scritta=pygame.transform.scale(scrittaor,(100,100))
+                                self.warping=True
+                                State.screen.clear()
+                                centerpos=State.screen.center[0]-scritta.get_width()/2,State.screen.center[1]-scritta.get_height()/2
+                                State.screen.blit(scritta,centerpos)
+                                State.screen.flip()
+                                try:dir=warp.properties['dir']
+                                except:dir=".\\mappe\\mappe_da_unire\\"
+                                mappa=warp.properties['dest_map']+".tmx"
+                                destx=int(warp.properties['dest_tile_x'])*32
+                                desty=int(warp.properties['dest_tile_y'])*32
+                                self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty))
+
+
+                
         #------------------------------------------------------
         def is_walkable2(self):
                 if self.ignora_collisioni:
@@ -375,28 +405,22 @@ class App_gum(Engine):
         #------------------------------------------------------------------ 
         def on_mouse_button_up(self, pos, button):
                 self.mouse_down = False
-        """
-        def on_user_event(self,e):
-            print "evento in main"
-            #self.beast.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale()
-            for beast in self.lista_beast:
-                if e.type==USEREVENT+1:
-                    beast.auto=True
-        """
+
         #------------------------------------------------------------------ 
         def on_key_up(self, key, mod):
                     self.cammina=False
                     self.movey =0
                     self.movex =0
                     if key == K_DOWN: 
-                        self.imm_fermo=Miohero.front_standing
+                        self.avatar.standing_scelta=self.avatar.front_standing
                     elif key == K_UP: 
-                        self.imm_fermo=Miohero.back_standing
+                        self.avatar.standing_scelta=self.avatar.back_standing
                     elif key == K_RIGHT: 
-                        self.imm_fermo=Miohero.right_standing
+                        self.avatar.standing_scelta=self.avatar.right_standing
                     elif key == K_LEFT: 
-                        self.imm_fermo=Miohero.left_standing
+                        self.avatar.standing_scelta=self.avatar.left_standing
                     self.verifica_residuale_tasti_premuti(key)
+                    
         #------------------------------------------------------------------ 
         def toggle_layer(self, i):
             """toggle visibility of layer i"""

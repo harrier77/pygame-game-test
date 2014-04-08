@@ -13,7 +13,6 @@ import gummworld2
 from gummworld2 import geometry,model,data
 
 
-
 import threading
 import datetime
 from pygame.sprite import Sprite
@@ -37,7 +36,6 @@ class Pseudo_async_timer():
         scaduto=False
         id=None
         def __init__(self,pausa,func,id=None):
-                pausa=pausa/1000
                 self.set_future_time(pausa)
                 self.pausa=pausa
                 self.id=id
@@ -49,8 +47,9 @@ class Pseudo_async_timer():
                 tnow=time.time()
                 if (tnow>self.fut_t):
                         if not self.scaduto:
+                                print "scaduta pausa "+str(self.pausa)
                                 self.scaduto=True
-                                self.func_da_chiamare()
+                                self.func_da_chiamare(self)
                                 return True
 #-------------------------------------------------
 
@@ -103,8 +102,7 @@ class Beast():
 #Inizio Classe               
 class MovingBeast(model.Object):
         debug=True
-        miotimer=None
-        def __init__(self,position=(100,100),durata_pausa=1000,id=1,points=(()),dir_name='boar'):
+        def __init__(self,position=(100,100),durata_pausa=4000,id=1,points=(()),dir_name='boar'):
                 model.Object.__init__(self)
                 self.miocing=Beast(dir_name=dir_name)
                 self.id=id
@@ -125,6 +123,10 @@ class MovingBeast(model.Object):
                 self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
                 self.durata_pausa=durata_pausa
         
+        #versione autocostruita di timer asincrono, aggiungi la pausa
+        def add_timer(self,pausa,fun_callback,id):
+                self.miotimer=Pseudo_async_timer(pausa,fun_callback,id)
+
         def calcola_points(self,points,position):
                 real_points=[]
                 for singlepos in points:
@@ -148,7 +150,40 @@ class MovingBeast(model.Object):
                 y=y-100
                 lista_destinazioni.append((x,y))
                 return lista_destinazioni
-   
+  
+        def mio_timer_pausa(self):
+                evento_scat='evento '+ str(USEREVENT+int(self.id))+ '   '
+                adesso= datetime.datetime.time(datetime.datetime.now())
+                if self.debug:print "timer per la pausa del cinghiale "+evento_scat+"partito "+str(adesso)
+                
+                self.lanciato=True
+                self.inpausa=True
+                self.auto=False  ##con auto=false il ciclo di muovi_cinghiale() non gira
+                
+                #versione con therad
+                #self.timer=threading.Timer(5.0, self.avvia)  
+                #self.timer.daemon=True  
+                #self.timer.start() ##parte il timer che tiene fermo il cinghiale
+                
+                #versione autocostruita
+                #self.add_timer(self.durata_pausa,self.fine_pausa,1)
+
+                pygame.time.set_timer(USEREVENT+int(self.id), self.durata_pausa)
+                #pygame.time.set_timer(USEREVENT+1, self.durata_pausa)
+                
+
+        def fine_pausa(self): ##questa procedura si avvia ogni n secondi e fa muovere il cinghiale e poi fermarsi
+                self.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale()
+                self.lanciato=False
+                #self.timer.cancel()
+                pygame.time.set_timer(USEREVENT+int(self.id), 0)
+                #pygame.time.set_timer(USEREVENT+1, 0)
+                self.inpausa=False
+                adesso= datetime.datetime.time(datetime.datetime.now())
+                evento_scat='evento '+ str(USEREVENT+int(self.id))+ '   '
+                if self.debug:print "finita pausa del cinghiale "+evento_scat+str(adesso)
+                
+                
         def calcola_direzione(self,pos,mousepos):
             angolo= geometry.angle_of(pos,mousepos)
             ore=(angolo*100/360)*12
@@ -223,35 +258,14 @@ class MovingBeast(model.Object):
             image=self.fotogramma
             return image
         
-        
-        #--------------------------------------------------------------------------------
-        def mio_timer_pausa(self):
-                adesso= datetime.datetime.time(datetime.datetime.now())
-                if self.debug:print "timer per la pausa del oggetto partito "+str(adesso)
-                self.lanciato=True
-                self.inpausa=True
-                self.auto=False  ##con auto=false il ciclo di muovi_cinghiale() non gira
-                fun_callback=self.fine_pausa
-                self.miotimer=Pseudo_async_timer(self.durata_pausa,fun_callback,1) #crea l'ggetto timer con la pausa presa dai par di MovingBeast()
-                
-        def fine_pausa(self): ##questa procedura si avvia ogni n secondi e fa muovere il cinghiale e poi fermarsi
-                self.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale() quindi è finita la pausa
-                self.lanciato=False
-                self.inpausa=False
-                adesso= datetime.datetime.time(datetime.datetime.now())
-                if self.debug:print "finita pausa del oggetto "+str(adesso)
-                self.miotimer=None
-        #--------------------------------------------------------------------------------
-        
         #----------------------------------------
         def muovi_cinghiale(self):
             if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
+        
                         if self.contatore_destinazioni>len(self.lista_destinazioni)-1: self.contatore_destinazioni=0 #resetta il contatore della lista delle destinazioni automatiche
                         if (self.x,self.y)==self.lista_destinazioni[self.contatore_destinazioni]:
                                 print "errore, destinazione uguale a partenza"
-                                self.x=self.x+3
-                                self.y=self.y+3
-                                #exit()
+                                exit()
                         self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[self.contatore_destinazioni])  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
                         pos_da_raggiungere=self.listap[len(self.listap)-1] #legge la posizione finale di destinazione dalla lista delle destinazioni
                         self.direzione=self.calcola_direzione((self.x,self.y),pos_da_raggiungere) #calcola la direzione della destinazione da raggiungere
@@ -268,11 +282,12 @@ class MovingBeast(model.Object):
                         self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
 
             if (self.lanciato==False) and (self.is_walking==False): 
-                    self.mio_timer_pausa() #lancia il timer che conta i secondi della pausa passati come parametro a MovingBeast()
+                    self.mio_timer_pausa()
                     fotog_sprite=self.sprite_fotogramma
-            
-            if self.miotimer: #controlla ad ogni ciclo se è attivo un timer e se la pausa di quel timer è scaduta
-                self.miotimer.check_time()
+            #print self.rect
+            if pygame.event.peek(USEREVENT+int(self.id)):
+                pygame.event.clear(USEREVENT+int(self.id))
+                self.fine_pausa()
 
             return self.fotogramma
         #---------------------------------------------------
