@@ -97,22 +97,28 @@ class Miohero(model.Object):
 
 #-------------------------------------------------------------------------------
 class App_gum(Engine):
-        
+        nuova_mappa_caricare=True
+        fringe_i=1
         def __init__(self,resolution=(400,200),dir=".\\mappe\\",mappa="mini.tmx",\
-                                coll_invis=True,ign_coll=False,miodebug=True,hero_ini_pos=(100,100)):
+                                coll_invis=True,ign_coll=False,miodebug=True,hero_ini_pos=(21*32,28*32)):
                 #necessario per resettare la condizione messa dalla libreria PGU
                 pygame.key.set_repeat()
                 #---------------
                 #self.warping=False
                 resolution = Vec2d(resolution)
-                tiled_map = TiledMap(dir+mappa)
-                for mylayer in tiled_map.layers:
+                self.mappa_dirfile=dir+mappa
+                #if self.nuova_mappa_caricare: 
+                self.tiled_map = TiledMap(dir+mappa)
+                for mylayer in self.tiled_map.layers:
                         if mylayer.name=="Collision":
                                 self.collision_group_i= mylayer.layeri
+                        if mylayer.name=="Fringe":
+                                self.fringe_i= mylayer.layeri
+                                
                 ##carica in una lista i lvelli degli oggetti 
                 self.lista_oggetti=list()
                 
-                for L in tiled_map.layers: 
+                for L in self.tiled_map.layers: 
                         if L.is_object_group :
                                 self.lista_oggetti.append(L)
                 ##fine
@@ -120,15 +126,15 @@ class App_gum(Engine):
                 self.prima_lista_ogg=self.lista_oggetti[0].objects.objects
 
                 ## Save special layers.
-                self.all_groups = tiled_map.layers[:]
-                self.avatar_group = tiled_map.layers[1]
-                self.collision_group = tiled_map.layers[self.collision_group_i]
+                self.all_groups = self.tiled_map.layers[:]
+                self.avatar_group = self.tiled_map.layers[self.fringe_i]
+                self.collision_group = self.tiled_map.layers[self.collision_group_i]
                 num_layers=len(self.all_groups)-1
-                self.overlays = tiled_map.layers[1:num_layers]
+                self.overlays = self.tiled_map.layers[1:num_layers]
                 ## Hide the busy Collision layer. Player can show it by hitting K_3.
                 self.collision_group.visible = not coll_invis
                 ## Remove above-ground layers so we can give map to the renderer.
-                del tiled_map.layers[1:]
+                del self.tiled_map.layers[1:]
                 
 
                 cinghiale_ini_pos=(251,483)
@@ -137,8 +143,9 @@ class App_gum(Engine):
                 for O in self.prima_lista_ogg:
                         if O.type=="warp":
                                 self.warps.append(O)
-                        if O.name=="Inizio":
+                        if O.name=="Inizio" or O.name=="inizio":
                                 hero_ini_pos= O.rect.x,O.rect.y
+
                         if O.name=="cinghiale":
                                 cinghiale_ini_pos=O.rect.x,O.rect.y
                                 cinghiale = {'pos': cinghiale_ini_pos, 'id': O.properties['id'],'durata_pausa':int(O.properties['durata_pausa'])}
@@ -165,7 +172,7 @@ class App_gum(Engine):
                     caption='Tiled Map with Renderer '+mappa,
                     resolution=resolution,
                     camera_target=self.avatar,
-                    map=tiled_map,
+                    map=self.tiled_map,
                     frame_speed=0)
                 
                 ## Insert avatar into the Fringe layer.
@@ -203,7 +210,7 @@ class App_gum(Engine):
                 self.corsa=False
                 #self.collision_dummy = Miohero((0,0),resolution//2,parentob=self)
                 ## Create the renderer.
-                self.renderer = BasicMapRenderer(tiled_map, max_scroll_speed=State.speed)
+                self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
 
                 
         #------------------------------------------------------------------ 
@@ -244,7 +251,7 @@ class App_gum(Engine):
                 wy = max(min(wy,rect.bottom), rect.top)
                 camera.position = wx,wy
                 self.avatar_group.add(avatar)
-        
+        #----------------------------------------------------------------------
         def draw_debug(self):
                 # draw the hitbox and speed box
                 camera = State.camera
@@ -309,7 +316,21 @@ class App_gum(Engine):
                                 mappa=warp.properties['dest_map']+".tmx"
                                 destx=int(warp.properties['dest_tile_x'])*32
                                 desty=int(warp.properties['dest_tile_y'])*32
-                                self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty))
+                                print self.mappa_dirfile
+                                if self.mappa_dirfile==dir+mappa:
+                                        self.nuova_mappa_caricare=False
+                                        self.avatar.rect.x=destx
+                                        self.avatar.rect.y=desty
+                                        camera = State.camera
+                                        wx,wy = destx,desty
+                                        # Keep avatar inside map bounds.
+                                        rect = State.world.rect
+                                        wx = max(min(wx,rect.right), rect.left)
+                                        wy = max(min(wy,rect.bottom), rect.top)
+                                        camera.position = wx,wy
+                                else:
+                                        self.nuova_mappa_caricare=True
+                                        self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty))
 
 
                 

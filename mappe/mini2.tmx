@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="20" height="19" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="minimap" value="graphics/minimaps/001-1.png"/>
+  <property name="music" value="Faith.ogg"/>
+  <property name="name" value="Tulimshar"/>
+ </properties>
+ <tileset firstgid="1" name="Desert1" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/desert1.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="257" name="Desert2" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/desert2.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="513" name="Desert x2" tilewidth="32" tileheight="64">
+  <image source="graphics/tiles/desert_x2.png" width="512" height="64"/>
+ </tileset>
+ <tileset firstgid="529" name="Desert x3" tilewidth="32" tileheight="96">
+  <image source="graphics/tiles/desert_x3.png" width="512" height="96"/>
+ </tileset>
+ <tileset firstgid="545" name="Desert x5" tilewidth="32" tileheight="160">
+  <image source="graphics/tiles/desert_x5.png" width="192" height="160"/>
+ </tileset>
+ <tileset firstgid="551" name="Tulimshar1" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/tulimshar1.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="807" name="Trans woodland desert" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/trans_woodland-desert.png" width="512" height="256"/>
+ </tileset>
+ <tileset firstgid="935" name="Tic-Tac-Toe" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/tictactoe.png" width="128" height="96"/>
+ </tileset>
+ <tileset firstgid="947" name="Collision" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/collision.png" width="64" height="32"/>
+ </tileset>
+ <layer name="Ground" width="20" height="19">
+  <data encoding="base64" compression="zlib">
+   eJxjZGBgYBzkmAWIWQfYfFq7YShgFjrE1WhcEOfnkRgGwwEPdLwBAE+zAb8=
+  </data>
+ </layer>
+ <layer name="Fringe" width="20" height="19">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMBIAAAXwAAE=
+  </data>
+ </layer>
+ <layer name="Over" width="20" height="19">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMBIAAAXwAAE=
+  </data>
+ </layer>
+ <layer name="Collision" width="20" height="19">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjIJRMBIAAAXwAAE=
+  </data>
+ </layer>
+ <objectgroup name="Objects" width="20" height="19">
+  <object name="inizio" x="103" y="139" width="24" height="22">
+   <ellipse/>
+  </object>
+  <object name="cinghiale" x="69" y="352">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="2"/>
+   </properties>
+   <polyline points="3,3 15,122 126,118 119,0 53,-98 70,68 3,-148 117,-217 324,-214"/>
+  </object>
+  <object name="cinghiale" x="149" y="501">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="3"/>
+   </properties>
+   <polyline points="3,3 478,4"/>
+  </object>
+  <object name="cinghiale" x="606" y="51">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="4"/>
+   </properties>
+   <polyline points="3,3 -2,397"/>
+  </object>
+  <object name="cinghiale" x="273" y="58">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="7"/>
+   </properties>
+   <polyline points="3,3 211,-3"/>
+  </object>
+  <object name="To South Tullimshar" type="warp" x="63" y="60" width="34" height="39">
+   <properties>
+    <property name="dest_map" value="001-1"/>
+    <property name="dest_tile_x" value="10"/>
+    <property name="dest_tile_y" value="10"/>
+    <property name="dir" value=".\\mappe\\mappe_da_unire\\"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object name="cinghiale" x="302" y="253">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="149" y="501">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="3"/>
+   </properties>
+   <polyline points="3,3 478,4"/>
+  </object>
+  <object x="219" y="221">
+   <polyline points="0,0 252,-64"/>
+  </object>
+  <object x="400" y="175">
+   <polyline points="0,0 -4,-1"/>
+  </object>
+  <object name="cinghiale" x="302" y="253">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="427" y="171">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="19" y="215">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="19" y="215">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="19" y="215">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="19" y="215">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="89" y="520">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="378" y="450">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="228" y="57">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="601" y="556">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="505" y="186">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="296" y="296">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="400" y="204">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="341" y="145">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="157" y="69">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="27" y="450">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="644" y="434">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="545" y="363">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="541" y="60">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="580" y="25">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="246" y="18">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="126" y="49">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="26" y="159">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="20" y="34">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="179" y="24">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="308" y="556">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="231" y="429">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="235" y="313">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="284" y="243">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="222" y="236">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="462" y="131">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="500" y="100">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="495" y="135">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+  <object name="cinghiale" x="421" y="96">
+   <properties>
+    <property name="durata_pausa" value="2000"/>
+    <property name="id" value="9"/>
+   </properties>
+   <polyline points="0,0 -9,61 166,130 -56,157"/>
+  </object>
+ </objectgroup>
+</map>
