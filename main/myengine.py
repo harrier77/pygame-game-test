@@ -18,6 +18,7 @@ from librerie import pyganim
 
 from beast import calcola_passi,Beast,MovingBeast
 from miovar_dump import *
+from dialogosemp import Dialogosemplice
 DEBUG=False
 
 #-------------------------------------------------------------------------------
@@ -211,6 +212,7 @@ class App_gum(Engine):
                 #self.collision_dummy = Miohero((0,0),resolution//2,parentob=self)
                 ## Create the renderer.
                 self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
+                self.dialogo=Dialogosemplice()
 
                 
         #------------------------------------------------------------------ 
@@ -230,6 +232,7 @@ class App_gum(Engine):
                 State.camera.update()
                 ## Set render's rect.
                 self.renderer.set_rect(center=State.camera.rect.center)
+                
         #------------------------------------------------------------------                      
         @property
         def mio_move_to(self):
@@ -274,6 +277,7 @@ class App_gum(Engine):
                 for beast in self.lista_beast:
                     beast.muovi_cinghiale()
                 self.draw_detail()
+                self.dialogo.scrivi_frase()
                 State.screen.flip()
         #---------------------------------------------------
         def draw_detail(self):
@@ -410,7 +414,7 @@ class App_gum(Engine):
                                 self.movex += -State.speed
                                 self.camera.target.giocatore_animato=self.animato['left_run']
                 elif key == pygame.K_F4:
-                        self.rendi_invisibili_collisioni()
+                        self.dialogo.open=True
                 elif key == K_g:
                     State.show_grid = not State.show_grid
                 elif key == K_l:
