@@ -1,6 +1,7 @@
 # coding: utf-8                     
 import sys
 import os
+
 import __builtin__
 import pygame
 from pygame.locals import *
@@ -17,7 +18,7 @@ from gummworld2 import geometry,model,data
 import threading
 import datetime
 from pygame.sprite import Sprite
-
+from miovar_dump import *
 
 #evento_timer = USEREVENT
 
@@ -56,8 +57,8 @@ class Pseudo_async_timer():
 
 #inizio classe
 class Beast():
+        
         def __init__(self,dir_name="boar"):
-                # load the "standing" sprites (these are single images, not animations)
                 try:
                         os.stat('animazioni')
                 except:
@@ -81,21 +82,24 @@ class Beast():
                 for animType in my_aniType:
                     imagesAndDurations1 = [('animazioni/animation/'+variable_path_name+'_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
                     self.animObjs[animType] = pyganim.PygAnimation(imagesAndDurations1)
-
+                
                 #create the right-facing sprites by copying and flipping the left-facing sprites
                 self.animObjs['right_walk'] = self.animObjs['left_walk'].getCopy()
                 self.animObjs['right_walk'].flip(True, False)
                 self.animObjs['right_walk'].makeTransformsPermanent()
+                
                 self.animObjs['SE'] = self.animObjs['SW'].getCopy()
                 self.animObjs['SE'].flip(True, False)
                 self.animObjs['SE'].makeTransformsPermanent()
+                
                 self.animObjs['NE'] = self.animObjs['NW'].getCopy()
                 self.animObjs['NE'].flip(True, False)
                 self.animObjs['NE'].makeTransformsPermanent()
+                
                 self.animObjs['right_stand'] = self.animObjs['left_stand'].getCopy()
                 self.animObjs['right_stand'].flip(True, False)
                 self.animObjs['right_stand'].makeTransformsPermanent()
-                
+           
                 self.moveConductor = pyganim.PygConductor(self.animObjs)
 #fine classe -------------------------------------
 
@@ -104,6 +108,11 @@ class Beast():
 class MovingBeast(model.Object):
         debug=True
         miotimer=None
+        segmento=0
+        dic_storia={}
+        messaggio_dato=False
+        motore=None
+        fermato=False
         def __init__(self,position=(100,100),durata_pausa=1000,id=1,points=(()),dir_name='boar'):
                 model.Object.__init__(self)
                 self.miocing=Beast(dir_name=dir_name)
@@ -113,6 +122,8 @@ class MovingBeast(model.Object):
                 #points = [(3,3), (200,200)]
                 if points:
                     self.lista_destinazioni=self.calcola_points(points,position)
+                    self.x=self.lista_destinazioni[0][0]
+                    self.y=self.lista_destinazioni[0][1]
                 else:
                     self.lista_destinazioni=self.comp_lista_destinazioni(self.x,self.y)
                 self.contatore_destinazioni=0
@@ -210,7 +221,7 @@ class MovingBeast(model.Object):
             fotog_sprite.image=self.fotogramma
             fotog_sprite.rect=self.fotogramma.get_rect()
             fotog_sprite.rect.x=self.x
-            fotog_sprite.rect.y=self.y
+            fotog_sprite.rect.y=self.y-fotog_sprite.rect.height
             return fotog_sprite
         
         @property
@@ -233,6 +244,8 @@ class MovingBeast(model.Object):
                 self.auto=False  ##con auto=false il ciclo di muovi_cinghiale() non gira
                 fun_callback=self.fine_pausa
                 self.miotimer=Pseudo_async_timer(self.durata_pausa,fun_callback,1) #crea l'ggetto timer con la pausa presa dai par di MovingBeast()
+                #print "segmento completato n. "+str(self.segmento)
+                self.segmento=self.segmento+1
                 
         def fine_pausa(self): ##questa procedura si avvia ogni n secondi e fa muovere il cinghiale e poi fermarsi
                 self.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale() quindi è finita la pausa
@@ -243,12 +256,28 @@ class MovingBeast(model.Object):
                 self.miotimer=None
         #--------------------------------------------------------------------------------
         
+        def check_storia(self):
+                try:
+                        if self.segmento==int(self.dic_storia['segmento']) and self.messaggio_dato==False:
+                                self.motore.dialogo.testo=self.dic_storia['messaggio']
+                                self.motore.dialogo.open=True
+                                self.messaggio_dato=True
+                                self.fermato=True
+                except:
+                        pass
+                if self.motore:
+                        if self.motore.dialogo.close_clicked:
+                                pass
+                
         #----------------------------------------
-        def muovi_cinghiale(self):
+        def muovi_animato(self):
+            
             if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
-                        if self.contatore_destinazioni>len(self.lista_destinazioni)-1: self.contatore_destinazioni=0 #resetta il contatore della lista delle destinazioni automatiche
+                        if self.contatore_destinazioni>len(self.lista_destinazioni)-1: 
+                                self.contatore_destinazioni=0 #resetta il contatore della lista delle destinazioni automatiche
+                                self.segmento=0
                         if (self.x,self.y)==self.lista_destinazioni[self.contatore_destinazioni]:
-                                print "errore, destinazione uguale a partenza"
+                                print "destinazione uguale a partenza"
                                 self.x=self.x+3
                                 self.y=self.y+3
                                 #exit()
@@ -259,7 +288,8 @@ class MovingBeast(model.Object):
                         self.auto=False #arresta il cinghiale quando ha fatto una singola camminata
                         self.lanciato=False #setta il timer su fermo mentre la camminata è in corso
             
-            if self.is_walking: 
+            #sezione che effettivamente muove l'animazione, ma solo se non è in pausa o non è fermata
+            if self.is_walking and not self.fermato: 
                 self.scegli_fotogramma_animazione(self.miocing,self.direzione)
             else:
                 if (self.direzione=='right') or (self.direzione=='SE') or (self.direzione=='NE'): 
@@ -273,6 +303,8 @@ class MovingBeast(model.Object):
             
             if self.miotimer: #controlla ad ogni ciclo se è attivo un timer e se la pausa di quel timer è scaduta
                 self.miotimer.check_time()
+            
+            self.check_storia() #controlla ad ogni ciclo se deve mandare un messaggio
 
             return self.fotogramma
         #---------------------------------------------------
@@ -283,7 +315,7 @@ class MovingBeast(model.Object):
 
                     
 def main():
-    bestia=MovingBeast(dir_name="caliph")
+    bestia=MovingBeast(dir_name="priest")
     
     
     pygame.init()
@@ -294,7 +326,7 @@ def main():
     #print ogg.sprite_fotogramma.rect
     while True:
         screen.fill(BGCOLOR)
-        bestia.muovi_cinghiale()
+        bestia.muovi_animato()
 
         screen.blit(bestia.sprite_fotogramma.image, (bestia.rect.x, bestia.rect.y))
 
@@ -309,6 +341,11 @@ def main():
                     sys.exit()
                 if event.key == K_F4:
                     print 'f4'
+                    if not bestia.fermato:
+                        bestia.fermato=True
+                    else:
+                        bestia.fermato=False
+
         pygame.display.flip()
         mainClock.tick(40) # Feel free to experiment with any FPS setting.
               

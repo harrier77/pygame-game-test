@@ -9,7 +9,9 @@
 
 
 import sys
+#sys.path.append("..\\") 
 sys.path.append("..\\librerie\\gamelib") 
+
 
 import os
 import math
@@ -44,11 +46,45 @@ def printer(obj, ident=''):
             printer(_obj, ident + '    ')        
 
 
+class Dialogosemplice():
+	open=True
+	def __init__(self):
+		self.text_altezza=100
+		self.crossrect=None
+	
+	def scrivi_frase(self,testo="Hello There"):
+		screen=pygame.display.get_surface()
+		# Fill background
+		background_txt = pygame.Surface((screen.get_size()[0]-10,self.text_altezza))
+		#self.background_txt = self.background_txt.convert()
+		background_txt.fill((250, 250, 250))
+		font = pygame.font.Font(None, 36)
+		text = font.render(testo, 1, (10, 10, 10))
+		background_txt.blit(text,(10,10))
+		bgrect=background_txt.get_rect()
+		bgrect.top=screen.get_size()[1]-self.text_altezza
+		self.crossrect=bgrect
+		cross=pygame.image.load('..\\immagini\\cross.gif')
+		background_txt.blit(cross,(bgrect.topright[0]-15,0))
+		screen.blit(background_txt,(bgrect.x,bgrect.y))
+		self.gestione_eventi()
+	
+	def gestione_eventi(self):
+		event=pygame.event.peek()
+		if event.type==pygame.MOUSEBUTTONDOWN:
+			pos=pygame.mouse.get_pos()
+			if self.crossrect.collidepoint(pos):
+				self.open=False
+					
+		
+		
+
 
 #--------------------------------------------------------------------------------
 # classe schermo_base, vedi sopra commento di testa
 # --------------------------------------------------------------------------------
 class schermo_base:
+	dialogo_surface=True
 	def __init__(self):
 		#print "Inzializzazione oggetto schermo_base..."
 		self.screen_width=800
@@ -91,18 +127,26 @@ class schermo_base:
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
 					self.running_loop = False
+				elif event.key == pygame.K_F4:
+					self.dialogo_surface=True
 			if event.type==pygame.MOUSEBUTTONDOWN:
 				self.lancia_frecce()
+				"""pos=pygame.mouse.get_pos()
+				if self.crossrect.collidepoint(pos):
+					self.dialogo_surface=False"""
 #------------------------------------------------------------------
 	def crea_mio_sprite(self,superficie):
 		background= pygame.Surface(superficie.get_size())
 		background.fill((250, 250, 250))
 		myrect=background.get_rect()
+		
 		background.blit(superficie,(10,10))
 		mysprite=pygame.sprite.Sprite() # create sprite
 		mysprite.image=background
 		mysprite.rect=myrect
 		mysprite.rect.topleft = [5, self.screen.get_size()[1]-self.text_altezza]
+		
+		
 		return mysprite
 #------------------------------------------------------------------		
 
@@ -114,12 +158,16 @@ class schermo_base:
 		font = pygame.font.Font(None, 36)
 		text = font.render(testo, 1, (10, 10, 10))
 		background_txt.blit(text,(10,10))
-		
 		bgrect=background_txt.get_rect()
 		bgrect.top=self.screen.get_size()[1]-self.text_altezza
+		self.crossrect=bgrect
+		cross=pygame.image.load('..\\immagini\\cross.gif')
+		background_txt.blit(cross,(bgrect.topright[0]-15,0))
 		b=tiledtmxloader.helperspygame.SpriteLayer.Sprite(background_txt,bgrect)
 		return b
-
+		
+		
+#--------------------------------------------------------------------
 	def scritta_trasparente(self,testo):
 		sfondo = pygame.Surface([800,50], pygame.SRCALPHA, 32)
 		sfondo = sfondo.convert_alpha()
@@ -186,18 +234,19 @@ def main():
 	screen_width = 900
 	screen_height = 600
 	oggetto.screen=oggetto.cambia_pieno_schermo('0')
+	dialogo=Dialogosemplice()
 	
 	
 
 	while oggetto.running_loop:
 		oggetto.screen.fill(0)
-
+		if dialogo.open:
+			dialogo.scrivi_frase()
 		
-		oggetto.scrivi_frase_blit()
 		oggetto.disegna_frecce()
 		
 		pygame.display.flip()
-		
+		#dialogo.gestione_eventi()
 		oggetto.gestione_eventi()
 	
 	

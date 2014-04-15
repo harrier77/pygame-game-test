@@ -1208,8 +1208,12 @@
     <property name="dest_tile_y" value="138"/>
    </properties>
   </object>
-  <!--<object name="Inizio" type="cerchio" x="4341" y="4658" width="22" height="21">
-   <ellipse/>
-  </object>-->
+  <object name="To casa gioco" type="warp" x="2240" y="4196" width="28" height="27">
+   <properties>
+    <property name="dest_map" value="casa_gioco"/>
+    <property name="dest_tile_x" value="11"/>
+    <property name="dest_tile_y" value="19"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

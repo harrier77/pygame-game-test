@@ -38,6 +38,9 @@ class Miohero(model.Object):
         left_standing = pygame.image.load('animazioni/gameimages/crono_left.gif')
         right_standing = pygame.transform.flip(left_standing, True, False)
         standing_scelta=sit_standing
+        div_scala=1.4
+        
+
         #------------------------------------
         def __init__(self,map_pos,screen_pos,parentob):
                 model.Object.__init__(self)
@@ -55,13 +58,18 @@ class Miohero(model.Object):
                 
         #------------------------------------       
         def crea_giocatore_animato(self):
-                playerWidth, playerHeight = self.front_standing.get_size()
+                #playerWidth, playerHeight = self.front_standing.get_size()
                 # creating the PygAnimation objects for walking/running in all directions
                 animTypes = 'back_run back_walk front_run front_walk left_run left_walk'.split()
                 animObjs = {}
                 for animType in animTypes:
                     imagesAndDurations = [('animazioni/gameimages/crono_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
                     animObjs[animType] = pyganim.PygAnimation(imagesAndDurations)
+ 
+                for id in animObjs:
+                        dim_meta=(int(animObjs[id].getRect().width/self.div_scala),int(animObjs[id].getRect().height/self.div_scala))
+                        animObjs[id].scale(dim_meta)
+                        
                 # create the right-facing sprites by copying and flipping the left-facing sprites
                 animObjs['right_walk'] = animObjs['left_walk'].getCopy()
                 animObjs['right_walk'].flip(True, False)
@@ -69,6 +77,9 @@ class Miohero(model.Object):
                 animObjs['right_run'] = animObjs['left_run'].getCopy()
                 animObjs['right_run'].flip(True, False)
                 animObjs['right_run'].makeTransformsPermanent()
+                
+                
+                
                 self.moveConductor = pyganim.PygConductor(animObjs)
                 self.moveConductor.play()
                 return animObjs
@@ -80,6 +91,8 @@ class Miohero(model.Object):
             else:
                 #image=self.front_standing
                 image=self.standing_scelta
+                dim_meta= (int(image.get_size()[0]/self.div_scala),int(image.get_size()[1]/self.div_scala))
+                image=pygame.transform.scale(image,dim_meta)
             return image
         #------------------------------------ 
         @property
@@ -100,7 +113,10 @@ class Miohero(model.Object):
 class App_gum(Engine):
         nuova_mappa_caricare=True
         fringe_i=1
-        def __init__(self,resolution=(400,200),dir=".\\mappe\\",mappa="mini.tmx",\
+        
+        dic_storia={'interlocutore':{'segmento':'2','messaggio':'Esci muoviti! Il califfo sta parlando e manchi solo tu!'}}
+        
+        def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                                 coll_invis=True,ign_coll=False,miodebug=True,hero_ini_pos=(21*32,28*32)):
                 #necessario per resettare la condizione messa dalla libreria PGU
                 pygame.key.set_repeat()
@@ -139,35 +155,50 @@ class App_gum(Engine):
                 
 
                 cinghiale_ini_pos=(251,483)
-                dict_cinghiali={}
+                dict_animati={}
                 self.warps=[]
                 for O in self.prima_lista_ogg:
                         if O.type=="warp":
                                 self.warps.append(O)
                         if O.name=="Inizio" or O.name=="inizio":
                                 hero_ini_pos= O.rect.x,O.rect.y
-
-                        if O.name=="cinghiale":
-                                cinghiale_ini_pos=O.rect.x,O.rect.y
-                                cinghiale = {'pos': cinghiale_ini_pos, 'id': O.properties['id'],'durata_pausa':int(O.properties['durata_pausa'])}
-                                cinghiale['points']=O.properties['points']
-                                id= int(cinghiale.get('id'))
-                                pos=cinghiale['pos']
-                                dict_cinghiali[id]=cinghiale
-   
+                        if O.type=="animato":
+                                if O.name=="cinghiale":
+                                        cinghiale_ini_pos=O.rect.x,O.rect.y
+                                        cinghiale = {'pos': cinghiale_ini_pos, 'id': O.properties['id'],'durata_pausa':int(O.properties['durata_pausa'])}
+                                        cinghiale['points']=O.properties['points']
+                                        cinghiale['dir']='boar'
+                                        id= int(cinghiale.get('id'))
+                                        pos=cinghiale['pos']
+                                        dict_animati[id]=cinghiale
+                                        dict_animati[id]['dic_storia'] ={}
+                                if O.name=="antagonista":
+                                        antagonista_ini_pos=O.rect.x,O.rect.y
+                                        antagonista = {'pos': antagonista_ini_pos, 'id': O.properties['id'],'durata_pausa':int(O.properties['durata_pausa'])}
+                                        antagonista['points']=O.properties['points']
+                                        antagonista['dir']='priest'
+                                        id= antagonista.get('id')
+                                        pos=antagonista['pos']
+                                        dict_animati[id]=antagonista
+                                        dict_animati[id]['dic_storia'] = self.dic_storia['interlocutore']
+                                        
                 self.cammina=False        
                 ## The avatar is also the camera target.
                 self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self)
+                
                 self.lista_beast=[]
-                for i in dict_cinghiali:
-                       pos_beast= dict_cinghiali[i]['pos']
-                       durata_pausa=dict_cinghiali[i]['durata_pausa']
-                       id=dict_cinghiali[i]['id']
-                       points=dict_cinghiali[i]['points']
-                       beast=MovingBeast(pos_beast,durata_pausa,id,points)
+                for i in dict_animati:
+                       pos_beast= dict_animati[i]['pos']
+                       durata_pausa=dict_animati[i]['durata_pausa']
+                       id=dict_animati[i]['id']
+                       points=dict_animati[i]['points']
+                       dir_from_dict=dict_animati[i]['dir']
+                       beast=MovingBeast(pos_beast,durata_pausa,id,points,dir_name=dir_from_dict)
                        beast.debug=miodebug
+                       beast.dic_storia=dict_animati[i]['dic_storia']
+                       beast.motore=self
                        self.lista_beast.append(beast)
-                #self.beast=MovingBeast(cinghiale_ini_pos)
+                
       
                 Engine.__init__(self,
                     caption='Tiled Map with Renderer '+mappa,
@@ -213,6 +244,7 @@ class App_gum(Engine):
                 ## Create the renderer.
                 self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
                 self.dialogo=Dialogosemplice()
+                
 
                 
         #------------------------------------------------------------------ 
@@ -264,6 +296,7 @@ class App_gum(Engine):
                 pygame.draw.polygon(camera.surface, Color('white'), self.speed_box.corners, 1)
         
         
+        
         #------------------------------------------------------------------ 
         def draw(self, interp):
                 State.screen.clear()
@@ -275,7 +308,7 @@ class App_gum(Engine):
                     toolkit.draw_labels(self.label_cache)
                 if self.all_groups[self.collision_group_i].visible: self.draw_debug()
                 for beast in self.lista_beast:
-                    beast.muovi_cinghiale()
+                    beast.muovi_animato()
                 self.draw_detail()
                 self.dialogo.scrivi_frase()
                 State.screen.flip()
@@ -414,6 +447,7 @@ class App_gum(Engine):
                                 self.movex += -State.speed
                                 self.camera.target.giocatore_animato=self.animato['left_run']
                 elif key == pygame.K_F4:
+                        #self.dialogo.testo="Pippo"
                         self.dialogo.open=True
                 elif key == K_g:
                     State.show_grid = not State.show_grid

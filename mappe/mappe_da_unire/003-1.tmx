@@ -724,7 +724,6 @@
 </data>
  </layer>
  <objectgroup name="Objects" width="0" height="0">
-  <object name="Inizio" type="warp" x="5480" y="2437" width="23" height="31"/>
   <object name="To Beach" type="warp" x="4480" y="608" width="96" height="32">
    <properties>
     <property name="dest_map" value="004-1"/>

@@ -56,28 +56,28 @@
   <object name="inizio" x="103" y="139" width="24" height="22">
    <ellipse/>
   </object>
-  <object name="cinghiale" x="69" y="352">
+  <object name="cinghiale" type="animato" x="69" y="352">
    <properties>
     <property name="durata_pausa" value="2000"/>
     <property name="id" value="2"/>
    </properties>
    <polyline points="3,3 15,122 126,118 119,0 53,-98 70,68 3,-148 117,-217 324,-214"/>
   </object>
-  <object name="cinghiale" x="149" y="501">
+  <object name="cinghiale" type="animato" x="149" y="501">
    <properties>
     <property name="durata_pausa" value="2000"/>
     <property name="id" value="3"/>
    </properties>
    <polyline points="3,3 478,4"/>
   </object>
-  <object name="cinghiale" x="606" y="51">
+  <object name="cinghiale" type="animato" x="606" y="51">
    <properties>
     <property name="durata_pausa" value="2000"/>
     <property name="id" value="4"/>
    </properties>
    <polyline points="3,3 -2,397"/>
   </object>
-  <object name="cinghiale" x="273" y="58">
+  <object name="cinghiale" type="animato" x="273" y="58">
    <properties>
     <property name="durata_pausa" value="2000"/>
     <property name="id" value="7"/>
