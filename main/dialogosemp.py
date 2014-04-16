@@ -25,7 +25,7 @@ class Dialogosemplice():
 	def scrivi_frase(self):	
 		if self.open:
 			#font = pygame.font.Font(None, 32)
-			text = self.font.render(self.testo, 1, (10, 10, 10))
+			text = self.font.render(self.testo, True, (10, 10, 10),(255,255,255))
 			self.background_txt.blit(text,(10,10))
 			self.background_txt.blit(self.cross,(self.crossrect.x,0))
 			self.screen.blit(self.background_txt,(self.bgrect.x,self.bgrect.y))

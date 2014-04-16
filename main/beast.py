@@ -267,6 +267,7 @@ class MovingBeast(model.Object):
                         pass
                 if self.motore:
                         if self.motore.dialogo.close_clicked:
+                                self.fermato=False
                                 pass
                 
         #----------------------------------------
