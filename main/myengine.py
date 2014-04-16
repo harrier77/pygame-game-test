@@ -19,6 +19,7 @@ from librerie import pyganim
 from beast import calcola_passi,Beast,MovingBeast
 from miovar_dump import *
 from dialogosemp import Dialogosemplice
+from librerie import xmltodict
 DEBUG=False
 
 #-------------------------------------------------------------------------------
@@ -113,8 +114,10 @@ class Miohero(model.Object):
 class App_gum(Engine):
         nuova_mappa_caricare=True
         fringe_i=1
-        
-        dic_storia={'interlocutore':{'segmento':'2','messaggio':'Esci muoviti! Il califfo sta parlando e manchi solo tu!'}}
+        #dic_storia={'interlocutore':{'segmento':'2','messaggio':'Esci muoviti! Il califfo sta parlando e manchi solo tu!'}}
+        xml = open('animazioni\\prova.xml', 'r').read()
+        dic_storia1=xmltodict.parse(xml)['storia']
+
         
         def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                                 coll_invis=True,ign_coll=False,miodebug=True,hero_ini_pos=(21*32,28*32)):
@@ -180,7 +183,8 @@ class App_gum(Engine):
                                         id= antagonista.get('id')
                                         pos=antagonista['pos']
                                         dict_animati[id]=antagonista
-                                        dict_animati[id]['dic_storia'] = self.dic_storia['interlocutore']
+                                        #dict_animati[id]['dic_storia'] = self.dic_storia['interlocutore']
+                                        dict_animati[id]['dic_storia'] = self.dic_storia1['interlocutore'][0]
                                         
                 self.cammina=False        
                 ## The avatar is also the camera target.
