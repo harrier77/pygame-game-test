@@ -114,9 +114,8 @@ class Miohero(model.Object):
 class App_gum(Engine):
         nuova_mappa_caricare=True
         fringe_i=1
-        #dic_storia={'interlocutore':{'segmento':'2','messaggio':'Esci muoviti! Il califfo sta parlando e manchi solo tu!'}}
         xml = open('animazioni\\prova.xml', 'r').read()
-        dic_storia1=xmltodict.parse(xml)['storia']
+        dic_storia=xmltodict.parse(xml)['storia']
 
         
         def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
@@ -135,14 +134,13 @@ class App_gum(Engine):
                         if mylayer.name=="Fringe":
                                 self.fringe_i= mylayer.layeri
                                 
-                ##carica in una lista i lvelli degli oggetti 
+                #carica in una lista i lvelli degli oggetti 
                 self.lista_oggetti=list()
-                
                 for L in self.tiled_map.layers: 
                         if L.is_object_group :
                                 self.lista_oggetti.append(L)
-                ##fine
-                ##l'attr lista_oggetti in realtà è una lista dei layer con oggetti, che spesso è uno solo
+                #fine
+                #l'attr lista_oggetti in realtà è una lista dei layer con oggetti, che spesso è uno solo
                 self.prima_lista_ogg=self.lista_oggetti[0].objects.objects
 
                 ## Save special layers.
@@ -155,37 +153,29 @@ class App_gum(Engine):
                 self.collision_group.visible = not coll_invis
                 ## Remove above-ground layers so we can give map to the renderer.
                 del self.tiled_map.layers[1:]
-                
 
-                cinghiale_ini_pos=(251,483)
                 dict_animati={}
                 self.warps=[]
                 for O in self.prima_lista_ogg:
-                        if O.type=="warp":
-                                self.warps.append(O)
                         if O.name=="Inizio" or O.name=="inizio":
                                 hero_ini_pos= O.rect.x,O.rect.y
+                        if O.type=="warp":
+                                self.warps.append(O)
                         if O.type=="animato":
-                                if O.name=="cinghiale":
-                                        cinghiale_ini_pos=O.rect.x,O.rect.y
-                                        cinghiale = {'pos': cinghiale_ini_pos, 'id': O.properties['id'],'durata_pausa':int(O.properties['durata_pausa'])}
-                                        cinghiale['points']=O.properties['points']
-                                        cinghiale['dir']='boar'
-                                        id= int(cinghiale.get('id'))
-                                        pos=cinghiale['pos']
-                                        dict_animati[id]=cinghiale
+                                animato_ini_pos=O.rect.x,O.rect.y
+                                animato = {'pos': animato_ini_pos, 'id': O.properties['id'],'durata_pausa':int(O.properties['durata_pausa'])}
+                                animato['points']=O.properties['points']
+                                animato['dir']=str(O.name)
+                                id= (animato.get('id'))
+                                pos=animato['pos']
+                                dict_animati[id]=animato
+                                dict_animati[id]['dic_storia'] ={}
+                                try:
+                                        dict_animati[id]['dic_storia'] = self.dic_storia[id][0]
+                                except:
                                         dict_animati[id]['dic_storia'] ={}
-                                if O.name=="antagonista":
-                                        antagonista_ini_pos=O.rect.x,O.rect.y
-                                        antagonista = {'pos': antagonista_ini_pos, 'id': O.properties['id'],'durata_pausa':int(O.properties['durata_pausa'])}
-                                        antagonista['points']=O.properties['points']
-                                        antagonista['dir']='priest'
-                                        id= antagonista.get('id')
-                                        pos=antagonista['pos']
-                                        dict_animati[id]=antagonista
-                                        #dict_animati[id]['dic_storia'] = self.dic_storia['interlocutore']
-                                        dict_animati[id]['dic_storia'] = self.dic_storia1['interlocutore'][0]
-                                        
+                                
+                                
                 self.cammina=False        
                 ## The avatar is also the camera target.
                 self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self)
@@ -262,8 +252,6 @@ class App_gum(Engine):
                             self.camera.target.herosprite.rect.y=wy
                             self.move_to = State.camera.screen_to_world((wx,wy))
                         self.is_warp()
-
-
                 self.update_camera_position()
                 State.camera.update()
                 ## Set render's rect.
@@ -298,8 +286,6 @@ class App_gum(Engine):
                 rect = self.avatar.hitbox
                 pygame.draw.rect(camera.surface, Color('red'), rect.move(-cx,-cy))
                 pygame.draw.polygon(camera.surface, Color('white'), self.speed_box.corners, 1)
-        
-        
         
         #------------------------------------------------------------------ 
         def draw(self, interp):
@@ -338,7 +324,7 @@ class App_gum(Engine):
                         else:
                             blit(s.image, s.rect.move(-cx,-cy))
   
-        
+        #---------------------------------------------------
         def is_warp(self):
                 dummy = self.avatar
                 newhitbox=dummy.hitbox.copy()
@@ -373,8 +359,6 @@ class App_gum(Engine):
                                         self.nuova_mappa_caricare=True
                                         self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty))
 
-
-                
         #------------------------------------------------------
         def is_walkable2(self):
                 if self.ignora_collisioni:

@@ -10,12 +10,12 @@ class Dialogosemplice():
 		self.text_altezza=100
 		self.crossrect=None
 		self.screen=pygame.display.get_surface()
-		self.background_txt = pygame.Surface((self.screen.get_size()[0]-10,self.text_altezza))
+		self.background_txt = pygame.Surface((self.screen.get_size()[0]-1,self.text_altezza))
 		self.background_txt.fill((250, 250, 250))
 		self.bgrect=self.background_txt.get_rect()
 		self.bgrect.top=self.screen.get_size()[1]-self.text_altezza
 		self.cross=pygame.image.load('.\\immagini\\cross.gif')
-		self.font=pygame.font.Font(data.filepath('font', 'Vera.ttf'), 22)
+		self.font=pygame.font.Font(data.filepath('font', 'Vera.ttf'), 18)
 		self.crossrect=self.cross.get_rect()
 		self.crossrect.x=self.bgrect.topright[0]-15
 		self.crossrect.y=self.bgrect.y
