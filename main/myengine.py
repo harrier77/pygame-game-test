@@ -16,7 +16,7 @@ from gummworld2 import context, data, model, geometry, toolkit
 from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim
 
-from beast import calcola_passi,Beast,MovingBeast
+from movingbeast import calcola_passi,MovingBeast
 from miovar_dump import *
 from dialogosemp import Dialogosemplice
 from librerie import xmltodict
@@ -38,14 +38,16 @@ class Miohero(model.Object):
         back_standing = pygame.image.load('animazioni/gameimages/crono_back.gif')
         left_standing = pygame.image.load('animazioni/gameimages/crono_left.gif')
         right_standing = pygame.transform.flip(left_standing, True, False)
+
         standing_scelta=sit_standing
         div_scala=1.4
         
 
         #------------------------------------
-        def __init__(self,map_pos,screen_pos,parentob):
+        def __init__(self,map_pos,screen_pos,parentob,dormi=True):
                 model.Object.__init__(self)
                 self.parent=parentob
+                self.dormi=dormi
                 self.animated_object=self.crea_giocatore_animato()
                 self.giocatore_animato=self.animated_object['front_walk']
                 #self.image= self.giocatore_animato.ritorna_fotogramma()
@@ -66,7 +68,10 @@ class Miohero(model.Object):
                 for animType in animTypes:
                     imagesAndDurations = [('animazioni/gameimages/crono_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
                     animObjs[animType] = pyganim.PygAnimation(imagesAndDurations)
- 
+                
+                imagesAndDurations = [('animazioni/gameimages/crono_sleep.000.gif',1),('animazioni/gameimages/crono_sleep.001.gif',1)]
+                animObjs['sleep']=pyganim.PygAnimation(imagesAndDurations)
+                
                 for id in animObjs:
                         dim_meta=(int(animObjs[id].getRect().width/self.div_scala),int(animObjs[id].getRect().height/self.div_scala))
                         animObjs[id].scale(dim_meta)
@@ -78,9 +83,7 @@ class Miohero(model.Object):
                 animObjs['right_run'] = animObjs['left_run'].getCopy()
                 animObjs['right_run'].flip(True, False)
                 animObjs['right_run'].makeTransformsPermanent()
-                
-                
-                
+  
                 self.moveConductor = pyganim.PygConductor(animObjs)
                 self.moveConductor.play()
                 return animObjs
@@ -89,8 +92,11 @@ class Miohero(model.Object):
         def image(self):
             if self.parent.cammina:
                 image= self.giocatore_animato.ritorna_fotogramma()
+                self.dormi=False
+            elif self.dormi:
+                self.giocatore_animato=self.animated_object['sleep']
+                image=self.giocatore_animato.ritorna_fotogramma()
             else:
-                #image=self.front_standing
                 image=self.standing_scelta
                 dim_meta= (int(image.get_size()[0]/self.div_scala),int(image.get_size()[1]/self.div_scala))
                 image=pygame.transform.scale(image,dim_meta)
@@ -119,7 +125,7 @@ class App_gum(Engine):
 
         
         def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
-                                coll_invis=True,ign_coll=False,miodebug=True,hero_ini_pos=(21*32,28*32)):
+                                coll_invis=True,ign_coll=False,miodebug=True,hero_ini_pos=(21*32,28*32),dormi=True):
                 #necessario per resettare la condizione messa dalla libreria PGU
                 pygame.key.set_repeat()
                 #---------------
@@ -171,14 +177,14 @@ class App_gum(Engine):
                                 dict_animati[id]=animato
                                 dict_animati[id]['dic_storia'] ={}
                                 try:
-                                        dict_animati[id]['dic_storia'] = self.dic_storia[id][0]
+                                        dict_animati[id]['dic_storia'] = self.dic_storia[id]
                                 except:
                                         dict_animati[id]['dic_storia'] ={}
                                 
                                 
                 self.cammina=False        
                 ## The avatar is also the camera target.
-                self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self)
+                self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
                 
                 self.lista_beast=[]
                 for i in dict_animati:
@@ -319,8 +325,6 @@ class App_gum(Engine):
                     for s in sprites:
                         if s is avatar:
                             blit(s.image, s.rect.move(camera.anti_interp(s)))
-                        #if s is beast:
-                            #blit(s.image, s.rect.move(-cx,-cy))
                         else:
                             blit(s.image, s.rect.move(-cx,-cy))
   
@@ -357,7 +361,7 @@ class App_gum(Engine):
                                         camera.position = wx,wy
                                 else:
                                         self.nuova_mappa_caricare=True
-                                        self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty))
+                                        self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)
 
         #------------------------------------------------------
         def is_walkable2(self):
