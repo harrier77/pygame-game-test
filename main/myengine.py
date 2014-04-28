@@ -45,48 +45,48 @@ class Miohero(model.Object):
 
         #------------------------------------
         def __init__(self,map_pos,screen_pos,parentob,dormi=True):
-                model.Object.__init__(self)
-                self.parent=parentob
-                self.dormi=dormi
-                self.animated_object=self.crea_giocatore_animato()
-                self.giocatore_animato=self.animated_object['front_walk']
-                #self.image= self.giocatore_animato.ritorna_fotogramma()
-                self.rect=self.image.get_rect()
-                #self.hitbox = self.rect
-                self.herosprite=pygame.sprite.Sprite()
-                self.herosprite.image=self.image
-                self.herosprite.rect=self.rect
-                self.position = map_pos
-                self.screen_position = screen_pos
+            model.Object.__init__(self)
+            self.parent=parentob
+            self.dormi=dormi
+            self.animated_object=self.crea_giocatore_animato()
+            self.giocatore_animato=self.animated_object['front_walk']
+            #self.image= self.giocatore_animato.ritorna_fotogramma()
+            self.rect=self.image.get_rect()
+            #self.hitbox = self.rect
+            self.herosprite=pygame.sprite.Sprite()
+            self.herosprite.image=self.image
+            self.herosprite.rect=self.rect
+            self.position = map_pos
+            self.screen_position = screen_pos
                 
         #------------------------------------       
         def crea_giocatore_animato(self):
-                #playerWidth, playerHeight = self.front_standing.get_size()
-                # creating the PygAnimation objects for walking/running in all directions
-                animTypes = 'back_run back_walk front_run front_walk left_run left_walk'.split()
-                animObjs = {}
-                for animType in animTypes:
-                    imagesAndDurations = [('animazioni/gameimages/crono_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
-                    animObjs[animType] = pyganim.PygAnimation(imagesAndDurations)
-                
-                imagesAndDurations = [('animazioni/gameimages/crono_sleep.000.gif',1),('animazioni/gameimages/crono_sleep.001.gif',1)]
-                animObjs['sleep']=pyganim.PygAnimation(imagesAndDurations)
-                
-                for id in animObjs:
-                        dim_meta=(int(animObjs[id].getRect().width/self.div_scala),int(animObjs[id].getRect().height/self.div_scala))
-                        animObjs[id].scale(dim_meta)
-                        
-                # create the right-facing sprites by copying and flipping the left-facing sprites
-                animObjs['right_walk'] = animObjs['left_walk'].getCopy()
-                animObjs['right_walk'].flip(True, False)
-                animObjs['right_walk'].makeTransformsPermanent()
-                animObjs['right_run'] = animObjs['left_run'].getCopy()
-                animObjs['right_run'].flip(True, False)
-                animObjs['right_run'].makeTransformsPermanent()
-  
-                self.moveConductor = pyganim.PygConductor(animObjs)
-                self.moveConductor.play()
-                return animObjs
+            #playerWidth, playerHeight = self.front_standing.get_size()
+            # creating the PygAnimation objects for walking/running in all directions
+            animTypes = 'back_run back_walk front_run front_walk left_run left_walk'.split()
+            animObjs = {}
+            for animType in animTypes:
+                imagesAndDurations = [('animazioni/gameimages/crono_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
+                animObjs[animType] = pyganim.PygAnimation(imagesAndDurations)
+            
+            imagesAndDurations = [('animazioni/gameimages/crono_sleep.000.gif',1),('animazioni/gameimages/crono_sleep.001.gif',1)]
+            animObjs['sleep']=pyganim.PygAnimation(imagesAndDurations)
+            
+            for id in animObjs:
+                    dim_meta=(int(animObjs[id].getRect().width/self.div_scala),int(animObjs[id].getRect().height/self.div_scala))
+                    animObjs[id].scale(dim_meta)
+                    
+            # create the right-facing sprites by copying and flipping the left-facing sprites
+            animObjs['right_walk'] = animObjs['left_walk'].getCopy()
+            animObjs['right_walk'].flip(True, False)
+            animObjs['right_walk'].makeTransformsPermanent()
+            animObjs['right_run'] = animObjs['left_run'].getCopy()
+            animObjs['right_run'].flip(True, False)
+            animObjs['right_run'].makeTransformsPermanent()
+
+            self.moveConductor = pyganim.PygConductor(animObjs)
+            self.moveConductor.play()
+            return animObjs
         #------------------------------------
         @property
         def image(self):
@@ -123,8 +123,8 @@ class App_gum(Engine):
         xml = open('animazioni\\prova.xml', 'r').read()
         dic_storia=xmltodict.parse(xml)['storia']
         godebug=False
-
-        
+        #print dic_storia
+        #exit()
         def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                                 coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True):
             #necessario per resettare la condizione messa dalla libreria PGU
@@ -211,7 +211,6 @@ class App_gum(Engine):
                    beast.staifermo=dict_animati[i]['staifermo']
                    beast.motore=self
                    self.lista_beast.append(beast)
-            
   
             Engine.__init__(self,
                 caption='Tiled Map with Renderer '+mappa,
@@ -408,23 +407,34 @@ class App_gum(Engine):
             else:
                     is_walkable=False
             return is_walkable       
+             
         
         #------------------------------------------------------
         def is_talking(self):
-            self.dialogo.open=False
+            hero=self.avatar.rect
+            camera = State.camera
+            cx,cy = camera.rect.topleft
+            i=0
             for beast in self.lista_beast:
-                hero=self.avatar.rect
+                
                 talk_box=beast.talk_box
                 hits=hero.colliderect(talk_box)
-                camera = State.camera
-                cx,cy = camera.rect.topleft
                 #pygame.draw.rect(camera.surface, Color('red'), talk_box.move(-cx,-cy))
                 if hits:
-                    if not self.dialogo.close_clicked:
-                        self.dialogo.open=True
-                        self.dialogo.testo=beast.dic_storia['messaggio']
+                    #if not self.dialogo.close_clicked:
+                    self.dialogo.open=True
+                    if type(beast.dic_storia['messaggio']) is not list:
+                        beast.dic_storia['messaggio']=[beast.dic_storia['messaggio']]
+                    self.dialogo.sequenza_messaggi(beast)
+                    #print str(i)+beast.id+str(beast.dic_storia['messaggio'])
+                    break
                 else:
-                    beast.fermato=False
+                    #beast.fermato=False
+                    #self.dialogo.sequenza_partita=False
+                    self.dialogo.open=False
+                i=i+1
+                
+            #print self.dialogo.open
 
         #------------------------------------------------------------------
         def verifica_residuale_tasti_premuti(self,mio_keydown):

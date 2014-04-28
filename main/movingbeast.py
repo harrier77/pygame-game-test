@@ -272,9 +272,11 @@ class MovingBeast(model.Object):
             else:
                 if self.staifermo:
                     direzioni=['left_walk','right-walk','front_walk','back_walk','SW','NW','SW','NE','SE']
-                    adesso= datetime.datetime.time(datetime.datetime.now()).microsecond
-                    if adesso==0:
+                    adesso= datetime.datetime.time(datetime.datetime.now()).microsecond/1000
+                    adesso1= int(adesso/4)
+                    if adesso1>230:
                         self.direzione=direzioni[randint(0,8)]
+                        #print self.direzione
             
             #sezione che effettivamente muove l'animazione, ma solo se non è in pausa o non è fermata
             if self.is_walking and not self.fermato: 
@@ -306,7 +308,7 @@ class MovingBeast(model.Object):
 def main():
     dir_name="aio"
     bestia=MovingBeast(dir_name=dir_name)
-    bestia.staifermo=False
+    bestia.staifermo=True
     
     pygame.init()
     screen = pygame.display.set_mode((600, 300))

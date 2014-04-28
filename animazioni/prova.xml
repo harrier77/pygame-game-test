@@ -10,5 +10,7 @@
         <aio>
                 <segmento>1</segmento>
                 <messaggio>Le tasse sono state alzate ancora!</messaggio>
+                <messaggio>E' inutile che vi lamentiate</messaggio>
+                <messaggio>Se non pagate morirete!</messaggio>
         </aio>
 </storia>

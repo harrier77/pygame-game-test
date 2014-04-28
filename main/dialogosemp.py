@@ -5,6 +5,29 @@ import paths
 import gummworld2
 from gummworld2 import data,context
 
+#--------------------------------------------------------
+class MessageTimerClass(threading.Thread):
+    def __init__(self,messaggi,ogg_genitore):
+        threading.Thread.__init__(self)
+        self.event = threading.Event()
+        self.count = 5
+        self.messaggi=messaggi
+        self.ogg_genitore=ogg_genitore
+    
+    def run(self):
+        for value in self.messaggi:
+            if self.ogg_genitore.open:self.ogg_genitore.suono.play()
+            self.ogg_genitore.testo=value
+            self.event.wait(2)
+        self.ogg_genitore.testo='...'
+        self.ogg_genitore.sequenza_finita=True
+        self.stop()
+
+        
+    def stop(self):
+        self.event.set()
+        
+#-----------------------------------------------------------
 
 class Dialogosemplice():
     open=False
@@ -12,6 +35,8 @@ class Dialogosemplice():
     close_clicked=False
     beeped=False
     scritto=False
+    sequenza_partita=False
+    sequenza_finita=True
 
     def __init__(self):
         self.text_altezza=50
@@ -30,20 +55,7 @@ class Dialogosemplice():
         self.crossrect.height=self.crossrect.height
         pygame.mixer.init()
         self.suono=pygame.mixer.Sound('immagini/message.wav')
-    
-    def mybeep(self):
-        if not self.beeped:
-            self.suono.play()
-            self.beeped=True
-    
-    def miotimer(self):
-        if not self.scritto:
-            self.t=threading.Timer(0.6, function=self.mywrite)
-            self.t.daemon=True
-            self.t.start()
-        else:
-            self.mywrite()
-                
+
     def mywrite(self):
         self.background_txt.fill((250, 250, 250))
         #font = pygame.font.Font(None, 32)
@@ -58,16 +70,29 @@ class Dialogosemplice():
         type_filter=pygame.MOUSEBUTTONDOWN
         for event in pygame.event.get(type_filter): # event handling loop
             self.gestione_eventi(event)
-        
-        
+    
+    #-----------------------------------------------------
+    
     def scrivi_frase(self):	
         if self.open:
-            self.mybeep()
-            self.miotimer()
+            #self.mybeep()
+            self.mywrite()
         else:
-            self.beeped=False
+            #self.beeped=False
             self.scritto=False
+    
+    #-----------------------------------------------------
+    def sequenza_messaggi(self,beast):
+        if not self.sequenza_partita:
+            #self.testo=beast.dic_storia['messaggio'][0]
+            self.seq=MessageTimerClass(beast.dic_storia['messaggio'],self)
+            self.seq.daemon=True
+            self.seq.start()
+            self.sequenza_partita=True
+            self.sequenza_finita=False
+        if self.sequenza_finita:self.sequenza_partita=False
 
+    #---------------------------------------------------------
     def gestione_eventi(self,event):
         #event=pygame.event.peek()
         #event=pygame.event.wait()
