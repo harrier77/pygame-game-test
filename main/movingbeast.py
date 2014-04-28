@@ -12,7 +12,7 @@ from librerie import miovar_dump
 from librerie import pyganim
 import gummworld2
 from gummworld2 import geometry,model,data
-
+from random import randint
 
 
 import threading
@@ -62,13 +62,14 @@ class Pseudo_async_timer():
 
 #Inizio Classe               
 class MovingBeast(model.Object):
-        debug=True
+        debug=False
         miotimer=None
         segmento=0
         dic_storia={}
         messaggio_dato=False
         motore=None
         fermato=False
+        staifermo=False
         def __init__(self,position=(100,100),durata_pausa=1000,id=1,points=(()),dir_name='boar'):
                 model.Object.__init__(self)
                 if dir_name=='boar' or dir_name=='priest':
@@ -78,6 +79,8 @@ class MovingBeast(model.Object):
                 self.id=id
                 self.x=position[0]
                 self.y=position[1]
+                
+                
                 #points = [(3,3), (200,200)]
                 if points:
                     self.lista_destinazioni=self.calcola_points(points,position)
@@ -96,28 +99,28 @@ class MovingBeast(model.Object):
                 self.durata_pausa=durata_pausa
         
         def calcola_points(self,points,position):
-                real_points=[]
-                for singlepos in points:
-                    newx=position[0]+singlepos[0]
-                    newy=position[1]+singlepos[1]
-                    couple=(newx,newy)
-                    real_points.append(couple)
-                return real_points
+            real_points=[]
+            for singlepos in points:
+                newx=position[0]+singlepos[0]
+                newy=position[1]+singlepos[1]
+                couple=(newx,newy)
+                real_points.append(couple)
+            return real_points
 
  
         def comp_lista_destinazioni(self,x,y):
-                lista_destinazioni=[]
-                x=x-50
-                y=y
-                lista_destinazioni.append((x,y))
-                y=y+50
-                lista_destinazioni.append((x,y))
-                x=x+150
-                lista_destinazioni.append((x,y))
-                x=x-100
-                y=y-100
-                lista_destinazioni.append((x,y))
-                return lista_destinazioni
+            lista_destinazioni=[]
+            x=x-50
+            y=y
+            lista_destinazioni.append((x,y))
+            y=y+50
+            lista_destinazioni.append((x,y))
+            x=x+150
+            lista_destinazioni.append((x,y))
+            x=x-100
+            y=y-100
+            lista_destinazioni.append((x,y))
+            return lista_destinazioni
    
         def calcola_direzione(self,pos,mousepos):
             angolo= geometry.angle_of(pos,mousepos)
@@ -140,12 +143,16 @@ class MovingBeast(model.Object):
                     direzione='left'
             return direzione
         
-        
+        #-------------------------------------------------------------------------
         def scegli_fotogramma_animazione(self,miocing,direzione):
             self.direzione=direzione
             if len(self.listap)>0:  ##inizia la camminata
-                pos= self.listap.pop(0)
-                self.x,self.y=pos ##qui vengono impostati x e y del fotogramma da proiettare sullo schermo prendendoli dalla lista della camminata self.listap
+                if not self.staifermo:
+                    #qui vengono impostati x e y del fotogramma da proiettare prendendoli dalla lista della camminata self.listap
+                    pos= self.listap.pop(0)
+                    self.x,self.y=pos ##qui vengono impostati x e y del fotogramma da proiettare sullo schermo prendendoli dalla lista della camminata self.listap
+                    #fine impostazione
+                
                 miocing.moveConductor.play()
                 #di seguito viene selezionata l'iimmagine a seconda della direzione della camminata; x e y sono già stati impostati
                 if direzione=='left':
@@ -194,62 +201,84 @@ class MovingBeast(model.Object):
             return image
         
         
+        @property
+        def talk_box(self):
+            talk_box=self.rect
+            if self.rect.height<100: talk_box.height=self.rect.height+120
+            else:talk_box.height=self.rect.height
+            if talk_box.width<100:talk_box.width=self.rect.width+120
+            else: talk_box.width=self.rect.width
+            y = self.rect.y
+            x= self.rect.x
+            talk_box.y=y
+            talk_box.x=x
+            return talk_box
+        
         #--------------------------------------------------------------------------------
         def mio_timer_pausa(self):
-                adesso= datetime.datetime.time(datetime.datetime.now())
-                if self.debug:print "timer per la pausa del oggetto partito "+str(adesso)
-                self.lanciato=True
-                self.inpausa=True
-                self.auto=False  ##con auto=false il ciclo di muovi_cinghiale() non gira
-                fun_callback=self.fine_pausa
-                self.miotimer=Pseudo_async_timer(self.durata_pausa,fun_callback,1) #crea l'ggetto timer con la pausa presa dai par di MovingBeast()
-                #print "segmento completato n. "+str(self.segmento)
-                self.segmento=self.segmento+1
-                
+            adesso= datetime.datetime.time(datetime.datetime.now())
+            if self.debug:print "timer per la pausa del oggetto partito "+str(adesso)
+            self.lanciato=True
+            self.inpausa=True
+            self.auto=False  ##con auto=false il ciclo di muovi_cinghiale() non gira
+            fun_callback=self.fine_pausa
+            self.miotimer=Pseudo_async_timer(self.durata_pausa,fun_callback,1) #crea l'ggetto timer con la pausa presa dai par di MovingBeast()
+            #print "segmento completato n. "+str(self.segmento)
+            self.segmento=self.segmento+1
+         #--------------------------------------------------------------------------------        
         def fine_pausa(self): ##questa procedura si avvia ogni n secondi e fa muovere il cinghiale e poi fermarsi
-                self.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale() quindi è finita la pausa
-                self.lanciato=False
-                self.inpausa=False
-                adesso= datetime.datetime.time(datetime.datetime.now())
-                if self.debug:print "finita pausa del oggetto "+str(adesso)
-                self.miotimer=None
+            self.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale() quindi è finita la pausa
+            self.lanciato=False
+            self.inpausa=False
+            adesso= datetime.datetime.time(datetime.datetime.now())
+            if self.debug:print "finita pausa del oggetto "+str(adesso)
+            self.miotimer=None
         #--------------------------------------------------------------------------------
         
         def check_storia(self):
-                try:
-                        if self.segmento==int(self.dic_storia['segmento']) and self.messaggio_dato==False:
-                                self.motore.dialogo.testo=self.dic_storia['messaggio']
-                                self.motore.dialogo.open=True
-                                self.messaggio_dato=True
-                                self.fermato=True
-                except:
-                        pass
-                if self.motore:
-                        if self.motore.dialogo.close_clicked:
-                                self.fermato=False
-                                pass
+            try:
+                #if self.segmento==int(self.dic_storia['segmento']) and self.messaggio_dato==False:
+                if self.messaggio_dato==False:
+                    #self.motore.dialogo.testo=self.dic_storia['messaggio']
+                    self.motore.dialogo.open=True
+                    #self.messaggio_dato=True
+                    #self.fermato=True
+            except:
+                pass
+            
+            if self.motore:
+                if self.motore.dialogo.close_clicked:
+                    self.fermato=False
+                            
                 
         #----------------------------------------
         def muovi_animato(self):
             
             if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
-                        if self.contatore_destinazioni>len(self.lista_destinazioni)-1: 
-                                self.contatore_destinazioni=0 #resetta il contatore della lista delle destinazioni automatiche
-                                self.segmento=0
-                        if (self.x,self.y)==self.lista_destinazioni[self.contatore_destinazioni]:
-                                print "destinazione uguale a partenza"
-                                self.x=self.x+3
-                                self.y=self.y+3
-                                #exit()
-                        self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[self.contatore_destinazioni])  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
-                        pos_da_raggiungere=self.listap[len(self.listap)-1] #legge la posizione finale di destinazione dalla lista delle destinazioni
-                        self.direzione=self.calcola_direzione((self.x,self.y),pos_da_raggiungere) #calcola la direzione della destinazione da raggiungere
-                        self.contatore_destinazioni=self.contatore_destinazioni+1 #incrementa il contatore delle destinazioni
-                        self.auto=False #arresta il cinghiale quando ha fatto una singola camminata
-                        self.lanciato=False #setta il timer su fermo mentre la camminata è in corso
+                if self.contatore_destinazioni>len(self.lista_destinazioni)-1: 
+                        self.contatore_destinazioni=0 #resetta il contatore della lista delle destinazioni automatiche
+                        self.segmento=0
+                if (self.x,self.y)==self.lista_destinazioni[self.contatore_destinazioni]:
+                        print "destinazione uguale a partenza"
+                        self.x=self.x+3
+                        self.y=self.y+3
+                        #exit()
+                self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[self.contatore_destinazioni])  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
+                pos_da_raggiungere=self.listap[len(self.listap)-1] #legge la posizione finale di destinazione dalla lista delle destinazioni
+                self.direzione=self.calcola_direzione((self.x,self.y),pos_da_raggiungere) #calcola la direzione della destinazione da raggiungere
+                self.contatore_destinazioni=self.contatore_destinazioni+1 #incrementa il contatore delle destinazioni
+                self.auto=False #arresta il cinghiale quando ha fatto una singola camminata
+                self.lanciato=False #setta il timer su fermo mentre la camminata è in corso
+            else:
+                if self.staifermo:
+                    direzioni=['left_walk','right-walk','front_walk','back_walk','SW','NW','SW','NE','SE']
+                    adesso= datetime.datetime.time(datetime.datetime.now()).microsecond
+                    if adesso==0:
+                        self.direzione=direzioni[randint(0,8)]
             
             #sezione che effettivamente muove l'animazione, ma solo se non è in pausa o non è fermata
             if self.is_walking and not self.fermato: 
+            #if self.is_walking:
                 self.scegli_fotogramma_animazione(self.miocing,self.direzione)
             else:
                 if (self.direzione=='right') or (self.direzione=='SE') or (self.direzione=='NE'): 
@@ -275,12 +304,13 @@ class MovingBeast(model.Object):
 
                     
 def main():
-    bestia=MovingBeast(dir_name="missionario")
-    
+    dir_name="aio"
+    bestia=MovingBeast(dir_name=dir_name)
+    bestia.staifermo=False
     
     pygame.init()
     screen = pygame.display.set_mode((600, 300))
-    pygame.display.set_caption('Cinghiale in movimento')
+    pygame.display.set_caption('Animato in movimento: '+dir_name)
     BGCOLOR = (180, 180, 180)
     mainClock = pygame.time.Clock()
     #print ogg.sprite_fotogramma.rect

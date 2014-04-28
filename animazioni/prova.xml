@@ -3,8 +3,12 @@
                 <segmento>2</segmento>
                 <messaggio>Esci muoviti! Il califfo sta parlando e manchi solo tu!</messaggio>
         </interlocutore>
-        <interlocutore>
+        <carro>
                 <segmento>1</segmento>
-                <messaggio>Testo!</messaggio>
-        </interlocutore>
+                <messaggio>Seguimi!</messaggio>
+        </carro>
+        <aio>
+                <segmento>1</segmento>
+                <messaggio>Le tasse sono state alzate ancora!</messaggio>
+        </aio>
 </storia>

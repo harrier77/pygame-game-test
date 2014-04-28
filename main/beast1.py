@@ -19,6 +19,8 @@ class Beast():
                 self.left_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'_left_walk.001.gif')
                 self.right_standing = pygame.transform.flip(self.left_standing, True, False)
                 self.playerWidth, self.playerHeight = self.front_standing.get_size()
+                self.rect=self.front_standing.get_rect()
+                
                 # creating the PygAnimation objects for walking/running in all directions
                 animTypes = 'left_walk back_walk front_walk NW SW'.split()
                 #animTypes = 'back_walk front_walk left_walk'.split()
@@ -49,4 +51,7 @@ class Beast():
                 self.animObjs['right_stand'].makeTransformsPermanent()
            
                 self.moveConductor = pyganim.PygConductor(self.animObjs)
+
+
+
 #fine classe -------------------------------------

@@ -5,37 +5,37 @@ import weakref
 
 #-------------------------------------------------
 class Pseudo_async_timer():
-        scaduto=False
-        id=None
-        def __init__(self,pausa,func,id=None):
-                self.set_future_time(pausa)
-                self.pausa=pausa
-                self.id=id
-                self.func_da_chiamare=func
-        def set_future_time(self,pausa):
-                t = time.time()
-                self.fut_t=t+pausa
-        def check_time(self):
-                tnow=time.time()
-                if (tnow>self.fut_t):
-                        if not self.scaduto:
-                                print "scaduta pausa "+str(self.pausa)
-                                self.scaduto=True
-                                self.func_da_chiamare(self)
-                                return True
+    scaduto=False
+    id=None
+    def __init__(self,pausa,func,id=None):
+            self.set_future_time(pausa)
+            self.pausa=pausa
+            self.id=id
+            self.func_da_chiamare=func
+    def set_future_time(self,pausa):
+            t = time.time()
+            self.fut_t=t+pausa
+    def check_time(self):
+            tnow=time.time()
+            if (tnow>self.fut_t):
+                    if not self.scaduto:
+                            print "scaduta pausa "+str(self.pausa)
+                            self.scaduto=True
+                            self.func_da_chiamare(self)
+                            return True
 #-------------------------------------------------
 
 
 #-------------------------------------------------               
 class Gruppo_timer():
-        lista_timer=[]
-        def add_timer(self,pausa,fun_callback,id):
-                newt=Pseudo_async_timer(pausa,fun_callback,id)
-                self.lista_timer.append(newt)
-        def controlla_tutti_timer(self):
-                for id,t in enumerate(self.lista_timer):
-                        if t.check_time():
-                                self.lista_timer.pop(id)
+    lista_timer=[]
+    def add_timer(self,pausa,fun_callback,id):
+            newt=Pseudo_async_timer(pausa,fun_callback,id)
+            self.lista_timer.append(newt)
+    def controlla_tutti_timer(self):
+            for id,t in enumerate(self.lista_timer):
+                    if t.check_time():
+                            self.lista_timer.pop(id)
 #-------------------------------------------------
 
 #-------------------------------------------------
