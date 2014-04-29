@@ -40,7 +40,7 @@ class Miohero(model.Object):
         right_standing = pygame.transform.flip(left_standing, True, False)
 
         standing_scelta=sit_standing
-        div_scala=1.5
+        div_scala=1.8
         
 
         #------------------------------------
@@ -198,6 +198,13 @@ class App_gum(Engine):
             ## The avatar is also the camera target.
             self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
             
+            Engine.__init__(self,
+                caption='Tiled Map with Renderer '+mappa,
+                resolution=resolution,
+                camera_target=self.avatar,
+                map=self.tiled_map,
+                frame_speed=0)
+                
             self.lista_beast=[]
             for i in dict_animati:
                    pos_beast= dict_animati[i]['pos']
@@ -209,15 +216,13 @@ class App_gum(Engine):
                    beast.debug=miodebug
                    beast.dic_storia=dict_animati[i]['dic_storia']
                    beast.staifermo=dict_animati[i]['staifermo']
+                   
+                   #beast.dialogosemp=Dialogosemplice()
+                   
                    beast.motore=self
                    self.lista_beast.append(beast)
   
-            Engine.__init__(self,
-                caption='Tiled Map with Renderer '+mappa,
-                resolution=resolution,
-                camera_target=self.avatar,
-                map=self.tiled_map,
-                frame_speed=0)
+            
             
             ## Insert avatar into the Fringe layer.
             self.avatar.rect.x=hero_ini_pos[0]
@@ -255,10 +260,8 @@ class App_gum(Engine):
             #self.collision_dummy = Miohero((0,0),resolution//2,parentob=self)
             ## Create the renderer.
             self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
-            self.dialogo=Dialogosemplice()
-                
+            #self.dialogo=Dialogosemplice()
 
-                
         #------------------------------------------------------------------ 
         def update(self, dt):
             if self.movex or self.movey:
@@ -274,7 +277,7 @@ class App_gum(Engine):
             State.camera.update()
             ## Set render's rect.
             self.renderer.set_rect(center=State.camera.rect.center)
-                
+
         #------------------------------------------------------------------                      
         @property
         def mio_move_to(self):
@@ -308,7 +311,6 @@ class App_gum(Engine):
             rect = self.avatar.hitbox
             pygame.draw.rect(camera.surface, Color('red'), rect.move(-cx,-cy))
             pygame.draw.polygon(camera.surface, Color('white'), self.speed_box.corners, 1)
-                
         
         #------------------------------------------------------------------ 
         def draw(self, interp):
@@ -324,7 +326,9 @@ class App_gum(Engine):
                 beast.muovi_animato()
             self.draw_detail()
             self.is_talking()
-            self.dialogo.scrivi_frase()
+            #self.dialogo.scrivi_frase()
+            for beast in self.lista_beast:
+                beast.dialogosemp.scrivi_frase()
             State.screen.flip()
         #---------------------------------------------------
         def draw_detail(self):
@@ -407,34 +411,25 @@ class App_gum(Engine):
             else:
                     is_walkable=False
             return is_walkable       
-             
-        
+
         #------------------------------------------------------
         def is_talking(self):
             hero=self.avatar.rect
             camera = State.camera
             cx,cy = camera.rect.topleft
-            i=0
             for beast in self.lista_beast:
-                
+                #print beast.dic_storia
                 talk_box=beast.talk_box
                 hits=hero.colliderect(talk_box)
                 #pygame.draw.rect(camera.surface, Color('red'), talk_box.move(-cx,-cy))
                 if hits:
-                    #if not self.dialogo.close_clicked:
-                    self.dialogo.open=True
-                    if type(beast.dic_storia['messaggio']) is not list:
-                        beast.dic_storia['messaggio']=[beast.dic_storia['messaggio']]
-                    self.dialogo.sequenza_messaggi(beast)
-                    #print str(i)+beast.id+str(beast.dic_storia['messaggio'])
-                    break
+                    beast.dialogosemp.open=True
+                    #print beast.dialogosemp.lista_messaggi
+                    beast.dialogosemp.sequenza_messaggi_new()
+                    #break
                 else:
-                    #beast.fermato=False
-                    #self.dialogo.sequenza_partita=False
-                    self.dialogo.open=False
-                i=i+1
-                
-            #print self.dialogo.open
+                    beast.dialogosemp.open=False
+                    beast.dialogosemp.seq.set_open(False)
 
         #------------------------------------------------------------------
         def verifica_residuale_tasti_premuti(self,mio_keydown):
@@ -509,7 +504,7 @@ class App_gum(Engine):
                         self.toggle_layer(key - K_0)                    
             elif key == K_ESCAPE: 
                     context.pop()
-                
+
         #------------------------------------------------------------------ 
         def on_mouse_button_down(self, pos, button):
                 self.mouse_down = True

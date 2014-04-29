@@ -21,6 +21,7 @@ from pygame.sprite import Sprite
 from miovar_dump import *
 from beast1 import Beast
 from beast2 import Beast2
+from dialogosemp import Dialogosemplice
 
 #evento_timer = USEREVENT
 
@@ -65,38 +66,42 @@ class MovingBeast(model.Object):
         debug=False
         miotimer=None
         segmento=0
-        dic_storia={}
+        dic_storia={'messaggio':'...'}
         messaggio_dato=False
         motore=None
         fermato=False
         staifermo=False
         def __init__(self,position=(100,100),durata_pausa=1000,id=1,points=(()),dir_name='boar'):
-                model.Object.__init__(self)
-                if dir_name=='boar' or dir_name=='priest':
-                        self.miocing=Beast(dir_name=dir_name)
-                else:
-                        self.miocing=Beast2(dir_name=dir_name)
-                self.id=id
-                self.x=position[0]
-                self.y=position[1]
-                
-                
-                #points = [(3,3), (200,200)]
-                if points:
-                    self.lista_destinazioni=self.calcola_points(points,position)
-                    self.x=self.lista_destinazioni[0][0]
-                    self.y=self.lista_destinazioni[0][1]
-                else:
-                    self.lista_destinazioni=self.comp_lista_destinazioni(self.x,self.y)
-                self.contatore_destinazioni=0
-                self.listap=[]
-                self.auto=True
-                self.lanciato=False
-                self.inpausa=False
-                self.fotogramma=self.miocing.left_standing
-                self.miocing.moveConductor.play()
-                self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
-                self.durata_pausa=durata_pausa
+            model.Object.__init__(self)
+            if dir_name=='boar' or dir_name=='priest':
+                    self.miocing=Beast(dir_name=dir_name)
+            else:
+                    self.miocing=Beast2(dir_name=dir_name)
+            self.id=id
+            self.x=position[0]
+            self.y=position[1]
+            
+            
+            #points = [(3,3), (200,200)]
+            if points:
+                self.lista_destinazioni=self.calcola_points(points,position)
+                self.x=self.lista_destinazioni[0][0]
+                self.y=self.lista_destinazioni[0][1]
+            else:
+                self.lista_destinazioni=self.comp_lista_destinazioni(self.x,self.y)
+            self.contatore_destinazioni=0
+            self.listap=[]
+            self.auto=True
+            self.lanciato=False
+            self.inpausa=False
+            self.fotogramma=self.miocing.left_standing
+            self.miocing.moveConductor.play()
+            self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
+            self.durata_pausa=durata_pausa
+            self.dialogosemp=Dialogosemplice()
+            print "dic_storia"+str(self.dic_storia)
+            #self.dialogosemp.lista_messaggi=self.dic_storia['messaggio']
+
         
         def calcola_points(self,points,position):
             real_points=[]
@@ -246,13 +251,16 @@ class MovingBeast(model.Object):
             except:
                 pass
             
-            if self.motore:
-                if self.motore.dialogo.close_clicked:
-                    self.fermato=False
+            #if self.motore:
+            #    if self.motore.dialogo.close_clicked:
+            #        self.fermato=False
                             
                 
         #----------------------------------------
         def muovi_animato(self):
+            if self.dialogosemp.lista_messaggi==['...']:
+                if type(self.dic_storia['messaggio']) is not list : self.dic_storia['messaggio']=[self.dic_storia['messaggio']]
+                self.dialogosemp.lista_messaggi=self.dic_storia['messaggio']
             
             if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
                 if self.contatore_destinazioni>len(self.lista_destinazioni)-1: 
@@ -295,7 +303,7 @@ class MovingBeast(model.Object):
             if self.miotimer: #controlla ad ogni ciclo se è attivo un timer e se la pausa di quel timer è scaduta
                 self.miotimer.check_time()
             
-            self.check_storia() #controlla ad ogni ciclo se deve mandare un messaggio
+            #self.check_storia() #controlla ad ogni ciclo se deve mandare un messaggio
 
             return self.fotogramma
         #---------------------------------------------------
@@ -306,17 +314,21 @@ class MovingBeast(model.Object):
 
                     
 def main():
-    dir_name="aio"
-    bestia=MovingBeast(dir_name=dir_name)
-    bestia.staifermo=True
-    
     pygame.init()
     screen = pygame.display.set_mode((600, 300))
+    dir_name="aio"
     pygame.display.set_caption('Animato in movimento: '+dir_name)
     BGCOLOR = (180, 180, 180)
     mainClock = pygame.time.Clock()
+    
+    
+    bestia=MovingBeast(dir_name=dir_name)
+    bestia.staifermo=True
+    
+
     #print ogg.sprite_fotogramma.rect
     while True:
+        #print bestia.dialogosemp.lista_messaggi
         screen.fill(BGCOLOR)
         bestia.muovi_animato()
 
@@ -333,11 +345,14 @@ def main():
                     sys.exit()
                 if event.key == K_F4:
                     print 'f4'
+                    bestia.dialogosemp.open=True
+                    """
                     if not bestia.fermato:
                         bestia.fermato=True
                     else:
                         bestia.fermato=False
-
+                    """
+        bestia.dialogosemp.scrivi_frase()
         pygame.display.flip()
         mainClock.tick(40) # Feel free to experiment with any FPS setting.
               

@@ -10,18 +10,23 @@ class MessageTimerClass(threading.Thread):
     def __init__(self,messaggi,ogg_genitore):
         threading.Thread.__init__(self)
         self.event = threading.Event()
-        self.count = 5
         self.messaggi=messaggi
         self.ogg_genitore=ogg_genitore
+        self.is_open=self.ogg_genitore.open
+    
+    def set_open(self,var):
+        self.is_open=var
     
     def run(self):
         for value in self.messaggi:
-            if self.ogg_genitore.open:self.ogg_genitore.suono.play()
-            self.ogg_genitore.testo=value
-            self.event.wait(2)
+            if self.is_open:
+                self.ogg_genitore.suono.play()
+                self.ogg_genitore.testo=value
+                self.event.wait(2)
         self.ogg_genitore.testo='...'
         self.ogg_genitore.sequenza_finita=True
         self.stop()
+        #print "running"
 
         
     def stop(self):
@@ -37,6 +42,7 @@ class Dialogosemplice():
     scritto=False
     sequenza_partita=False
     sequenza_finita=True
+    lista_messaggi=['...']
 
     def __init__(self):
         self.text_altezza=50
@@ -55,6 +61,7 @@ class Dialogosemplice():
         self.crossrect.height=self.crossrect.height
         pygame.mixer.init()
         self.suono=pygame.mixer.Sound('immagini/message.wav')
+        self.seq=MessageTimerClass(['...'],self)
 
     def mywrite(self):
         self.background_txt.fill((250, 250, 250))
@@ -64,7 +71,7 @@ class Dialogosemplice():
         self.background_txt.blit(self.cross,(self.crossrect.x,0))
         self.screen.blit(self.background_txt,(self.bgrect.x,self.bgrect.y))
         self.scritto=True
-        self.t=None
+        
         #event=pygame.event.wait()
         #self.gestione_eventi(event)
         type_filter=pygame.MOUSEBUTTONDOWN
@@ -82,7 +89,7 @@ class Dialogosemplice():
             self.scritto=False
     
     #-----------------------------------------------------
-    def sequenza_messaggi(self,beast):
+    """def sequenza_messaggi(self,beast):
         if not self.sequenza_partita:
             #self.testo=beast.dic_storia['messaggio'][0]
             self.seq=MessageTimerClass(beast.dic_storia['messaggio'],self)
@@ -90,7 +97,20 @@ class Dialogosemplice():
             self.seq.start()
             self.sequenza_partita=True
             self.sequenza_finita=False
-        if self.sequenza_finita:self.sequenza_partita=False
+        if self.sequenza_finita:
+            self.sequenza_partita=False"""
+    
+     #-----------------------------------------------------
+    def sequenza_messaggi_new(self):
+        if not self.sequenza_partita:
+            #self.testo=beast.dic_storia['messaggio'][0]
+            self.seq=MessageTimerClass(self.lista_messaggi,self)
+            self.seq.daemon=True
+            self.seq.start()
+            self.sequenza_partita=True
+            self.sequenza_finita=False
+        if self.sequenza_finita:
+            self.sequenza_partita=False
 
     #---------------------------------------------------------
     def gestione_eventi(self,event):

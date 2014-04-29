@@ -213,12 +213,12 @@
     <property name="dest_tile_y" value="19"/>
    </properties>
   </object>
-  <object name="carro" type="animato" x="2075" y="4324">
+  <object name="villager" type="animato" x="2075" y="4307">
    <properties>
     <property name="durata_pausa" value="1"/>
-    <property name="id" value="carro"/>
+    <property name="id" value="villager"/>
    </properties>
-   <polyline points="0,0 1560,-4 1554,-346 1371,-806"/>
+   <polyline points="0,0 1560,-4 1721,-142 1640,-229"/>
   </object>
   <object name="aio" type="animato" x="3859" y="4088">
    <properties>
