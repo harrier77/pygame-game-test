@@ -18,9 +18,12 @@ from librerie import pyganim
 
 from movingbeast import calcola_passi,MovingBeast
 from miovar_dump import *
-from dialogosemp import Dialogosemplice
+#from dialogosemp import Dialogosemplice
 from librerie import xmltodict
+import subprocess
+
 DEBUG=False
+
 
 #-------------------------------------------------------------------------------
 class Miohero(model.Object):
@@ -105,9 +108,10 @@ class Miohero(model.Object):
         @property
         def hitbox(self):
             hitbox=self.rect.copy()
-            hitbox.height=18
+            hitbox.height=12
             hitbox.width=10
-            y = self.rect.y+(hitbox.height/2)
+            #y = self.rect.y+(hitbox.height/2)
+            y = self.rect.y+hitbox.height/2
             x= self.rect.x-(hitbox.width/2)
             hitbox.y=y
             hitbox.x=x
@@ -123,17 +127,21 @@ class App_gum(Engine):
         xml = open('animazioni\\prova.xml', 'r').read()
         dic_storia=xmltodict.parse(xml)['storia']
         godebug=False
-        #print dic_storia
-        #exit()
+
         def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                                 coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True):
             #necessario per resettare la condizione messa dalla libreria PGU
             pygame.key.set_repeat()
-            #---------------
-            #self.warping=False
+            
+            x = 20
+            y = 80
+            #import os
+            os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)    
+            
+            
             resolution = Vec2d(resolution)
             self.mappa_dirfile=dir+mappa
-            #if self.nuova_mappa_caricare: 
+
             self.tiled_map = TiledMap(dir+mappa)
             for mylayer in self.tiled_map.layers:
                     if mylayer.name=="Collision":
@@ -143,9 +151,10 @@ class App_gum(Engine):
                             
             #carica in una lista i lvelli degli oggetti 
             self.lista_oggetti=list()
+            myappend=self.lista_oggetti.append
             for L in self.tiled_map.layers: 
                     if L.is_object_group :
-                            self.lista_oggetti.append(L)
+                            myappend(L)
             #fine
             #l'attr lista_oggetti in realtà è una lista dei layer con oggetti, che spesso è uno solo
             self.prima_lista_ogg=self.lista_oggetti[0].objects.objects
@@ -160,77 +169,41 @@ class App_gum(Engine):
             self.collision_group.visible = not coll_invis
             ## Remove above-ground layers so we can give map to the renderer.
             del self.tiled_map.layers[1:]
-
+            self.cammina=False   
             dict_animati={}
             self.warps=[]
+            self.lista_beast=[]
+            self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
+            Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
+       
             for O in self.prima_lista_ogg:
                 if O.name=="Inizio" or O.name=="inizio":
                     hero_ini_pos= O.rect.x,O.rect.y
+                    self.avatar.position=hero_ini_pos
+                    ## The avatar is also the camera target.
                 if O.type=="warp":
                     self.warps.append(O)
                 if O.type=="animato":
-                    animato_ini_pos=O.rect.x,O.rect.y
-                    animato = {'pos': animato_ini_pos, 'id': O.properties['id'],'durata_pausa':int(O.properties['durata_pausa'])}
-                    animato['points']=O.properties['points']
-                    animato['dir']=str(O.name)
-                    try:
-                        animato['staifermo']=O.properties['staifermo']
-                    except:
-                        animato['staifermo']=False
-                    id= (animato.get('id'))
-                    #print id
-                    pos=animato['pos']
-                    dict_animati[id]=animato
-                    dict_animati[id]['dic_storia'] ={}
-                    try:
-                        dict_animati[id]['dic_storia'] = self.dic_storia[id]
-                    except:
-                        dict_animati[id]['dic_storia'] ={}
+                    animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
+                    for p in O.properties:
+                        animato[p]=O.properties[p]
                         
-            #print self.dic_storia['aio']['messaggio']
-            #for d in dict_animati:
-            #    print d
-            #exit()
-                            
-                            
-                            
-            self.cammina=False        
-            ## The avatar is also the camera target.
-            self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
-            
-            Engine.__init__(self,
-                caption='Tiled Map with Renderer '+mappa,
-                resolution=resolution,
-                camera_target=self.avatar,
-                map=self.tiled_map,
-                frame_speed=0)
-                
-            self.lista_beast=[]
-            for i in dict_animati:
-                   pos_beast= dict_animati[i]['pos']
-                   durata_pausa=dict_animati[i]['durata_pausa']
-                   id=dict_animati[i]['id']
-                   points=dict_animati[i]['points']
-                   dir_from_dict=dict_animati[i]['dir']
-                   beast=MovingBeast(pos_beast,durata_pausa,id,points,dir_name=dir_from_dict)
-                   beast.debug=miodebug
-                   beast.dic_storia=dict_animati[i]['dic_storia']
-                   beast.staifermo=dict_animati[i]['staifermo']
-                   
-                   #beast.dialogosemp=Dialogosemplice()
-                   
-                   beast.motore=self
-                   self.lista_beast.append(beast)
-  
-            
+                    dict_animati[animato.get('id')]=animato
+                    dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
+                    beast=MovingBeast(animato)
+                    beast.debug=miodebug
+                    beast.dic_storia=animato['dic_storia']
+                    beast.staifermo=animato['staifermo']
+                    beast.orientamento=animato['orientamento']
+                    beast.motore=self
+                    self.lista_beast.append(beast)
+                    self.avatar_group.add(beast)
             
             ## Insert avatar into the Fringe layer.
             self.avatar.rect.x=hero_ini_pos[0]
             self.avatar.rect.y=hero_ini_pos[1]
             self.avatar_group.add(self.avatar)
-            for beast in self.lista_beast:
-                    self.avatar_group.add(beast)
-            
+                    
             State.camera.position=Vec2d(State.camera.position)
      
             # Create a speed box for converting mouse position to destination
@@ -257,10 +230,10 @@ class App_gum(Engine):
             #con questa proprietà le collisioni vengono ignorate
             self.ignora_collisioni=ign_coll
             self.corsa=False
-            #self.collision_dummy = Miohero((0,0),resolution//2,parentob=self)
+
             ## Create the renderer.
             self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
-            #self.dialogo=Dialogosemplice()
+
 
         #------------------------------------------------------------------ 
         def update(self, dt):
@@ -322,12 +295,10 @@ class App_gum(Engine):
             if State.show_labels:
                 toolkit.draw_labels(self.label_cache)
             if self.all_groups[self.collision_group_i].visible: self.draw_debug()
+            self.draw_detail()
             for beast in self.lista_beast:
                 beast.muovi_animato()
-            self.draw_detail()
-            self.is_talking()
-            #self.dialogo.scrivi_frase()
-            for beast in self.lista_beast:
+                self.is_talking2(beast)
                 beast.dialogosemp.scrivi_frase()
             State.screen.flip()
         #---------------------------------------------------
@@ -412,21 +383,14 @@ class App_gum(Engine):
                     is_walkable=False
             return is_walkable       
 
+
         #------------------------------------------------------
-        def is_talking(self):
-            hero=self.avatar.rect
-            camera = State.camera
-            cx,cy = camera.rect.topleft
-            for beast in self.lista_beast:
-                #print beast.dic_storia
-                talk_box=beast.talk_box
-                hits=hero.colliderect(talk_box)
+        def is_talking2(self,beast):
+                hits=self.avatar.rect.colliderect(beast.talk_box)
                 #pygame.draw.rect(camera.surface, Color('red'), talk_box.move(-cx,-cy))
                 if hits:
                     beast.dialogosemp.open=True
-                    #print beast.dialogosemp.lista_messaggi
                     beast.dialogosemp.sequenza_messaggi_new()
-                    #break
                 else:
                     beast.dialogosemp.open=False
                     beast.dialogosemp.seq.set_open(False)
@@ -496,6 +460,8 @@ class App_gum(Engine):
                     self.godebug=True
                 else:
                     self.godebug=False
+            elif key == pygame.K_F6:
+                 self.wx.version.SetLabel(label=str(self.avatar.hitbox))
             elif key == K_g:
                 State.show_grid = not State.show_grid
             elif key == K_l:
@@ -544,13 +510,14 @@ class App_gum(Engine):
 #Eofclass#-----------------------------------------------------------------------------------			
 
 def miomain(debug=True):
-        oggetto=App_gum(resolution=(800,600),miodebug=debug)
-        icon=pygame.image.load(".\immagini\\icona2.gif")
-        pygame.display.set_icon(icon)
-        gummworld2.run(oggetto)
+    oggetto=App_gum(resolution=(800,600),miodebug=debug)
+    icon=pygame.image.load(".\immagini\\icona2.gif")
+    pygame.display.set_icon(icon)
+    gummworld2.run(oggetto)
         
 
 if __name__ == '__main__':
-        miomain(debug=DEBUG)
+    #import profile
+    miomain(debug=DEBUG)
         
      
