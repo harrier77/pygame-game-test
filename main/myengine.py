@@ -127,7 +127,7 @@ class App_gum(Engine):
         xml = open('animazioni\\prova.xml', 'r').read()
         dic_storia=xmltodict.parse(xml)['storia']
         godebug=False
-
+        #dialogo_btn=False
         def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                                 coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True):
             #necessario per resettare la condizione messa dalla libreria PGU
@@ -233,6 +233,7 @@ class App_gum(Engine):
 
             ## Create the renderer.
             self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
+            self.dialogo_btn=False
 
 
         #------------------------------------------------------------------ 
@@ -298,6 +299,7 @@ class App_gum(Engine):
             self.draw_detail()
             for beast in self.lista_beast:
                 beast.muovi_animato()
+                #beast.dialogosemp.dialogo_btn=self.dialogo_btn
                 self.is_talking2(beast)
                 beast.dialogosemp.scrivi_frase()
             State.screen.flip()
@@ -382,18 +384,32 @@ class App_gum(Engine):
             else:
                     is_walkable=False
             return is_walkable       
-
+        
+        #-------------------------------------------------------
+        @property
+        def dialogo_btn(self):
+            return self._dialogo_btn
+        #------------------------------------------------------
+        @dialogo_btn.setter
+        def dialogo_btn(self,val):
+            self._dialogo_btn=val
+        #-------------------------------------------------------    
+        
 
         #------------------------------------------------------
         def is_talking2(self,beast):
                 hits=self.avatar.rect.colliderect(beast.talk_box)
-                #pygame.draw.rect(camera.surface, Color('red'), talk_box.move(-cx,-cy))
-                if hits:
-                    beast.dialogosemp.open=True
-                    beast.dialogosemp.sequenza_messaggi_new()
-                else:
-                    beast.dialogosemp.open=False
-                    beast.dialogosemp.seq.set_open(False)
+                #cx,cy = self.camera.rect.topleft
+                #pygame.draw.rect(self.camera.surface, Color('red'), beast.talk_box.move(-cx,-cy))
+                if beast.dialogosemp.dialogo_btn:
+                    if hits:
+                        #beast.set_dialogo_btn(True)
+                        beast.dialogosemp.is_near=True
+                        beast.dialogosemp.sequenza_messaggi_new()
+                    else:
+                        beast.dialogosemp.is_near=False
+                        beast.set_dialogo_btn(False)
+                        beast.dialogosemp.open=False
 
         #------------------------------------------------------------------
         def verifica_residuale_tasti_premuti(self,mio_keydown):
@@ -447,14 +463,13 @@ class App_gum(Engine):
                 if self.corsa:
                         self.movex += -State.speed
                         self.camera.target.giocatore_animato=self.animato['left_run']
-            elif key == pygame.K_F4:
-                if not self.dialogo.open:
-                    self.dialogo.close_clicked=False
-                    self.dialogo.beeped=False
-                    self.dialogo.open=True
+            elif key == pygame.K_F4 or key==pygame.K_z:
+                if not self.dialogo_btn:
+                    self.dialogo_btn=True
                 else:
-                    self.dialogo.close_clicked=True
-                    self.dialogo.open=False
+                    self.dialogo_btn=False
+                for beast in self.lista_beast:
+                    beast.dialogosemp.dialogo_btn=self.dialogo_btn
             elif key == pygame.K_F5:
                 if not self.godebug:
                     self.godebug=True

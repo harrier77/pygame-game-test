@@ -34,21 +34,32 @@ class MessageTimerClass(threading.Thread):
         self.event = threading.Event()
         self.messaggi=messaggi
         self.ogg_genitore=ogg_genitore
-        self.is_open=self.ogg_genitore.open
+        #self.is_open=self.ogg_genitore.open
     #-----------------------------------------------------
-    def set_open(self,var):
-        self.is_open=var
+    #def set_open(self,var):
+    #    self.is_open=var
+    
+    @property
+    def is_near(self):
+        return self.ogg_genitore.is_near
+        
+    @is_near.setter
+    def is_near(self,val):
+        self._is_near=val
+    
     #-----------------------------------------------------
     def run(self):
-        for value in self.messaggi:
-            if self.is_open:
-                self.ogg_genitore.suono.play()
-                self.ogg_genitore.testo=value
-                self.event.wait(2)
-        self.ogg_genitore.testo='...'
-        self.ogg_genitore.sequenza_finita=True
+        if self.is_near:
+            if self.ogg_genitore.dialogo_btn:
+                for value in self.messaggi:
+                    #if self.ogg_genitore.dialogo_btn:
+                    self.ogg_genitore.suono.play()
+                    self.ogg_genitore.testo=value
+                    self.event.wait(2)
+            self.ogg_genitore.sequenza_finita=True
+            self.ogg_genitore.sequenza_messaggi_new()
         self.stop()
-        #print "running"
+        
     #-----------------------------------------------------
     def stop(self):
         self.event.set()
@@ -57,7 +68,7 @@ class MessageTimerClass(threading.Thread):
 
 #ClassDialogoSemplice
 class Dialogosemplice():
-    open=False
+    is_near=False
     testo="Hello!"
     close_clicked=False
     beeped=False
@@ -67,20 +78,25 @@ class Dialogosemplice():
     lista_messaggi=['...']
     text_altezza=50
     crossrect=None
+    dialogo_btn=False
+    
     #-----------------------------------------------------
     def __init__(self):
         self.screen=pygame.display.get_surface()
-        self.background_txt = pygame.Surface((self.screen.get_size()[0]-1,self.text_altezza))
-        self.background_txt.fill((250, 250, 250))
+        #self.background_txt = pygame.Surface((self.screen.get_size()[0]-1,self.text_altezza))
+        square=pygame.image.load('.\\immagini\\square.png').convert_alpha()
+        self.background_txt =pygame.transform.scale(square,(self.screen.get_size()[0]-1,self.text_altezza))
+        self.backvuoto=self.background_txt.copy()
+        #self.background_txt.fill((250, 250, 250))
         self.bgrect=self.background_txt.get_rect()
         self.bgrect.top=self.screen.get_size()[1]-self.text_altezza
         self.font=pygame.font.Font(data.filepath('font', 'Vera.ttf'), 18)
         #self.disegna_crocetta()
         pygame.mixer.init()
         self.suono=pygame.mixer.Sound('immagini/message.wav')
-        self.seq=MessageTimerClass(['...'],self)
+        self.seq=MessageTimerClass(self.lista_messaggi,self)
     
-    
+    """
     def disegna_crocetta(self):
         self.cross=pygame.image.load('.\\immagini\\cross.gif')
         self.crossrect=self.cross.get_rect()
@@ -88,30 +104,37 @@ class Dialogosemplice():
         self.crossrect.y=self.bgrect.y
         self.crossrect.width=self.crossrect.width
         self.crossrect.height=self.crossrect.height
-    
+    """
+    def disegna_messaggio(self):
+        self.screen.blit(self.background_txt,(self.bgrect.x,self.bgrect.y))
     
     #-----------------------------------------------------
     def mywrite(self):
-        self.background_txt.fill((250, 250, 250))
+        #self.background_txt.fill((250, 250, 250))
         #font = pygame.font.Font(None, 32)
         text = self.font.render(self.testo, True, (10, 10, 10),(255,255,255))
+        self.background_txt=self.backvuoto.copy()
         self.background_txt.blit(text,(10,10))
         #self.background_txt.blit(self.cross,(self.crossrect.x,0))
-        self.screen.blit(self.background_txt,(self.bgrect.x,self.bgrect.y))
+        #self.screen.blit(self.background_txt,(self.bgrect.x,self.bgrect.y))
+        self.disegna_messaggio()
         self.scritto=True
         type_filter=pygame.MOUSEBUTTONDOWN
         for event in pygame.event.get(type_filter): # event handling loop
             self.gestione_eventi(event)  
     #-----------------------------------------------------
     def scrivi_frase(self):	
-        if self.open:
-            self.mywrite()
+        if self.is_near:
+            if self.dialogo_btn==True:
+                self.mywrite()
         else:
             self.scritto=False
+        
+        
     #-----------------------------------------------------
     def sequenza_messaggi_new(self):
         if self.lista_messaggi[0]=='nulla':
-            self.open=False
+            self.is_near=False
             return
         else:
             if not self.sequenza_partita:
@@ -123,6 +146,9 @@ class Dialogosemplice():
                 self.sequenza_finita=False
             if self.sequenza_finita:
                 self.sequenza_partita=False
+
+
+                
     #---------------------------------------------------------
     def gestione_eventi(self,event):
         #event=pygame.event.peek()
@@ -141,7 +167,7 @@ class Dialogosemplice():
 
 #inizio classe
 class Beast2():
-        
+        motore=None
         def __init__(self,dir_name="missionario"):
             try:
                     os.stat('animazioni')
@@ -239,11 +265,11 @@ class MovingBeast(model.Object):
         segmento=0
         dic_storia={'messaggio':'...'}
         messaggio_dato=False
-        motore=None
         fermato=False
         staifermo=False
         giacambiato=False
         orientamento="vuoto"
+        motore=None
         def __init__(self,animato=None):
             model.Object.__init__(self)
 
@@ -273,8 +299,15 @@ class MovingBeast(model.Object):
             self.durata_pausa=int(animato['durata_pausa'])
             
             self.dialogosemp=Dialogosemplice()
+            #self.dialogosemp.motore=self.motore
 
-
+        def set_dialogo_btn(self,val=True):
+            if not self.motore:
+                self.dialogosemp.dialogo_btn=val
+            else:
+                if self.motore.dialogo_btn:
+                    self.dialogosemp.dialogo_btn=self.motore.dialogo_btn
+            
         
         def calcola_points(self,points,position):
             real_points=[]
@@ -384,9 +417,9 @@ class MovingBeast(model.Object):
         @property
         def talk_box(self):
             talk_box=self.rect
-            if self.rect.height<100: talk_box.height=self.rect.height+120
+            if self.rect.height<100: talk_box.height=self.rect.height+10
             else:talk_box.height=self.rect.height
-            if talk_box.width<100:talk_box.width=self.rect.width+120
+            if talk_box.width<100:talk_box.width=self.rect.width+10
             else: talk_box.width=self.rect.width
             y = self.rect.y
             x= self.rect.x
@@ -420,7 +453,7 @@ class MovingBeast(model.Object):
                 #if self.segmento==int(self.dic_storia['segmento']) and self.messaggio_dato==False:
                 if self.messaggio_dato==False:
                     #self.motore.dialogo.testo=self.dic_storia['messaggio']
-                    self.motore.dialogo.open=True
+                    self.motore.dialogo.is_near=True
                     #self.messaggio_dato=True
                     #self.fermato=True
             except:
@@ -439,6 +472,7 @@ class MovingBeast(model.Object):
                 except:
                     self.dic_storia['messaggio']=['nulla']
                 self.dialogosemp.lista_messaggi=self.dic_storia['messaggio']
+                
             
             if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
                 if self.contatore_destinazioni>len(self.lista_destinazioni)-1: 
@@ -519,6 +553,7 @@ def main():
     animato={'dir':'aio','id':'1','pos':(100,100),'points':None,'durata_pausa':'10'}
     bestia=MovingBeast(animato)
     bestia.staifermo=True
+    bestia.dialogosemp.lista_messaggi=['pippo','TOPOLINO','PLUTO']
     
 
     #print ogg.sprite_fotogramma.rect
@@ -539,8 +574,22 @@ def main():
                     pygame.quit()
                     sys.exit()
                 if event.key == K_F4:
-                    print 'f4'
-                    bestia.dialogosemp.open=True
+                    print 'is_near '+str(bestia.dialogosemp.is_near)
+                    print 'btn'+str(bestia.dialogosemp.dialogo_btn)
+                    
+                    if not bestia.dialogosemp.is_near:
+                        bestia.dialogosemp.is_near=True
+                        bestia.dialogosemp.sequenza_messaggi_new()
+                    else:
+                        bestia.dialogosemp.is_near=False
+                    
+                    if not bestia.dialogosemp.dialogo_btn:
+                        bestia.dialogosemp.dialogo_btn=True
+                        #bestia.set_dialogo_btn(True)
+                    else:
+                        bestia.dialogosemp.dialogo_btn=False
+                        #bestia.set_dialogo_btn(False)
+                        
                     """
                     if not bestia.fermato:
                         bestia.fermato=True
@@ -548,6 +597,7 @@ def main():
                         bestia.fermato=False
                     """
         bestia.dialogosemp.scrivi_frase()
+        
         pygame.display.flip()
         mainClock.tick(40) # Feel free to experiment with any FPS setting.
               
