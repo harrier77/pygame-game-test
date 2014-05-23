@@ -410,7 +410,7 @@ class MovingBeast(model.Object):
             fotog_sprite=pygame.sprite.Sprite()
             fotog_sprite.image=self.fotogramma
             fotog_sprite.rect=self.fotogramma.get_rect()
-            fotog_sprite.rect.x=self.x
+            fotog_sprite.rect.x=self.x-fotog_sprite.rect.width/2
             fotog_sprite.rect.y=self.y-fotog_sprite.rect.height
             return fotog_sprite
         

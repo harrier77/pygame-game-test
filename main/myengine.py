@@ -199,7 +199,7 @@ class App_gum(Engine):
                     animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
                     for p in O.properties:
                         animato[p]=O.properties[p]
-                
+                    
                     dict_animati[animato.get('id')]=animato
                     dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
                     beast=MovingBeast(animato)
@@ -210,8 +210,7 @@ class App_gum(Engine):
                     beast.motore=self
                     #self.lista_beast.append(beast)
                     self.lista_beast[beast.id]=beast
-                    #for k,value in self.lista_beast.iteritems():
-                    #    print value.attendi_evento
+    
                     #exit()
                     self.avatar_group.add(beast)
             #miovar_dump(self.lista_beast[0])
