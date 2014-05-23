@@ -117,6 +117,13 @@ class Miohero(model.Object):
             hitbox.x=x
             return hitbox
         
+        @property
+        def sprite(self):
+            miosprite=pygame.sprite.Sprite()
+            miosprite.image=self.image
+            miosprite.rect=self.hitbox
+            return miosprite
+        
         
 #FineClasse -------------------------------------------------------------------------------
 
@@ -172,6 +179,7 @@ class App_gum(Engine):
             self.cammina=False   
             dict_animati={}
             self.warps=[]
+            self.eventi=pygame.sprite.Group()
             self.lista_beast=[]
             self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
             Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
@@ -183,6 +191,8 @@ class App_gum(Engine):
                     ## The avatar is also the camera target.
                 if O.type=="warp":
                     self.warps.append(O)
+                if O.type=="evento":
+                    self.eventi.add(O)
                 if O.type=="animato":
                     animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
                     for p in O.properties:
@@ -198,7 +208,8 @@ class App_gum(Engine):
                     beast.motore=self
                     self.lista_beast.append(beast)
                     self.avatar_group.add(beast)
-            
+            #print self.eventi[0].rect
+            #exit()
             ## Insert avatar into the Fringe layer.
             self.avatar.rect.x=hero_ini_pos[0]
             self.avatar.rect.y=hero_ini_pos[1]
@@ -247,6 +258,7 @@ class App_gum(Engine):
                         self.camera.target.herosprite.rect.y=wy
                         self.move_to = State.camera.screen_to_world((wx,wy))
                     self.is_warp()
+                    self.is_event_collide()
             self.update_camera_position()
             State.camera.update()
             ## Set render's rect.
@@ -321,10 +333,10 @@ class App_gum(Engine):
                         if s is avatar:
                             blit(s.image, s.rect.move(camera.anti_interp(s)))
                         else:
-                            if self.godebug:
-                                print(camera.rect)
-                                print(s.rect)
-                                print(camera.rect.colliderect(s.rect))
+                            #if self.godebug:
+                            #    print(camera.rect)
+                            #    print(s.rect)
+                            #    print(camera.rect.colliderect(s.rect))
                             blit(s.image, s.rect.move(-cx,-cy))
   
         #---------------------------------------------------
@@ -385,6 +397,13 @@ class App_gum(Engine):
                     is_walkable=False
             return is_walkable       
         
+        def is_event_collide(self):
+            newsprite=self.avatar.sprite          
+            hits=pygame.sprite.spritecollide(newsprite, self.eventi,False)
+            if hits : print hits[0].properties['azione']
+            return hits
+            
+        
         #-------------------------------------------------------
         @property
         def dialogo_btn(self):
@@ -399,17 +418,23 @@ class App_gum(Engine):
         #------------------------------------------------------
         def is_talking2(self,beast):
                 hits=self.avatar.rect.colliderect(beast.talk_box)
-                #cx,cy = self.camera.rect.topleft
-                #pygame.draw.rect(self.camera.surface, Color('red'), beast.talk_box.move(-cx,-cy))
+               
+                if self.godebug:
+                    cx,cy = self.camera.rect.topleft
+                    pygame.draw.rect(self.camera.surface, Color('red'), beast.talk_box.move(-cx,-cy))
                 if beast.dialogosemp.dialogo_btn:
                     if hits:
                         #beast.set_dialogo_btn(True)
                         beast.dialogosemp.is_near=True
-                        beast.dialogosemp.sequenza_messaggi_new()
+                        #beast.dialogosemp.sequenza_messaggi_new()
+                        #beast.staifermo=True
+                        beast.fermato=True
+                        beast.dialogosemp.sequenza_messaggi_noth()
                     else:
                         beast.dialogosemp.is_near=False
                         beast.set_dialogo_btn(False)
                         beast.dialogosemp.open=False
+                        beast.dialogosemp.idx_mess=0
 
         #------------------------------------------------------------------
         def verifica_residuale_tasti_premuti(self,mio_keydown):
@@ -463,13 +488,22 @@ class App_gum(Engine):
                 if self.corsa:
                         self.movex += -State.speed
                         self.camera.target.giocatore_animato=self.animato['left_run']
-            elif key == pygame.K_F4 or key==pygame.K_z:
+            elif key==pygame.K_z:
+                print "z"
+                for beast in self.lista_beast:
+                    beast.dialogosemp.incrementa_idx_mess()
+            
+            elif key == pygame.K_F4:
                 if not self.dialogo_btn:
                     self.dialogo_btn=True
                 else:
                     self.dialogo_btn=False
+                    pass
+                    
                 for beast in self.lista_beast:
                     beast.dialogosemp.dialogo_btn=self.dialogo_btn
+                    beast.dialogosemp.incrementa_idx_mess()
+                #beast.dialogosemp.suono.play()
             elif key == pygame.K_F5:
                 if not self.godebug:
                     self.godebug=True
@@ -487,8 +521,13 @@ class App_gum(Engine):
                     context.pop()
 
         #------------------------------------------------------------------ 
-        def on_mouse_button_down(self, pos, button):
+        def on_mouse_button_down(self, pos, button):                
                 self.mouse_down = True
+                self.dialogo_btn=True
+                for beast in self.lista_beast:
+                    beast.dialogosemp.dialogo_btn=self.dialogo_btn
+
+
         #------------------------------------------------------------------ 
         def on_mouse_button_up(self, pos, button):
                 self.mouse_down = False

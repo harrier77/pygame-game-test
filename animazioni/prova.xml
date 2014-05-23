@@ -1,7 +1,14 @@
 <storia>
+        <cing1>
+                <segmento>2</segmento>
+                <messaggio>Growl</messaggio>
+                <messaggio>growl...</messaggio> 
+        </cing1>
         <interlocutore>
                 <segmento>2</segmento>
                 <messaggio>Esci muoviti! Il califfo sta parlando e manchi solo tu!</messaggio>
+                <messaggio>Se non vai sari messo al bando</messaggio>
+                <messaggio>Tutti devono essere presenti!</messaggio>
         </interlocutore>
         <villager>
                 <segmento>1</segmento>

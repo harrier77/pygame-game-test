@@ -51,7 +51,7 @@
    H4sIAAAAAAAAC+3ZMQEAMAjEQAZEIKH+FXZEwjPcKcieKgAAWNPpAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALjhdboAAAAAAAAASPELAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuOoDMCVW7EDTAQA=
   </data>
  </layer>
- <layer name="Collision" width="178" height="168">
+ <layer name="Collision" width="178" height="168" visible="0">
   <data encoding="base64" compression="gzip">
    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
   </data>
@@ -208,7 +208,7 @@
     <property name="dest_tile_y" value="138"/>
    </properties>
   </object>
-  <object name="To casa gioco" type="warp" x="2241" y="4191" width="28" height="27">
+  <object name="To casa gioco" type="warp" x="2658" y="2910" width="28" height="27">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="11"/>
@@ -222,7 +222,7 @@
    </properties>
    <polyline points="0,0 1560,-4 1721,-142 1535,-31"/>
   </object>
-  <object name="aio" type="animato" x="3859" y="4088">
+  <object name="aio" type="animato" x="4100" y="2419">
    <properties>
     <property name="durata_pausa" value="1"/>
     <property name="id" value="aio"/>
@@ -299,6 +299,20 @@
     <property name="staifermo" value="1"/>
    </properties>
    <polyline points="0,0 35,-1"/>
+  </object>
+  <object name="villager" type="animato" x="2668" y="2951">
+   <properties>
+    <property name="durata_pausa" value="5"/>
+    <property name="id" value="villager"/>
+   </properties>
+   <polyline points="0,0 -209,213 -900,273 -1137,341 -1141,752 -1136,1357 -915,1472 -635,1392 -64,1329 725,1361 1333,1469 2021,1441 2069,851 2035,275 1644,104 1699,-160 1305,-295"/>
+  </object>
+  <object x="3747" y="2591" width="843" height="44"/>
+  <object x="3959" y="2437">
+   <polyline points="0,0 501,0"/>
+  </object>
+  <object x="3855" y="4151">
+   <polyline points="0,0 11,-3"/>
   </object>
  </objectgroup>
 </map>

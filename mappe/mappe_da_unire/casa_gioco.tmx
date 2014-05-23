@@ -11,12 +11,12 @@
  <tileset firstgid="547" source="../tilesets/inn_x3.tsx"/>
  <layer name="Ground1" width="36" height="33">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3UYQqDMAwF4Oz+x2nddgK7E2y7iv/moIUQXiVZOxtB4SFWSj7S6EJEi6OQA8ORTF5s3OPR5OV8+eXBU+qFC1HMCSITWNOk1VMzIc913XPLuVN/H3doPPO6J+U8SNdDiycITzR6evdHnhfyTEoPmkHrDPF5KEniLt9Z+mP1zKJGAnVr2cvzzetHj5w5q+eZa28lVdbf1M8h5xmFz7MlLf9ojcdq+ocnOvcgV69vynJetbpbrhZPa8o10oBMow1H6BPqlQejVxOJ59Em6fJiQv06c6YlH7k2P+2QEgAA
+   H4sIAAAAAAAAC+2VSw6CQAyG603VE6AnUE+AnkQDPpa6AZe6UZd6DHbWpMShdng4KCWB5MuEf0r6ZWaABAASRYAChzY5aXEzfTQ6adlf8yryWSKrPzkFPYCQCBhrGvdYd4DPeRuuPjan1OeEdWeq3eC4JXaCYx+zATIk+pDNipxMD5vPHese1DvCMSaO8K5J8TAbIWPCg2xW5BMwn1DwMeE+fH6C2RSZERPIZmV8TBfJZ13S5/Wsj9kcWRA+ZLMiH/M8pMRs5HN56xP0qvXnRKxHLPS1YfNxedcknxfXL334mavqc6HeecSW/Ab1efDzLGGe5yq4fKPL+FR1+oVPqNxH8qr7/1Vmv2x987xcfFxJryYdJKemHdqwTtJaaXDU6gTsvmkn7qXFSVqvjg4XngzXN6GQEgAA
   </data>
  </layer>
  <layer name="Ground2" width="36" height="33">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+2SuwrCMBSGA14HFcXL5GWobupSUDdXfQN3Fd29PY2P4CP4TOrg0M2/ECEeLM2l0iI58PEnpyH90sZjjHkWy5+TAlmQ4Zkj83eeA/o084Y+VVDj2SDzujC/CP2e0B+BMZgIz/0zpjXdHNCVyKvkOoecSdXnyaIrlyO66fiUQYXv+ZB47yzExyV9FZ8b4S7hswjxoaXio1O+z1zSR/V/+bUEK3DieRTGPmueG57bAM+ofHZgr8Ah4Pt02OcdcjV9mLC/bH6rKH2iqKmBxy98TF10fQqgCEqgDwZgGKNPE7RAm4zj8qF31vQOJ9nHYrFYLJYk8wJqFpAvkBIAAA==
+   H4sIAAAAAAAAC+2Ryw7BQBiFm1AsEOKycllghyV21n0DexL2eC/egDeoN+AJsLAVp8lMMplUZzq9zWJO8uV0Zv60X1vLUo8LbuAbI1FyBw+NfE7grJHPBVw18nFJp+GTAwVgky5ya5uZ5ff9uhTRpwGapNvcukWahu6PmLkZmIMFc+69Y17g9i8DMBQ0jWiONvtOYX0+AWeqYd1UfGqgTtbvBPzC+Dw5XhL3XyXooxLPx4ngIvJZM9ebgLkt6Z2ki6rPHhxCcLT8v09fwkP2fzmC5uf8EqdPHFlq5sMmTZ8yqIAqGIMJmGbo0wFd0OOus/KRiW4+IiedXIyPfj4iJ51cjI/YJyxZP99gCOIHF/zQa5ASAAA=
   </data>
  </layer>
  <layer name="Fringe" width="36" height="33">
@@ -29,28 +29,34 @@
    H4sIAAAAAAAAC+3OsQkAIBAEQUu1I+t9I3NRMHt4Z+CSi7Y1AKrr2QGbkR1AaZEdwLfisHn5XwcAVS0Bw30OkBIAAA==
   </data>
  </layer>
- <layer name="Collision" width="36" height="33">
+ <layer name="Collision" width="36" height="33" visible="0">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3T0QkAMAgD0eD+QzuCIAQCucL7LUetI2kAVHMcenx9bT2feTlnnNST9J+T9itt39t7rrva38fZAwBAsgVcaPJYkBIAAA==
+   H4sIAAAAAAAAC+3TMQoAIAwEwZD/v1msrIWYg8OssKU6iMmIyGJnVfd3hwcPnre7Ohcene8HzxJZsrjHzaOyKP+P03y5zft0z+2s6e+j9BARETm3AdkdhfKQEgAA
   </data>
  </layer>
  <objectgroup name="Objects" width="36" height="33">
   <object name="To Outside" type="warp" x="352" y="640" width="32" height="32">
    <properties>
     <property name="dest_map" value="021-1"/>
-    <property name="dest_tile_x" value="70"/>
-    <property name="dest_tile_y" value="132"/>
+    <property name="dest_tile_x" value="83"/>
+    <property name="dest_tile_y" value="92"/>
    </properties>
   </object>
-  <object name="Inizio" x="352" y="582" width="32" height="32">
+  <object name="Inizio" x="354" y="464" width="32" height="32">
    <ellipse/>
   </object>
-  <object name="priest" type="animato" x="352" y="571">
+  <object name="priest" type="animato" x="358" y="560">
    <properties>
     <property name="durata_pausa" value="10"/>
     <property name="id" value="interlocutore"/>
    </properties>
    <polyline points="11,78 11,-7"/>
+  </object>
+  <object name="evento1" type="evento" x="191" y="532" width="678" height="31">
+   <properties>
+    <property name="azione" value="attiva_animato"/>
+    <property name="id_animato" value="interlocutore"/>
+   </properties>
   </object>
  </objectgroup>
 </map>

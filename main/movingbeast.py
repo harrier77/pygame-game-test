@@ -15,7 +15,7 @@ from gummworld2 import geometry,model,data
 from random import randint
 
 
-import threading
+#import threading
 import datetime
 from pygame.sprite import Sprite
 from miovar_dump import *
@@ -27,44 +27,6 @@ import glob
 #evento_timer = USEREVENT
 
 
-#--------------------------------------------------------
-class MessageTimerClass(threading.Thread):
-    def __init__(self,messaggi,ogg_genitore):
-        threading.Thread.__init__(self)
-        self.event = threading.Event()
-        self.messaggi=messaggi
-        self.ogg_genitore=ogg_genitore
-        #self.is_open=self.ogg_genitore.open
-    #-----------------------------------------------------
-    #def set_open(self,var):
-    #    self.is_open=var
-    
-    @property
-    def is_near(self):
-        return self.ogg_genitore.is_near
-        
-    @is_near.setter
-    def is_near(self,val):
-        self._is_near=val
-    
-    #-----------------------------------------------------
-    def run(self):
-        if self.is_near:
-            if self.ogg_genitore.dialogo_btn:
-                for value in self.messaggi:
-                    #if self.ogg_genitore.dialogo_btn:
-                    self.ogg_genitore.suono.play()
-                    self.ogg_genitore.testo=value
-                    self.event.wait(2)
-            self.ogg_genitore.sequenza_finita=True
-            self.ogg_genitore.sequenza_messaggi_new()
-        self.stop()
-        
-    #-----------------------------------------------------
-    def stop(self):
-        self.event.set()
-        
-#fineclasse----------------------------------------------------
 
 #ClassDialogoSemplice
 class Dialogosemplice():
@@ -79,12 +41,18 @@ class Dialogosemplice():
     text_altezza=50
     crossrect=None
     dialogo_btn=False
+    idx_mess=0
+    conta_click=0
+    is_triang=False
     
     #-----------------------------------------------------
-    def __init__(self):
+    def __init__(self,moving_beast_genitore):
+        self.moving_beast_genitore=moving_beast_genitore
         self.screen=pygame.display.get_surface()
         #self.background_txt = pygame.Surface((self.screen.get_size()[0]-1,self.text_altezza))
         square=pygame.image.load('.\\immagini\\square.png').convert_alpha()
+        triangle=pygame.image.load('.\\immagini\\triangle.png').convert_alpha()
+        self.triangle=pygame.transform.scale(triangle,(15,10))
         self.background_txt =pygame.transform.scale(square,(self.screen.get_size()[0]-1,self.text_altezza))
         self.backvuoto=self.background_txt.copy()
         #self.background_txt.fill((250, 250, 250))
@@ -94,7 +62,7 @@ class Dialogosemplice():
         #self.disegna_crocetta()
         pygame.mixer.init()
         self.suono=pygame.mixer.Sound('immagini/message.wav')
-        self.seq=MessageTimerClass(self.lista_messaggi,self)
+        #self.seq=MessageTimerClass(self.lista_messaggi,self)
     
     """
     def disegna_crocetta(self):
@@ -106,27 +74,33 @@ class Dialogosemplice():
         self.crossrect.height=self.crossrect.height
     """
     def disegna_messaggio(self):
+        #self.disegna_triangolo()
         self.screen.blit(self.background_txt,(self.bgrect.x,self.bgrect.y))
+        
     
     #-----------------------------------------------------
     def mywrite(self):
         #self.background_txt.fill((250, 250, 250))
         #font = pygame.font.Font(None, 32)
         text = self.font.render(self.testo, True, (10, 10, 10),(255,255,255))
-        self.background_txt=self.backvuoto.copy()
+        self.background_txt=self.backvuoto.copy() #qui ogni volta viene sbiancato il contenuto del riquadro dialogo
+        
         self.background_txt.blit(text,(10,10))
-        #self.background_txt.blit(self.cross,(self.crossrect.x,0))
+        self.disegna_triangolo()
+        
         #self.screen.blit(self.background_txt,(self.bgrect.x,self.bgrect.y))
         self.disegna_messaggio()
         self.scritto=True
         type_filter=pygame.MOUSEBUTTONDOWN
         for event in pygame.event.get(type_filter): # event handling loop
+            #print 'pippo'
             self.gestione_eventi(event)  
     #-----------------------------------------------------
     def scrivi_frase(self):	
         if self.is_near:
             if self.dialogo_btn==True:
                 self.mywrite()
+                
         else:
             self.scritto=False
         
@@ -146,19 +120,54 @@ class Dialogosemplice():
                 self.sequenza_finita=False
             if self.sequenza_finita:
                 self.sequenza_partita=False
-
-
-                
-    #---------------------------------------------------------
-    def gestione_eventi(self,event):
-        #event=pygame.event.peek()
-        #event=pygame.event.wait()
+    
+    #-----------------------------------------------------
+    def sequenza_messaggi_noth(self):
+        if self.lista_messaggi[0]=='nulla':
+            self.is_near=False
+            return
+        else:
+            #if not self.sequenza_partita:
+            self.testo=self.lista_messaggi[self.idx_mess]
+            #if self.sequenza_finita:
+            #    self.sequenza_partita=False
+    
+    def disegna_triangolo(self):
+        x=self.background_txt.get_width()-self.triangle.get_width()-10
+        y=self.background_txt.get_height()-self.triangle.get_height()-10
         
-        if event.type == pygame.QUIT:
-            context.pop()
-        if event.type==pygame.MOUSEBUTTONDOWN:
+        if self.conta_click<len(self.lista_messaggi)-1:
+            self.background_txt.blit(self.triangle,(x,y))
+    
+    
+    #-----------------------------------------------------
+    def incrementa_idx_mess(self):
+        max_idx=len(self.lista_messaggi)
+        #self.suono.play()
+        self.conta_click=self.conta_click+1
+        if self.conta_click>max_idx-1:
+            self.dialogo_btn=False
+            self.moving_beast_genitore.staifermo=False
+            self.conta_click=0
+            self.moving_beast_genitore.fermato=False
+            #print "chiudi"+str(max_idx)
+        if self.idx_mess<max_idx-1:
+            self.idx_mess=self.idx_mess+1
             
-            pos=pygame.mouse.get_pos()
+            
+        else:
+            self.idx_mess=0
+            
+        self.sequenza_messaggi_noth()
+    #---------------------------------------------------------
+    
+    def gestione_eventi(self,event):
+        if event.type == pygame.QUIT:
+            context.pop()      
+        if event.type==pygame.MOUSEBUTTONDOWN:
+            self.incrementa_idx_mess()
+            #self.suono.play()
+            #pos=pygame.mouse.get_pos()
             """if self.crossrect.collidepoint(pos):
                 self.close_clicked=True
                 print event.type
@@ -298,7 +307,7 @@ class MovingBeast(model.Object):
             self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
             self.durata_pausa=int(animato['durata_pausa'])
             
-            self.dialogosemp=Dialogosemplice()
+            self.dialogosemp=Dialogosemplice(self)
             #self.dialogosemp.motore=self.motore
 
         def set_dialogo_btn(self,val=True):
@@ -519,6 +528,7 @@ class MovingBeast(model.Object):
                 self.scegli_fotogramma_animazione(self.miocing,self.direzione)
          
             else:
+                #print self.direzione
                 if (self.direzione=='right') or (self.direzione=='SE') or (self.direzione=='NE'): 
                     self.fotogramma=self.miocing.animObjs['right_stand'].ritorna_fotogramma()
                 elif (self.direzione=='left') or (self.direzione=='SW') or (self.direzione=='NW'): 
@@ -552,7 +562,7 @@ def main():
     
     animato={'dir':'aio','id':'1','pos':(100,100),'points':None,'durata_pausa':'10'}
     bestia=MovingBeast(animato)
-    bestia.staifermo=True
+    bestia.staifermo=False
     bestia.dialogosemp.lista_messaggi=['pippo','TOPOLINO','PLUTO']
     
 
@@ -563,8 +573,13 @@ def main():
         bestia.muovi_animato()
 
         screen.blit(bestia.sprite_fotogramma.image, (bestia.rect.x, bestia.rect.y))
-
-        for event in pygame.event.get(): # event handling loop
+        
+        if bestia.dialogosemp.dialogo_btn: 
+            type_filter=[pygame.KEYDOWN,pygame.QUIT]
+        else:
+            type_filter=[pygame.KEYDOWN,pygame.MOUSEBUTTONDOWN,pygame.QUIT]
+            
+        for event in pygame.event.get(type_filter): # event handling loop
             # handle ending the program
             if event.type == QUIT:
                 pygame.quit()
@@ -573,31 +588,29 @@ def main():
                 if event.key == K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-                if event.key == K_F4:
-                    print 'is_near '+str(bestia.dialogosemp.is_near)
-                    print 'btn'+str(bestia.dialogosemp.dialogo_btn)
-                    
+                if event.key == K_z:
+                    bestia.dialogosemp.incrementa_idx_mess()
+                if event.key == K_F4:                   
+                    print bestia.dialogosemp.dialogo_btn
                     if not bestia.dialogosemp.is_near:
                         bestia.dialogosemp.is_near=True
-                        bestia.dialogosemp.sequenza_messaggi_new()
+                        bestia.dialogosemp.sequenza_messaggi_noth()
                     else:
                         bestia.dialogosemp.is_near=False
-                    
                     if not bestia.dialogosemp.dialogo_btn:
                         bestia.dialogosemp.dialogo_btn=True
                         #bestia.set_dialogo_btn(True)
                     else:
                         bestia.dialogosemp.dialogo_btn=False
-                        #bestia.set_dialogo_btn(False)
                         
-                    """
-                    if not bestia.fermato:
-                        bestia.fermato=True
-                    else:
-                        bestia.fermato=False
-                    """
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+                bestia.dialogosemp.dialogo_btn=True
+                bestia.dialogosemp.is_near=True
+                #bestia.stai_fermo_fermo=True
+                bestia.fermato=True
+                bestia.dialogosemp.sequenza_messaggi_noth()
+                #bestia.dialogosemp.suono.play()
         bestia.dialogosemp.scrivi_frase()
-        
         pygame.display.flip()
         mainClock.tick(40) # Feel free to experiment with any FPS setting.
               
