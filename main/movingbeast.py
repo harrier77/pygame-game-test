@@ -279,6 +279,7 @@ class MovingBeast(model.Object):
         giacambiato=False
         orientamento="vuoto"
         motore=None
+        attendi_evento=False
         def __init__(self,animato=None):
             model.Object.__init__(self)
 
@@ -306,7 +307,8 @@ class MovingBeast(model.Object):
             self.miocing.moveConductor.play()
             self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
             self.durata_pausa=int(animato['durata_pausa'])
-            
+            try:self.attendi_evento=animato['attendi_evento']
+            except:pass
             self.dialogosemp=Dialogosemplice(self)
             #self.dialogosemp.motore=self.motore
 

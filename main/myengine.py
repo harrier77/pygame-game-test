@@ -133,6 +133,8 @@ class App_gum(Engine):
         fringe_i=1
         xml = open('animazioni\\prova.xml', 'r').read()
         dic_storia=xmltodict.parse(xml)['storia']
+        lista_beast=[]
+        lista_beast={}
         godebug=False
         #dialogo_btn=False
         def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
@@ -180,7 +182,7 @@ class App_gum(Engine):
             dict_animati={}
             self.warps=[]
             self.eventi=pygame.sprite.Group()
-            self.lista_beast=[]
+            #self.lista_beast=[]
             self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
             Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
        
@@ -197,7 +199,7 @@ class App_gum(Engine):
                     animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
                     for p in O.properties:
                         animato[p]=O.properties[p]
-                        
+                
                     dict_animati[animato.get('id')]=animato
                     dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
                     beast=MovingBeast(animato)
@@ -206,9 +208,13 @@ class App_gum(Engine):
                     beast.staifermo=animato['staifermo']
                     beast.orientamento=animato['orientamento']
                     beast.motore=self
-                    self.lista_beast.append(beast)
+                    #self.lista_beast.append(beast)
+                    self.lista_beast[beast.id]=beast
+                    #for k,value in self.lista_beast.iteritems():
+                    #    print value.attendi_evento
+                    #exit()
                     self.avatar_group.add(beast)
-            #print self.eventi[0].rect
+            #miovar_dump(self.lista_beast[0])
             #exit()
             ## Insert avatar into the Fringe layer.
             self.avatar.rect.x=hero_ini_pos[0]
@@ -287,7 +293,7 @@ class App_gum(Engine):
                 #re-add the moving avatar 
                 self.avatar_group.add(avatar)
                 #re-add all others moving things
-                for beast in self.lista_beast:
+                for k,beast in self.lista_beast.iteritems():
                     self.avatar_group.add(beast)
         #----------------------------------------------------------------------
         def draw_debug(self):
@@ -309,11 +315,12 @@ class App_gum(Engine):
                 toolkit.draw_labels(self.label_cache)
             if self.all_groups[self.collision_group_i].visible: self.draw_debug()
             self.draw_detail()
-            for beast in self.lista_beast:
-                beast.muovi_animato()
-                #beast.dialogosemp.dialogo_btn=self.dialogo_btn
-                self.is_talking2(beast)
-                beast.dialogosemp.scrivi_frase()
+            for k,beast in self.lista_beast.iteritems():
+                if not beast.attendi_evento:
+                    beast.muovi_animato()
+                    #beast.dialogosemp.dialogo_btn=self.dialogo_btn
+                    self.is_talking2(beast)
+                    beast.dialogosemp.scrivi_frase()
             State.screen.flip()
         #---------------------------------------------------
         def draw_detail(self):
@@ -322,7 +329,6 @@ class App_gum(Engine):
             cx,cy = camera_rect.topleft
             blit = camera.surface.blit
             avatar = self.avatar
-            #beast=self.beast
             # Draw static overlay tiles.
             for layer in self.overlays:
                 sprites = layer.objects.intersect_objects(camera_rect)
@@ -337,7 +343,13 @@ class App_gum(Engine):
                             #    print(camera.rect)
                             #    print(s.rect)
                             #    print(camera.rect.colliderect(s.rect))
-                            blit(s.image, s.rect.move(-cx,-cy))
+                            if isinstance(s,MovingBeast):
+                                if not s.attendi_evento:
+                                    blit(s.image, s.rect.move(-cx,-cy))
+                            else:
+                                blit(s.image, s.rect.move(-cx,-cy))
+                            
+                            
   
         #---------------------------------------------------
         def is_warp(self):
@@ -400,8 +412,9 @@ class App_gum(Engine):
         def is_event_collide(self):
             newsprite=self.avatar.sprite          
             hits=pygame.sprite.spritecollide(newsprite, self.eventi,False)
-            if hits : print hits[0].properties['azione']
-            return hits
+            if hits : 
+                id_animato=hits[0].properties['id_animato']
+                self.lista_beast[id_animato].attendi_evento=False
             
         
         #-------------------------------------------------------
@@ -500,7 +513,7 @@ class App_gum(Engine):
                     self.dialogo_btn=False
                     pass
                     
-                for beast in self.lista_beast:
+                for k,beast in self.lista_beast.iteritems():
                     beast.dialogosemp.dialogo_btn=self.dialogo_btn
                     beast.dialogosemp.incrementa_idx_mess()
                 #beast.dialogosemp.suono.play()
@@ -510,7 +523,11 @@ class App_gum(Engine):
                 else:
                     self.godebug=False
             elif key == pygame.K_F6:
-                 self.wx.version.SetLabel(label=str(self.avatar.hitbox))
+                self.wx.version.SetLabel(label=str(self.avatar.hitbox))
+            elif key == pygame.K_F7:
+                print 'f7'
+                print self.lista_beast['interlocutore'].id
+                self.lista_beast['interlocutore'].attendi_evento=False
             elif key == K_g:
                 State.show_grid = not State.show_grid
             elif key == K_l:
@@ -524,7 +541,7 @@ class App_gum(Engine):
         def on_mouse_button_down(self, pos, button):                
                 self.mouse_down = True
                 self.dialogo_btn=True
-                for beast in self.lista_beast:
+                for k,beast in self.lista_beast.iteritems():
                     beast.dialogosemp.dialogo_btn=self.dialogo_btn
 
 

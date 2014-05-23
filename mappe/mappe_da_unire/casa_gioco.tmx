@@ -45,8 +45,9 @@
   <object name="Inizio" x="354" y="464" width="32" height="32">
    <ellipse/>
   </object>
-  <object name="priest" type="animato" x="358" y="560">
+  <object name="priest" type="animato" x="341" y="559">
    <properties>
+    <property name="attendi_evento" value="True"/>
     <property name="durata_pausa" value="10"/>
     <property name="id" value="interlocutore"/>
    </properties>
