@@ -113,8 +113,10 @@ class Miohero(model.Object):
             #y = self.rect.y+(hitbox.height/2)
             y = self.rect.y+hitbox.height/2
             x= self.rect.x-(hitbox.width/2)
+            
             hitbox.y=y
             hitbox.x=x
+            #print hitbox.midbottom
             return hitbox
         
         @property
@@ -185,7 +187,7 @@ class App_gum(Engine):
             #self.lista_beast=[]
             self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
             Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
-       
+            self.State=State
             for O in self.prima_lista_ogg:
                 if O.name=="Inizio" or O.name=="inizio":
                     hero_ini_pos= O.rect.x,O.rect.y
@@ -208,10 +210,10 @@ class App_gum(Engine):
                     beast.staifermo=animato['staifermo']
                     beast.orientamento=animato['orientamento']
                     beast.motore=self
-                    #self.lista_beast.append(beast)
-                    self.lista_beast[beast.id]=beast
-    
+                    #if beast.vai_incontro:
+                    #    beast.lista_destinazioni=[beast.lista_destinazioni[0],(self.avatar.hitbox.x,self.avatar.hitbox.y)]
                     #exit()
+                    self.lista_beast[beast.id]=beast
                     self.avatar_group.add(beast)
             #miovar_dump(self.lista_beast[0])
             #exit()
@@ -409,12 +411,14 @@ class App_gum(Engine):
             return is_walkable       
         
         def is_event_collide(self):
-            newsprite=self.avatar.sprite          
+            newsprite=self.avatar.sprite
             hits=pygame.sprite.spritecollide(newsprite, self.eventi,False)
+            
             if hits : 
                 id_animato=hits[0].properties['id_animato']
                 self.lista_beast[id_animato].attendi_evento=False
-            
+                
+        
         
         #-------------------------------------------------------
         @property
@@ -433,7 +437,8 @@ class App_gum(Engine):
                
                 if self.godebug:
                     cx,cy = self.camera.rect.topleft
-                    pygame.draw.rect(self.camera.surface, Color('red'), beast.talk_box.move(-cx,-cy))
+                    #pygame.draw.rect(self.camera.surface, Color('red'), beast.talk_box.move(-cx,-cy))
+                    pygame.draw.rect(self.camera.surface, Color('red'), beast.beast_hit_box.move(-cx,-cy))
                 if beast.dialogosemp.dialogo_btn:
                     if hits:
                         #beast.set_dialogo_btn(True)
@@ -502,7 +507,7 @@ class App_gum(Engine):
                         self.camera.target.giocatore_animato=self.animato['left_run']
             elif key==pygame.K_z:
                 print "z"
-                for beast in self.lista_beast:
+                for k,beast in self.lista_beast.iteritems():
                     beast.dialogosemp.incrementa_idx_mess()
             
             elif key == pygame.K_F4:

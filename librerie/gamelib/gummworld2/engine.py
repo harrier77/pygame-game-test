@@ -333,6 +333,7 @@ class Engine(Context):
         time the clock indicates an update cycle is ready.
         """
         for e in self._get_pygame_events():
+            State.mioevento=e
             typ = e.type
             if typ == KEYDOWN:
                 self.on_key_down(e.unicode, e.key, e.mod)

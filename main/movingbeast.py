@@ -41,8 +41,8 @@ class Dialogosemplice():
     text_altezza=50
     crossrect=None
     dialogo_btn=False
-    idx_mess=0
-    conta_click=0
+    idx_mess=-1
+    conta_click=1
     is_triang=False
     
     #-----------------------------------------------------
@@ -92,9 +92,12 @@ class Dialogosemplice():
         self.disegna_messaggio()
         self.scritto=True
         type_filter=pygame.MOUSEBUTTONDOWN
-        for event in pygame.event.get(type_filter): # event handling loop
+        e=self.moving_beast_genitore.motore.State.mioevento
+        self.gestione_eventi(e)
+        self.moving_beast_genitore.motore.State.mioevento=None
+        #for event in pygame.event.get(type_filter): # event handling loop
             #print 'pippo'
-            self.gestione_eventi(event)  
+            #self.gestione_eventi(event)  
     #-----------------------------------------------------
     def scrivi_frase(self):	
         if self.is_near:
@@ -143,35 +146,36 @@ class Dialogosemplice():
     #-----------------------------------------------------
     def incrementa_idx_mess(self):
         max_idx=len(self.lista_messaggi)
+        
         #self.suono.play()
-        self.conta_click=self.conta_click+1
-        if self.conta_click>max_idx-1:
+        print self.conta_click
+        if self.conta_click>max_idx:
             self.dialogo_btn=False
             self.moving_beast_genitore.staifermo=False
-            self.conta_click=0
+            self.conta_click=1
             self.moving_beast_genitore.fermato=False
             #print "chiudi"+str(max_idx)
-        if self.idx_mess<max_idx-1:
-            self.idx_mess=self.idx_mess+1
-            
-            
         else:
-            self.idx_mess=0
+            self.idx_mess=self.idx_mess+1
+            if self.idx_mess==len(self.lista_messaggi):self.idx_mess=0
+            self.sequenza_messaggi_noth()
+            self.conta_click=self.conta_click+1
             
-        self.sequenza_messaggi_noth()
+        
     #---------------------------------------------------------
     
     def gestione_eventi(self,event):
-        if event.type == pygame.QUIT:
-            context.pop()      
-        if event.type==pygame.MOUSEBUTTONDOWN:
-            self.incrementa_idx_mess()
-            #self.suono.play()
-            #pos=pygame.mouse.get_pos()
-            """if self.crossrect.collidepoint(pos):
-                self.close_clicked=True
-                print event.type
-                self.open=False"""
+        if event:
+                if event.type == pygame.QUIT:
+                    context.pop()      
+                if event.type==pygame.MOUSEBUTTONDOWN:
+                    self.incrementa_idx_mess()
+                    #self.suono.play()
+                    #pos=pygame.mouse.get_pos()
+                    """if self.crossrect.collidepoint(pos):
+                        self.close_clicked=True
+                        print event.type
+                        self.open=False"""
 #FineCLasse
 
 #inizio classe
@@ -280,6 +284,8 @@ class MovingBeast(model.Object):
         orientamento="vuoto"
         motore=None
         attendi_evento=False
+        vai_incontro=False
+        rendez_vous_punto=(200,200)
         def __init__(self,animato=None):
             model.Object.__init__(self)
 
@@ -290,8 +296,11 @@ class MovingBeast(model.Object):
             self.x=animato['pos'][0]
             self.y=animato['pos'][1]
             position=animato['pos']
-            
-            points = animato['points']
+            if self.vai_incontro:
+                points=[position,self.rendez_vous_punto]
+            else:
+                points = animato['points']
+
             if points:
                 self.lista_destinazioni=self.calcola_points(points,position)
                 self.x=self.lista_destinazioni[0][0]
@@ -308,6 +317,8 @@ class MovingBeast(model.Object):
             self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
             self.durata_pausa=int(animato['durata_pausa'])
             try:self.attendi_evento=animato['attendi_evento']
+            except:pass
+            try:self.vai_incontro=animato['vai_incontro']
             except:pass
             self.dialogosemp=Dialogosemplice(self)
             #self.dialogosemp.motore=self.motore
@@ -367,7 +378,7 @@ class MovingBeast(model.Object):
         
         #-------------------------------------------------------------------------
         def scegli_fotogramma_animazione(self,miocing,direzione):
-            
+
             self.direzione=direzione
             if len(self.listap)>0:  ##inizia la camminata
                 if not self.staifermo:
@@ -375,6 +386,9 @@ class MovingBeast(model.Object):
                     pos= self.listap.pop(0)
                     self.x,self.y=pos ##qui vengono impostati x e y del fotogramma da proiettare sullo schermo prendendoli dalla lista della camminata self.listap
                     #fine impostazione
+                    if self.vai_incontro:
+                            if self.motore:
+                                    self.lista_destinazioni=[self.lista_destinazioni[0],(self.motore.avatar.hitbox.bottomleft[0],self.motore.avatar.hitbox.bottomleft[1])]
                 
                 miocing.moveConductor.play()
                 #di seguito viene selezionata l'iimmagine a seconda della direzione della camminata; x e y sono già stati impostati
@@ -438,6 +452,26 @@ class MovingBeast(model.Object):
             talk_box.x=x
             return talk_box
         
+        @property
+        def beast_hit_box(self):
+            beast_hit_box=self.rect.copy()
+            beast_hit_box.height=20
+            beast_hit_box.width=30
+            beast_hit_box.x=beast_hit_box.x+beast_hit_box.width/2
+            beast_hit_box.y=beast_hit_box.y+beast_hit_box.height
+            return beast_hit_box
+        
+        @property
+        def is_persona_collide(self):
+            newsprite=self.motore.avatar.sprite
+            hits=self.beast_hit_box.colliderect(newsprite.rect)
+            #hits=pygame.sprite.collide_rect(newsprite, self.sprite_fotogramma)
+            if hits:
+                return True
+            else:
+                return False
+        
+        
         #--------------------------------------------------------------------------------
         def mio_timer_pausa(self):
             adesso= datetime.datetime.time(datetime.datetime.now())
@@ -473,8 +507,11 @@ class MovingBeast(model.Object):
             #if self.motore:
             #    if self.motore.dialogo.close_clicked:
             #        self.fermato=False
-                            
+        
+
                 
+        
+        
         #----------------------------------------
         def muovi_animato(self):
             if self.dialogosemp.lista_messaggi==['...']:
@@ -526,6 +563,7 @@ class MovingBeast(model.Object):
             
             #sezione che effettivamente muove l'animazione, ma solo se non è in pausa o non è fermata
             
+            #if self.is_walking and not self.fermato and not self.is_persona_collide: 
             if self.is_walking and not self.fermato: 
                 self.scegli_fotogramma_animazione(self.miocing,self.direzione)
          

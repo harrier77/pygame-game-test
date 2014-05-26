@@ -16,7 +16,7 @@
  </layer>
  <layer name="Ground2" width="36" height="33">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+2Ryw7BQBiFm1AsEOKycllghyV21n0DexL2eC/egDeoN+AJsLAVp8lMMplUZzq9zWJO8uV0Zv60X1vLUo8LbuAbI1FyBw+NfE7grJHPBVw18nFJp+GTAwVgky5ya5uZ5ff9uhTRpwGapNvcukWahu6PmLkZmIMFc+69Y17g9i8DMBQ0jWiONvtOYX0+AWeqYd1UfGqgTtbvBPzC+Dw5XhL3XyXooxLPx4ngIvJZM9ebgLkt6Z2ki6rPHhxCcLT8v09fwkP2fzmC5uf8EqdPHFlq5sMmTZ8yqIAqGIMJmGbo0wFd0OOus/KRiW4+IiedXIyPfj4iJ51cjI/YJyxZP99gCOIHF/zQa5ASAAA=
+   H4sIAAAAAAAAC+2Ryw7BQBSGm1AsEOKycllghyV21n0DexL2eC/egDeoN+AJsLAVf5OZZDJpOpe2Oov5ky9nLmfab1rH0Y8PbopnvgLi5A4eBvmcwNkgnwu4GuTja5zR9cmBAnBJLXJzl+nl18NqKaZPAzRJbXPzFqk0dH3E9M3AHCyY/eCOeeKm6jMAQ0GlEfXRyt5J1ecTsacb1k3HpwbqZP5OwU/F58nxknj+KkUfnQQ+XgwXkc+aGW8i+rak7iRddH324KDA0Qn/Pn0JD9n/5Qkq3xeWJH2SyNIwHzb/9CmDCqiCMZiAaYY+HdAFPW6clY9MTPMROZnkYn3M8xE5meRifcQ+qmT9foslih85IMIJkBIAAA==
   </data>
  </layer>
  <layer name="Fringe" width="36" height="33">
@@ -45,13 +45,14 @@
   <object name="Inizio" x="354" y="464" width="32" height="32">
    <ellipse/>
   </object>
-  <object name="priest" type="animato" x="356" y="559">
+  <object name="priest" type="animato" x="355" y="557">
    <properties>
     <property name="attendi_evento" value="True"/>
     <property name="durata_pausa" value="10"/>
     <property name="id" value="interlocutore"/>
+    <property name="vai_incontro" value="True"/>
    </properties>
-   <polyline points="11,78 11,-7"/>
+   <polyline points="11,78 150,-42"/>
   </object>
   <object name="evento1" type="evento" x="191" y="532" width="678" height="31">
    <properties>
