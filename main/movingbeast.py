@@ -139,16 +139,14 @@ class Dialogosemplice():
         x=self.background_txt.get_width()-self.triangle.get_width()-10
         y=self.background_txt.get_height()-self.triangle.get_height()-10
         
-        if self.conta_click<len(self.lista_messaggi)-1:
+        if self.conta_click<=len(self.lista_messaggi):
             self.background_txt.blit(self.triangle,(x,y))
     
     
     #-----------------------------------------------------
     def incrementa_idx_mess(self):
         max_idx=len(self.lista_messaggi)
-        
         #self.suono.play()
-        print self.conta_click
         if self.conta_click>max_idx:
             self.dialogo_btn=False
             self.moving_beast_genitore.staifermo=False
@@ -193,6 +191,9 @@ class Beast2():
             self.front_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'front_walk.001.png')
             self.back_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'back_walk.001.png')
             self.left_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'left_walk.001.png')
+            
+            
+            
             self.right_standing = pygame.transform.flip(self.left_standing, True, False)
             self.playerWidth, self.playerHeight = self.front_standing.get_size()
             self.rect=self.front_standing.get_rect()
@@ -286,13 +287,18 @@ class MovingBeast(model.Object):
         attendi_evento=False
         vai_incontro=False
         rendez_vous_punto=(200,200)
+
         def __init__(self,animato=None):
             model.Object.__init__(self)
 
             dir_name=animato['dir']
             self.miocing=Beast2(dir_name=dir_name)
             self.id=animato['id']
-
+            
+            exclpng=pygame.image.load('immagini/exclam1.png').convert_alpha()
+            #self.exclamation=pygame.transform.scale(exclpng,(50,38))
+            self.exclamation=exclpng
+            
             self.x=animato['pos'][0]
             self.y=animato['pos'][1]
             position=animato['pos']
@@ -387,6 +393,7 @@ class MovingBeast(model.Object):
                     self.x,self.y=pos ##qui vengono impostati x e y del fotogramma da proiettare sullo schermo prendendoli dalla lista della camminata self.listap
                     #fine impostazione
                     if self.vai_incontro:
+                            self.mostra_esclamazione()
                             if self.motore:
                                     self.lista_destinazioni=[self.lista_destinazioni[0],(self.motore.avatar.hitbox.bottomleft[0],self.motore.avatar.hitbox.bottomleft[1])]
                 
@@ -409,7 +416,7 @@ class MovingBeast(model.Object):
                     self.fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
                 elif direzione=='NE':
                     self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
-                    
+                
                 return self.fotogramma
         
         @property
@@ -461,12 +468,18 @@ class MovingBeast(model.Object):
             beast_hit_box.y=beast_hit_box.y+beast_hit_box.height
             return beast_hit_box
         
+        
+        def mostra_esclamazione(self):
+            cx,cy=self.motore.State.camera.rect.topleft
+            self.motore.State.screen.blit(self.exclamation,(self.rect.x-cx+3,self.rect.y-cy-25))
+        
         @property
         def is_persona_collide(self):
             newsprite=self.motore.avatar.sprite
             hits=self.beast_hit_box.colliderect(newsprite.rect)
             #hits=pygame.sprite.collide_rect(newsprite, self.sprite_fotogramma)
             if hits:
+                #self.mostra_esclamazione()
                 return True
             else:
                 return False
@@ -563,8 +576,8 @@ class MovingBeast(model.Object):
             
             #sezione che effettivamente muove l'animazione, ma solo se non è in pausa o non è fermata
             
-            #if self.is_walking and not self.fermato and not self.is_persona_collide: 
-            if self.is_walking and not self.fermato: 
+            if self.is_walking and not self.fermato and not self.is_persona_collide: 
+            #if self.is_walking and not self.fermato: 
                 self.scegli_fotogramma_animazione(self.miocing,self.direzione)
          
             else:
@@ -631,7 +644,7 @@ def main():
                 if event.key == K_z:
                     bestia.dialogosemp.incrementa_idx_mess()
                 if event.key == K_F4:                   
-                    print bestia.dialogosemp.dialogo_btn
+                    
                     if not bestia.dialogosemp.is_near:
                         bestia.dialogosemp.is_near=True
                         bestia.dialogosemp.sequenza_messaggi_noth()

@@ -218,7 +218,7 @@
   <object name="villager" type="animato" x="2075" y="4307">
    <properties>
     <property name="durata_pausa" value="1"/>
-    <property name="id" value="villager"/>
+    <property name="id" value="villagerbis"/>
    </properties>
    <polyline points="0,0 1560,-4 1721,-142 1535,-31"/>
   </object>

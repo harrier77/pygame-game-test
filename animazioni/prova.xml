@@ -4,17 +4,17 @@
                 <messaggio>Growl</messaggio>
                 <messaggio>growl...</messaggio> 
         </cing1>
-        <interlocutore1>
+        <interlocutore>
                 <segmento>2</segmento>
                 <messaggio>Esci muoviti! Il califfo sta parlando e manchi solo tu!</messaggio>
                 <messaggio>Se non vai sarai messo al bando</messaggio>
                 <messaggio>Tutti devono essere presenti!</messaggio>
                 <messaggio>Sbrigati!</messaggio>
-        </interlocutore1>
-        <interlocutore>
+        </interlocutore>
+        <interlocutore1>
                 <segmento>1</segmento>
                 <messaggio>uno di uno</messaggio>
-        </interlocutore>
+        </interlocutore1>
          <villager>
                 <segmento>1</segmento>
                 <messaggio>Seguimi!</messaggio>
