@@ -21,21 +21,64 @@ from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
 import subprocess
-
+import math
+from math import atan2,pi
 DEBUG=False
 
+#-------------------------------------------------------------------------------
+class Proiettile(model.Object):
+    try:
+        __builtin__.miavar
+    except:
+        try:
+            os.stat('animation')
+        except:
+            print 'cambio dir a '+os.getcwd()
+            os.chdir('..\\') 
+    freccia=pygame.image.load('immagini/bullet.png')
+    #------------------------------------
+    def __init__(self,motore,mouse_position):
+        self.motore=motore
+        self.rect=self.image.get_rect()
+        self.rect=self.motore.avatar.rect.copy()
+        pos= self.motore.camera.screen_to_world(mouse_position)
+        self.mouse_position=pos
+        dify = (pos[1]-self.rect.y) 
+        difx=  (pos[0]-self.rect.x)
+        angolo_rads=math.atan2(dify,difx)
+        self.dx=math.cos(angolo_rads)
+        self.dy=math.sin(angolo_rads)
+        self.freccia=pygame.transform.rotate(self.freccia, 360-angolo_rads*57.29)
+        #self.lista_pos=calcola_passi((self.rect.x,self.rect.y),(pos))
+
+    
+    #------------------------------------
+    def mostra(self):
+
+        self.motore.avatar_group.add(self)
+    #------------------------------------
+    def muovi(self): 
+        """if len(self.lista_pos)>0: 
+            pos=self.lista_pos.pop(0)
+            self.rect.x,self.rect.y=pos
+            #print pos"""
+        """p=geometry.step_toward_point((self.rect.x,self.rect.y), self.mouse_position, 10)
+        self.rect.x=p[0]
+        self.rect.y=p[1]
+        print p"""
+        self.rect.x=self.rect.x+self.dx*10
+        self.rect.y=self.rect.y+self.dy*10
+        pass
+    #------------------------------------
+    @property
+    def image(self):
+        #self.freccia=pygame.transform.rotate(self.freccia, 360-self.arcotangente*57.29)
+        return self.freccia
+#end of class
 
 #-------------------------------------------------------------------------------
 class Miohero(model.Object):
         # load the "standing" sprites (these are single images, not animations)
-        try:
-                __builtin__.miavar
-        except:
-                try:
-                        os.stat('animation')
-                except:
-                        print 'cambio dir a '+os.getcwd()
-                        os.chdir('..\\') 
         sit_standing=pygame.image.load('animazioni/gameimages/crono_sleep.000.gif')
         front_standing = pygame.image.load('animazioni/gameimages/crono_front.gif')
         back_standing = pygame.image.load('animazioni/gameimages/crono_back.gif')
@@ -45,6 +88,7 @@ class Miohero(model.Object):
         standing_scelta=sit_standing
         div_scala=1.8
         
+        freccia=pygame.image.load('immagini/bullet.png')
 
         #------------------------------------
         def __init__(self,map_pos,screen_pos,parentob,dormi=True):
@@ -221,7 +265,9 @@ class App_gum(Engine):
             self.avatar.rect.x=hero_ini_pos[0]
             self.avatar.rect.y=hero_ini_pos[1]
             self.avatar_group.add(self.avatar)
-                    
+
+            #self.freccia=Proiettile(self)
+     
             State.camera.position=Vec2d(State.camera.position)
      
             # Create a speed box for converting mouse position to destination
@@ -337,6 +383,9 @@ class App_gum(Engine):
                     if layer is self.avatar_group:
                         sprites.sort(key=lambda o:o.rect.bottom)
                     for s in sprites:
+                        if isinstance(s,Proiettile):
+                            s.muovi()
+                            pass
                         if s is avatar:
                             blit(s.image, s.rect.move(camera.anti_interp(s)))
                         else:
@@ -349,9 +398,7 @@ class App_gum(Engine):
                                     blit(s.image, s.rect.move(-cx,-cy))
                             else:
                                 blit(s.image, s.rect.move(-cx,-cy))
-                            
-                            
-  
+
         #---------------------------------------------------
         def is_warp(self):
             dummy = self.avatar
@@ -543,11 +590,14 @@ class App_gum(Engine):
 
         #------------------------------------------------------------------ 
         def on_mouse_button_down(self, pos, button):                
+            if button==3:
                 self.mouse_down = True
                 self.dialogo_btn=True
                 for k,beast in self.lista_beast.iteritems():
                     beast.dialogosemp.dialogo_btn=self.dialogo_btn
-
+            if button==1:
+                self.freccia=Proiettile(self,pos)
+                self.freccia.mostra()
 
         #------------------------------------------------------------------ 
         def on_mouse_button_up(self, pos, button):

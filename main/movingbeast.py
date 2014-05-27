@@ -94,7 +94,7 @@ class Dialogosemplice():
         type_filter=pygame.MOUSEBUTTONDOWN
         e=self.moving_beast_genitore.motore.State.mioevento
         self.gestione_eventi(e)
-        self.moving_beast_genitore.motore.State.mioevento=None
+        
         #for event in pygame.event.get(type_filter): # event handling loop
             #print 'pippo'
             #self.gestione_eventi(event)  
@@ -166,14 +166,14 @@ class Dialogosemplice():
         if event:
                 if event.type == pygame.QUIT:
                     context.pop()      
-                if event.type==pygame.MOUSEBUTTONDOWN:
+                if event.type==pygame.MOUSEBUTTONDOWN and event.button == 3:
                     self.incrementa_idx_mess()
+                    self.moving_beast_genitore.motore.State.mioevento=None
                     #self.suono.play()
                     #pos=pygame.mouse.get_pos()
-                    """if self.crossrect.collidepoint(pos):
-                        self.close_clicked=True
-                        print event.type
-                        self.open=False"""
+                    #if self.crossrect.collidepoint(pos):
+                    #    self.close_clicked=True
+                    #    self.open=False
 #FineCLasse
 
 #inizio classe
