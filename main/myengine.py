@@ -35,14 +35,19 @@ class Proiettile(model.Object):
         except:
             print 'cambio dir a '+os.getcwd()
             os.chdir('..\\') 
-    freccia=pygame.image.load('immagini/bullet.png')
+    freccia=pygame.image.load('immagini/bulletnero.png')
+    #freccia=pygame.transform.scale(freccia,(72,72))
     #------------------------------------
     def __init__(self,motore,mouse_position):
         self.motore=motore
         self.rect=self.image.get_rect()
-        self.rect=self.motore.avatar.rect.copy()
+        #self.rect=self.motore.avatar.rect.copy()
+        self.rect.x=self.motore.avatar.rect.x-self.freccia.get_width()/2
+        self.rect.y=self.motore.avatar.rect.y-self.freccia.get_height()/2
         pos= self.motore.camera.screen_to_world(mouse_position)
         self.mouse_position=pos
+        #self.rect.x=pos[0]
+        #self.rect.y=pos[1]
         dify = (pos[1]-self.rect.y) 
         difx=  (pos[0]-self.rect.x)
         angolo_rads=math.atan2(dify,difx)
@@ -51,10 +56,9 @@ class Proiettile(model.Object):
         self.freccia=pygame.transform.rotate(self.freccia, 360-angolo_rads*57.29)
         #self.lista_pos=calcola_passi((self.rect.x,self.rect.y),(pos))
 
-    
+
     #------------------------------------
     def mostra(self):
-
         self.motore.avatar_group.add(self)
     #------------------------------------
     def muovi(self): 
@@ -66,8 +70,8 @@ class Proiettile(model.Object):
         self.rect.x=p[0]
         self.rect.y=p[1]
         print p"""
-        self.rect.x=self.rect.x+self.dx*10
-        self.rect.y=self.rect.y+self.dy*10
+        self.rect.x=self.rect.x+self.dx*5
+        self.rect.y=self.rect.y+self.dy*5
         pass
     #------------------------------------
     @property
@@ -88,7 +92,7 @@ class Miohero(model.Object):
         standing_scelta=sit_standing
         div_scala=1.8
         
-        freccia=pygame.image.load('immagini/bullet.png')
+        #freccia=pygame.image.load('immagini/bullet.png')
 
         #------------------------------------
         def __init__(self,map_pos,screen_pos,parentob,dormi=True):
@@ -182,6 +186,7 @@ class App_gum(Engine):
         lista_beast=[]
         lista_beast={}
         godebug=False
+        raccolti=[]
         #dialogo_btn=False
         def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                                 coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True):
@@ -196,14 +201,19 @@ class App_gum(Engine):
             
             resolution = Vec2d(resolution)
             self.mappa_dirfile=dir+mappa
-
+            
             self.tiled_map = TiledMap(dir+mappa)
             for mylayer in self.tiled_map.layers:
                     if mylayer.name=="Collision":
                             self.collision_group_i= mylayer.layeri
                     if mylayer.name=="Fringe":
                             self.fringe_i= mylayer.layeri
-                            
+                    if mylayer.name=="raccolto": 
+                            self.raccolto_spathash=mylayer.objects
+                            for r in mylayer.objects.objects:
+                                
+                                pass
+          
             #carica in una lista i lvelli degli oggetti 
             self.lista_oggetti=list()
             myappend=self.lista_oggetti.append
@@ -312,6 +322,7 @@ class App_gum(Engine):
                         self.move_to = State.camera.screen_to_world((wx,wy))
                     self.is_warp()
                     self.is_event_collide()
+                    self.is_raccolto_collide()
             self.update_camera_position()
             State.camera.update()
             ## Set render's rect.
@@ -368,6 +379,12 @@ class App_gum(Engine):
                     #beast.dialogosemp.dialogo_btn=self.dialogo_btn
                     self.is_talking2(beast)
                     beast.dialogosemp.scrivi_frase()
+            x=0
+            if not self.dialogo_btn:
+                for obj in self.raccolti:
+                    larg=obj.image.get_width()
+                    x=x+larg
+                    State.screen.blit(obj.image,(x,550))
             State.screen.flip()
         #---------------------------------------------------
         def draw_detail(self):
@@ -384,10 +401,12 @@ class App_gum(Engine):
                         sprites.sort(key=lambda o:o.rect.bottom)
                     for s in sprites:
                         if isinstance(s,Proiettile):
-                            s.muovi()
+                            #s.muovi()
+                            #blit(s.image, s.rect.move(-cx,-cy))
                             pass
                         if s is avatar:
                             blit(s.image, s.rect.move(camera.anti_interp(s)))
+                            pass
                         else:
                             #if self.godebug:
                             #    print(camera.rect)
@@ -396,8 +415,13 @@ class App_gum(Engine):
                             if isinstance(s,MovingBeast):
                                 if not s.attendi_evento:
                                     blit(s.image, s.rect.move(-cx,-cy))
+                            elif isinstance(s,Proiettile):
+                                s.muovi()
+                                blit(s.image, s.rect.move(-cx,-cy))
+                                pass
                             else:
                                 blit(s.image, s.rect.move(-cx,-cy))
+                                pass
 
         #---------------------------------------------------
         def is_warp(self):
@@ -460,12 +484,18 @@ class App_gum(Engine):
         def is_event_collide(self):
             newsprite=self.avatar.sprite
             hits=pygame.sprite.spritecollide(newsprite, self.eventi,False)
-            
             if hits : 
                 id_animato=hits[0].properties['id_animato']
                 self.lista_beast[id_animato].attendi_evento=False
                 
-        
+        def is_raccolto_collide(self):
+            newsprite=self.avatar.sprite
+            hits=pygame.sprite.spritecollide(newsprite, self.raccolto_spathash.objects,False)
+            if hits:
+                for obj in hits:
+                    #miovar_dump(State.screen)
+                    self.raccolti.append(obj)
+                    self.raccolto_spathash.remove(obj)
         
         #-------------------------------------------------------
         @property
