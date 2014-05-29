@@ -9,6 +9,19 @@
  <tileset firstgid="259" source="../tilesets/inn2.tsx"/>
  <tileset firstgid="515" source="../tilesets/inn_x2.tsx"/>
  <tileset firstgid="547" source="../tilesets/inn_x3.tsx"/>
+ <tileset firstgid="579" name="raccoglibili" tilewidth="32" tileheight="32">
+  <image source="../graphics/tiles/raccoglibili.png" width="96" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="nome" value="birra"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="nome" value="arco"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer name="Ground1" width="36" height="33">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC+2WzQ4BMRCA61U9AZ4AT4AnIfvDkcuuIxccOXqEvZlNptHMTle7RSdC8qVJZ5gv05rdSilVCeKOxPagTrEdbH2S0i9pPtRJyvm6OOnYElh9ySnpKZUiCSHDdQt5O9WM2wj1sTlpnwPkHTE3h3WNbBjHHH+3j9D7+uoOmB42nyvk3bB2AWuJ7NUzRzOAvSEwQnx9EuKTMj4m1IfGx7A3AaaI7/+Znhfnkzn61N+dwd4cWCC+PuZ90JRkpbG2/iTEyXduFKRGydS1YfMJmbecT825o08W6HPC2m2Ulv2Lat413Z+uM6htrpn32YeQGe3i4+v0CZ9UuA/n9e7nl8t52eq2eYX4hCLpvc50iu3A9Uh6r6T4cU6xvbj3sE96udYw4xL6pNGf2B5/foMHZAhz9JASAAA=
@@ -16,27 +29,27 @@
  </layer>
  <layer name="Ground2" width="36" height="33">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+2QTQ7BQBiGm1AsEOJn5WeBHZbYWfcG9iTscS9uwA3qBpwAC1vxTjJNvkwa7UynxmKe5Mnbab9p36njqOPDS4L9urnCm+kShAM8mi5BOMGz6RIE/4ffysAcdHnmhbVLZsX7YVlI2KcG6zybwrrBMyC4PyBzEziFM/KcnTGr2K0H+xEZEDUXJD2TLC+FPVGEnSUurE8FVvn6qauUInfBR4w9i1QbycP6eCm+f0muV1/m1jw3KXZhbOFOwr0T/n+6Gjt5ESnOhaGzjw7mpgv8CUVYgmU4hCM4NtinBduwI1xbLBaLRZ63pGm/32pN4geF/5u2kBIAAA==
+   H4sIAAAAAAAAC+2QOwvCMBSFA1p1UFF8TD4GdVNHdXPuP3BX0F393ergKp5AAiEE8mhCRe4HH6dpb8JJGSOI/6cCazATWdfWmTKrvzdlo2CfHuyLHGrrgUiJfL9Q5jZwC3fKd37HamC3GZxbUmKbk6neyZd3wB4bpru4wvt0YFesX7FKBfLQfDrsOSRt5A/vkyc8/whPDp5FXhJ24VzhzcM7M/+facROuSX1ORMx+8RgX3aBH6EJW7ANl3AF1yX2GcExnGjPBEEQhD8fT1OfT5JF/AK9cVXDkBIAAA==
   </data>
  </layer>
  <layer name="Fringe" width="36" height="33">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3OSwqAMAyE4VBfIPUWHtL76g2s+w6uRFxVpRb/DwaSRcKYAfi7LfGucWat0rlH6+y8fg4Jf/vTTa19fKHfHdXH+qAc02GelSVXkQurEnKXAAAAQDEioxd7eJASAAA=
+   H4sIAAAAAAAAC+3OOwqAMBCE4SW+QPQWuf+l9AZJegcrsUyUGPw/mGKLWcYMwN+lzN7gzEZlco/OOS36uWb8nW+dXrd/YV+J7mN70KZN2WuPuAhKrD0CAAAAzTgA9Xr8AJASAAA=
   </data>
  </layer>
  <layer name="Over" width="36" height="33">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3OsQkAIBAEQUu1I+t9I3NRMHt4Z+CSi7Y1AKrr2QGbkR1AaZEdwLfisHn5XwcAVS0Bw30OkBIAAA==
+   H4sIAAAAAAAAC+3OMQoAMAgEQf//Y1P5gQTSCToD21x1EQAAc2T3AdbKS+ex/wYAUxX4gRw6kBIAAA==
   </data>
  </layer>
- <layer name="Collision" width="36" height="33" visible="0">
+ <layer name="Collision" width="36" height="33">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3TMQoAIAwEwZD/v1msrIWYg8OssKU6iMmIyGJnVfd3hwcPnre7Ohcene8HzxJZsrjHzaOyKP+P03y5zft0z+2s6e+j9BARETm3AdkdhfKQEgAA
+   H4sIAAAAAAAAC+2USwoAIAgFxfufOVq1aRP4iQfOg6GVOITqZuZBTqL11eCDDz65XpVR88m4/cg0n9Xk8todu95Dt0/nzKnNs4KP2v2Z7hPZ1Un/0+kDAACgzAYZYmvEkBIAAA==
   </data>
  </layer>
  <layer name="raccolto" width="36" height="33">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3OMQ0AAAjAMKTiBOsgggSONtm/CACA33Kq6wkAANY00CSpH5ASAAA=
+   H4sIAAAAAAAAC+3OQQkAAAgEsMNq9u9kA7+CbAmWAMAvXdcDAABgM5qjDbWQEgAA
   </data>
  </layer>
  <objectgroup name="Objects" width="36" height="33">
@@ -65,5 +78,6 @@
     <property name="id_animato" value="interlocutore"/>
    </properties>
   </object>
+  <object name="teschio" type="raccolto" gid="51" x="388" y="490"/>
  </objectgroup>
 </map>

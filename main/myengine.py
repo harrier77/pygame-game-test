@@ -1,5 +1,7 @@
 # coding: utf-8
 import os
+
+
 from os.path import relpath
 import sys
 import __builtin__
@@ -24,17 +26,37 @@ import subprocess
 import math
 from math import atan2,pi
 DEBUG=False
+try:
+    __builtin__.miavar
+except:
+    try:
+        os.stat('animation')
+    except:
+        print 'cambio dir a '+os.getcwd()
+        os.chdir('..\\') 
+        
+        
+        
+#-------------------------------------------------------------------------------
+class Magazzino(model.Object):
+    def __init__(self,motore):
+        self.motore=motore
+        square=pygame.image.load('.\\immagini\\square1.png').convert_alpha()
+        self.background_magazzino =pygame.transform.scale(square,(State.screen.size[0]-1,100))
+        self.backvuoto=self.background_magazzino.copy()
+    def aggiungi_magazzino(self):
+        x=10
+        if not self.motore.dialogo_btn:
+            for obj in self.motore.raccolti:
+                larg=obj.image.get_width()
+                self.background_magazzino.blit(obj.image,(x,15))
+                State.screen.blit(self.background_magazzino,(5,550))
+                x=x+larg
+#-------------------------------------------------------------------------------
+
 
 #-------------------------------------------------------------------------------
 class Proiettile(model.Object):
-    try:
-        __builtin__.miavar
-    except:
-        try:
-            os.stat('animation')
-        except:
-            print 'cambio dir a '+os.getcwd()
-            os.chdir('..\\') 
     freccia=pygame.image.load('immagini/bulletnero.png')
     #freccia=pygame.transform.scale(freccia,(72,72))
     #------------------------------------
@@ -55,8 +77,6 @@ class Proiettile(model.Object):
         self.dy=math.sin(angolo_rads)
         self.freccia=pygame.transform.rotate(self.freccia, 360-angolo_rads*57.29)
         #self.lista_pos=calcola_passi((self.rect.x,self.rect.y),(pos))
-
-
     #------------------------------------
     def mostra(self):
         self.motore.avatar_group.add(self)
@@ -78,7 +98,7 @@ class Proiettile(model.Object):
     def image(self):
         #self.freccia=pygame.transform.rotate(self.freccia, 360-self.arcotangente*57.29)
         return self.freccia
-#end of class
+#-------------------------------------------------------------------------------#end of class
 
 #-------------------------------------------------------------------------------
 class Miohero(model.Object):
@@ -92,8 +112,6 @@ class Miohero(model.Object):
         standing_scelta=sit_standing
         div_scala=1.8
         
-        #freccia=pygame.image.load('immagini/bullet.png')
-
         #------------------------------------
         def __init__(self,map_pos,screen_pos,parentob,dormi=True):
             model.Object.__init__(self)
@@ -188,6 +206,7 @@ class App_gum(Engine):
         godebug=False
         raccolti=[]
         #dialogo_btn=False
+
         def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                                 coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True):
             #necessario per resettare la condizione messa dalla libreria PGU
@@ -203,6 +222,8 @@ class App_gum(Engine):
             self.mappa_dirfile=dir+mappa
             
             self.tiled_map = TiledMap(dir+mappa)
+            #miovar_dump(self.tiled_map.raw_map.tile_sets[0].properties)
+            
             for mylayer in self.tiled_map.layers:
                     if mylayer.name=="Collision":
                             self.collision_group_i= mylayer.layeri
@@ -210,10 +231,14 @@ class App_gum(Engine):
                             self.fringe_i= mylayer.layeri
                     if mylayer.name=="raccolto": 
                             self.raccolto_spathash=mylayer.objects
-                            for r in mylayer.objects.objects:
-                                
-                                pass
-          
+                            for tile_con_nome in self.tiled_map.raw_map.tile_sets[mylayer.layeri].tiles:
+                                print tile_con_nome.properties['nome']
+                                #exit()
+                                #miovar_dump(mylayer)
+                                #for k,r in mylayer.objects.cell_ids.iteritems():
+                                #    print r
+                                #    pass
+            #exit()
             #carica in una lista i lvelli degli oggetti 
             self.lista_oggetti=list()
             myappend=self.lista_oggetti.append
@@ -308,8 +333,11 @@ class App_gum(Engine):
             ## Create the renderer.
             self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
             self.dialogo_btn=False
-
-
+            #self.crea_magazzino()
+            self.mag=Magazzino(self)
+        #------------------------------------------------------------------ 
+        
+      
         #------------------------------------------------------------------ 
         def update(self, dt):
             if self.movex or self.movey:
@@ -376,15 +404,9 @@ class App_gum(Engine):
             for k,beast in self.lista_beast.iteritems():
                 if not beast.attendi_evento:
                     beast.muovi_animato()
-                    #beast.dialogosemp.dialogo_btn=self.dialogo_btn
                     self.is_talking2(beast)
                     beast.dialogosemp.scrivi_frase()
-            x=0
-            if not self.dialogo_btn:
-                for obj in self.raccolti:
-                    larg=obj.image.get_width()
-                    x=x+larg
-                    State.screen.blit(obj.image,(x,550))
+            self.mag.aggiungi_magazzino()
             State.screen.flip()
         #---------------------------------------------------
         def draw_detail(self):
@@ -493,7 +515,6 @@ class App_gum(Engine):
             hits=pygame.sprite.spritecollide(newsprite, self.raccolto_spathash.objects,False)
             if hits:
                 for obj in hits:
-                    #miovar_dump(State.screen)
                     self.raccolti.append(obj)
                     self.raccolto_spathash.remove(obj)
         
