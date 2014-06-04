@@ -219,6 +219,7 @@
    <properties>
     <property name="durata_pausa" value="1"/>
     <property name="id" value="villagerbis"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="0,0 1560,-4 1721,-142 1535,-31"/>
   </object>
@@ -227,6 +228,7 @@
     <property name="durata_pausa" value="1"/>
     <property name="id" value="aio"/>
     <property name="staifermo" value="1"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="-16,63 50,45"/>
   </object>
@@ -236,6 +238,7 @@
     <property name="id" value="a"/>
     <property name="orientamento" value="back"/>
     <property name="staifermo" value="1"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -243,6 +246,7 @@
    <properties>
     <property name="durata_pausa" value="1000"/>
     <property name="id" value="1"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="-40,-14 38,-39 147,6 35,34"/>
   </object>
@@ -252,6 +256,7 @@
     <property name="id" value="b"/>
     <property name="orientamento" value="front"/>
     <property name="staifermo" value="1"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -261,6 +266,7 @@
     <property name="id" value="c"/>
     <property name="orientamento" value="back"/>
     <property name="staifermo" value="1"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -270,6 +276,7 @@
     <property name="id" value="d"/>
     <property name="orientamento" value="back"/>
     <property name="staifermo" value="1"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -279,6 +286,7 @@
     <property name="id" value="e"/>
     <property name="orientamento" value="front"/>
     <property name="staifermo" value="1"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -288,6 +296,7 @@
     <property name="id" value="g"/>
     <property name="orientamento" value="left"/>
     <property name="staifermo" value="1"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -297,6 +306,7 @@
     <property name="id" value="1a"/>
     <property name="orientamento" value="right"/>
     <property name="staifermo" value="1"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -304,6 +314,7 @@
    <properties>
     <property name="durata_pausa" value="5"/>
     <property name="id" value="villager"/>
+    <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="-63,76 -209,213 -900,273 -1137,341 -1141,752 -1136,1357 -915,1472 -635,1392 -64,1329 725,1361 1333,1469 2021,1441 2069,851 2035,275 1644,104 1699,-160 1305,-295"/>
   </object>

@@ -211,4 +211,7 @@ def _load_tiled_tmx_map(tmx_map, gummworld_map, load_invisible=True):
                     sprite.image = screen_img
                     sprite.rect = screen_img.get_rect(topleft=(x + offx, y + offy))
                     sprite.name = xpos,ypos
+                    #myhack to detect which is idx of image  in the sprite
+                    sprite.img_idx=img_idx
+                    #end of hack
                     gummworld_layer.add(sprite)
