@@ -19,7 +19,7 @@ from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim
 
 from moving_beast import calcola_passi,MovingBeast
-from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina
+from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
 from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
@@ -302,8 +302,10 @@ class App_gum(Engine):
                     beast=AnimatoSemplice(animato)
                 elif O.properties['sottotipo']=='parlante':
                     beast=AnimatoParlanteAvvicina(animato)
-                else:
-                    beast=MovingBeast(animato)
+                elif O.properties['sottotipo']=='parlantefermo':
+                    beast=AnimatoParlanteFermo(animato)
+                #else:
+                    #beast=MovingBeast(animato)
                 
                 self.beast_sprite_group.add(beast.sprite_fotogramma)
                 beast.debug=miodebug

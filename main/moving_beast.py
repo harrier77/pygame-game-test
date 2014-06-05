@@ -169,16 +169,16 @@ class Dialogosemplice():
     
     def gestione_eventi(self,event):
         if event:
-                if event.type == pygame.QUIT:
-                    context.pop()      
-                if event.type==pygame.MOUSEBUTTONDOWN and event.button == 3:
-                    self.incrementa_idx_mess()
-                    self.moving_beast_genitore.motore.State.mioevento=None
-                    #self.suono.play()
-                    #pos=pygame.mouse.get_pos()
-                    #if self.crossrect.collidepoint(pos):
-                    #    self.close_clicked=True
-                    #    self.open=False
+            if event.type == pygame.QUIT:
+                context.pop()      
+            if event.type==pygame.MOUSEBUTTONDOWN and event.button == 3:
+                self.incrementa_idx_mess()
+                self.moving_beast_genitore.motore.State.mioevento=None
+                #self.suono.play()
+                #pos=pygame.mouse.get_pos()
+                #if self.crossrect.collidepoint(pos):
+                #    self.close_clicked=True
+                #    self.open=False
 #FineCLasse
 
 #inizio classe
@@ -218,10 +218,19 @@ class Beast2():
         #    imagesAndDurations1 = [('animazioni/animation/'+variable_path_name+'%s.%s.png' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
         #    self.animObjs[animType] = pyganim.PygAnimation(imagesAndDurations1)
         #my_aniType='left_stand'
+        
         file_img='animazioni/animation/'+variable_path_name+'left_walk.000.png'
-
         imagesAndDurations1 = [(file_img,0.1)]
         self.animObjs['left_stand'] = pyganim.PygAnimation(imagesAndDurations1)
+        
+        file_img='animazioni/animation/'+variable_path_name+'front_walk.000.png'
+        imagesAndDurations1 = [(file_img,0.1)]
+        self.animObjs['front_stand'] = pyganim.PygAnimation(imagesAndDurations1)
+        
+        file_img='animazioni/animation/'+variable_path_name+'back_walk.000.png'
+        imagesAndDurations1 = [(file_img,0.1)]
+        self.animObjs['back_stand'] = pyganim.PygAnimation(imagesAndDurations1)
+        
         #create the right-facing sprites by copying and flipping the left-facing sprites
         self.animObjs['right_walk'] = self.animObjs['left_walk'].getCopy()
         self.animObjs['right_walk'].flip(True, False)

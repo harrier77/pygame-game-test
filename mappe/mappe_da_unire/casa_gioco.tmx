@@ -4257,5 +4257,14 @@
    </properties>
    <polyline points="0,0 162,0"/>
   </object>
+  <object name="aio" type="animato" x="235" y="333">
+   <properties>
+    <property name="durata_pausa" value="1000"/>
+    <property name="id" value="1"/>
+    <property name="orientamento" value="front"/>
+    <property name="sottotipo" value="parlantefermo"/>
+   </properties>
+   <polyline points="0,0 119,0"/>
+  </object>
  </objectgroup>
 </map>

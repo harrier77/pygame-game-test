@@ -1,5 +1,8 @@
 # coding: utf-8
 from moving_beast import calcola_passi,MovingBeast
+import datetime
+from random import randint
+from miovar_dump import *
 
 #Inizio Classe               
 class AnimatoSemplice(MovingBeast):
@@ -126,3 +129,65 @@ class AnimatoParlanteAvvicina(MovingBeast):
             
         return self.fotogramma
         #---------------------------------------------------
+#EofClass
+
+#Inizio Classe               
+class AnimatoParlanteFermo(MovingBeast):
+    direzione='front'
+    is_walking=False
+    
+    #----------------------------------------
+    @property
+    def draw_fotogramma(self):
+        return True
+    
+    #-------------------------------------------------------------------------
+    def scegli_fotogramma_animazione(self,miocing,direzione):
+
+        self.direzione=direzione
+        if direzione=='left':
+            self.fotogramma=miocing.animObjs['left_stand'].ritorna_fotogramma()
+        elif direzione=='front':
+            self.fotogramma=miocing.animObjs['front_stand'].ritorna_fotogramma()
+        elif direzione=='right':
+            self.fotogramma=miocing.animObjs['right_stand'].ritorna_fotogramma()
+        elif direzione=='back':
+            self.fotogramma=miocing.animObjs['back_stand'].ritorna_fotogramma()
+        elif direzione=='SW':
+            self.fotogramma=miocing.animObjs['SW'].ritorna_fotogramma()
+        elif direzione=='NW':
+            self.fotogramma=miocing.animObjs['NW'].ritorna_fotogramma()
+        elif direzione=='SE':
+            self.fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
+        elif direzione=='NE':
+            self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
+        return self.fotogramma
+    #--------------------------------------------------------------------------------
+    
+    
+    #----------------------------------------
+    def muovi_animato(self):
+        
+        if self.dialogosemp.lista_messaggi==['...']:
+                try:
+                    if type(self.dic_storia['messaggio']) is not list: self.dic_storia['messaggio']=[self.dic_storia['messaggio']]
+                except:
+                    self.dic_storia['messaggio']=['nulla']
+                self.dialogosemp.lista_messaggi=self.dic_storia['messaggio']
+
+        direzioni=['left','right','front','back','SW','NW','NE','SE']
+        
+        adesso= datetime.datetime.time(datetime.datetime.now()).second
+        adesso1= int(adesso%5)
+        if adesso1==0:
+            if not self.giacambiato:
+                numdirez=len(direzioni)
+                self.direzione=direzioni[randint(0,numdirez-1)]
+                self.giacambiato=True
+        else:
+            self.giacambiato=False
+        #sezione che effettivamente muove l'animazione, ma solo se non èin pausa o non è fermata
+        self.scegli_fotogramma_animazione(self.miocing,self.direzione)
+        
+        return True
+#EofClass
