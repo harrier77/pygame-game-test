@@ -298,6 +298,7 @@ class App_gum(Engine):
                     animato[p]=O.properties[p]
                 dict_animati[animato.get('id')]=animato
                 dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
+                
                 if O.properties['sottotipo']=='semplice':
                     beast=AnimatoSemplice(animato)
                 elif O.properties['sottotipo']=='parlante':
@@ -315,7 +316,6 @@ class App_gum(Engine):
                 beast.motore=self
                 self.lista_beast[beast.id]=beast
                 self.avatar_group.add(beast)
-        
         ## Insert avatar into the Fringe layer.
         self.avatar.rect.x=hero_ini_pos[0]
         self.avatar.rect.y=hero_ini_pos[1]

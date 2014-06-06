@@ -146,13 +146,13 @@ class AnimatoParlanteFermo(MovingBeast):
 
         self.direzione=direzione
         if direzione=='left':
-            self.fotogramma=miocing.animObjs['left_stand'].ritorna_fotogramma()
+            self.fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()
         elif direzione=='front':
-            self.fotogramma=miocing.animObjs['front_stand'].ritorna_fotogramma()
+            self.fotogramma=miocing.animObjs['front_walk'].ritorna_fotogramma()
         elif direzione=='right':
-            self.fotogramma=miocing.animObjs['right_stand'].ritorna_fotogramma()
+            self.fotogramma=miocing.animObjs['right_walk'].ritorna_fotogramma()
         elif direzione=='back':
-            self.fotogramma=miocing.animObjs['back_stand'].ritorna_fotogramma()
+            self.fotogramma=miocing.animObjs['back_walk'].ritorna_fotogramma()
         elif direzione=='SW':
             self.fotogramma=miocing.animObjs['SW'].ritorna_fotogramma()
         elif direzione=='NW':
@@ -167,13 +167,13 @@ class AnimatoParlanteFermo(MovingBeast):
     
     #----------------------------------------
     def muovi_animato(self):
-        
         if self.dialogosemp.lista_messaggi==['...']:
                 try:
                     if type(self.dic_storia['messaggio']) is not list: self.dic_storia['messaggio']=[self.dic_storia['messaggio']]
                 except:
                     self.dic_storia['messaggio']=['nulla']
                 self.dialogosemp.lista_messaggi=self.dic_storia['messaggio']
+
 
         direzioni=['left','right','front','back','SW','NW','NE','SE']
         

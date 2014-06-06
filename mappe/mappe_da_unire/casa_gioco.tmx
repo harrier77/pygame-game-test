@@ -4260,7 +4260,7 @@
   <object name="aio" type="animato" x="235" y="333">
    <properties>
     <property name="durata_pausa" value="1000"/>
-    <property name="id" value="1"/>
+    <property name="id" value="aio"/>
     <property name="orientamento" value="front"/>
     <property name="sottotipo" value="parlantefermo"/>
    </properties>
