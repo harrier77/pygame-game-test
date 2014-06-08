@@ -102,7 +102,7 @@ def make_hud(caption=None, visible=True):
     both as an example, and for an early design and debugging convenience.
     """
     State.hud = HUD()
-#    State.hud.visible = visible
+    State.hud.visible = visible
     next_pos = State.hud.next_pos
     
     if caption:

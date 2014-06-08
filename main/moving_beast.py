@@ -30,24 +30,25 @@ import glob
 
 #ClassDialogoSemplice
 class Dialogosemplice():
-    is_near=False
-    testo="Hello!"
-    close_clicked=False
-    beeped=False
-    scritto=False
-    sequenza_partita=False
-    sequenza_finita=True
-    lista_messaggi=['...']
-    text_altezza=50
-    crossrect=None
-    dialogo_btn=False
-    finito_dialogo=False
-    idx_mess=0
-    conta_click=0
-    is_triang=False
     
     #-----------------------------------------------------
     def __init__(self,moving_beast_genitore):
+        self.is_near=False
+        self.testo="Hello!"
+        self.close_clicked=False
+        self.beeped=False
+        self.scritto=False
+        self.sequenza_partita=False
+        self.sequenza_finita=True
+        self.lista_messaggi=['...']
+        self.text_altezza=50
+        self.crossrect=None
+        self.dialogo_btn=False
+        self.finito_dialogo=False
+        self.idx_mess=0
+        self.conta_click=0
+        self.is_triang=False
+  
         self.moving_beast_genitore=moving_beast_genitore
         self.screen=pygame.display.get_surface()
         #self.background_txt = pygame.Surface((self.screen.get_size()[0]-1,self.text_altezza))
@@ -111,7 +112,7 @@ class Dialogosemplice():
         
         
     #-----------------------------------------------------
-    def sequenza_messaggi_new(self):
+    """def sequenza_messaggi_new(self):
         if self.lista_messaggi[0]=='nulla':
             self.is_near=False
             return
@@ -124,7 +125,7 @@ class Dialogosemplice():
                 self.sequenza_partita=True
                 self.sequenza_finita=False
             if self.sequenza_finita:
-                self.sequenza_partita=False
+                self.sequenza_partita=False"""
     
     #-----------------------------------------------------
     def sequenza_messaggi_noth(self):
@@ -141,36 +142,29 @@ class Dialogosemplice():
         x=self.background_txt.get_width()-self.triangle.get_width()-10
         y=self.background_txt.get_height()-self.triangle.get_height()-10
         
-        if self.conta_click<=len(self.lista_messaggi):
+        if self.conta_click<=len(self.lista_messaggi)-2:
             self.background_txt.blit(self.triangle,(x,y))
     
     
     #-----------------------------------------------------
     def incrementa_idx_mess(self):
-        max_idx=len(self.lista_messaggi)
-        #print self.conta_click
-        #print len(self.lista_messaggi)
-        #self.suono.play()
-        if self.conta_click>max_idx-2:
+        max_idx=len(self.lista_messaggi)-1
+        if self.conta_click>=max_idx or self.idx_mess>=max_idx:
+            self.conta_click=self.idx_mess=0
             self.moving_beast_genitore.staifermo=False
-            self.conta_click=0
             self.moving_beast_genitore.fermato=False
             self.finito_dialogo=True
         else:
-            self.idx_mess=self.idx_mess+1
-            if self.idx_mess==len(self.lista_messaggi):
-                self.idx_mess=0
-
-            self.sequenza_messaggi_noth()
             self.conta_click=self.conta_click+1
+            self.idx_mess=self.conta_click
+        self.sequenza_messaggi_noth()
             
-        
     #---------------------------------------------------------
     
     def gestione_eventi(self,event):
         if event:
-            if event.type == pygame.QUIT:
-                context.pop()      
+            #if event.type == pygame.QUIT:
+                #context.pop()      
             if event.type==pygame.MOUSEBUTTONDOWN and event.button == 3:
                 self.incrementa_idx_mess()
                 self.moving_beast_genitore.motore.State.mioevento=None
@@ -183,7 +177,7 @@ class Dialogosemplice():
 
 #inizio classe
 class Beast2():
-    motore=None
+    
     def __init__(self,dir_name="missionario"):
         try:
                 os.stat('animazioni')
@@ -191,6 +185,7 @@ class Beast2():
                 print 'cambio dir a ..\\'
                 os.chdir('..\\') 
         
+        self.motore=None
         #anim_file_name=dir_name
         variable_path_name=dir_name+"/"
         self.front_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'front_walk.001.png')
@@ -265,9 +260,10 @@ def calcola_passi(or_pos=(300,200),target_pos=(200,200)):
 
 #-------------------------------------------------
 class Pseudo_async_timer():
-    scaduto=False
-    id=None
+
     def __init__(self,pausa,func,id=None):
+            self.scaduto=False
+            self.id=None
             pausa=pausa/1000
             self.set_future_time(pausa)
             self.pausa=pausa
@@ -288,72 +284,58 @@ class Pseudo_async_timer():
 
 #Inizio Classe               
 class MovingBeast(model.Object):
-        debug=False
-        miotimer=None
-        segmento=0
-        dic_storia={'messaggio':'...'}
-        messaggio_dato=False
-        fermato=False
-        staifermo=False
-        giacambiato=False
-        orientamento="vuoto"
-        motore=None
-        attendi_evento=False
-        vai_incontro=False
-        rendez_vous_punto=(200,200)
-        miosprite=pygame.sprite.Sprite()
-        in_uscita=False
-        finito_evento=False
-        #--------------------------------------------------------------------------------
-        def __init__(self,animato=None):
-            model.Object.__init__(self)
 
+        #--------------------------------------------------------------------------------
+        def __init__(self,animato=None,parlante=True):
+            self.debug=False
+            self.miotimer=None
+            self.segmento=0
+            self.dic_storia={'messaggio':'...'}
+            self.messaggio_dato=False
+            self.fermato=False
+            self.staifermo=False
+            self.giacambiato=False
+            self.orientamento="vuoto"
+            self.motore=None
+            self.attendi_evento=False
+            self.vai_incontro=False
+            self.rendez_vous_punto=(200,200)
+            self.in_uscita=False
+            self.finito_evento=False
+            self.contatore_destinazioni=0
+            self.listap=[]
+            self.auto=True
+            self.lanciato=False
+            self.inpausa=False
+            model.Object.__init__(self)
+            self.miosprite=pygame.sprite.Sprite()
             dir_name=animato['dir']
             self.miocing=Beast2(dir_name=dir_name)
             self.id=animato['id']
-            
-            exclpng=pygame.image.load('immagini/exclam1.png').convert_alpha()
+            #exclpng=pygame.image.load('immagini/exclam1.png').convert_alpha()
             #self.exclamation=pygame.transform.scale(exclpng,(50,38))
-            self.exclamation=exclpng
-            
+            #self.exclamation=exclpng
             self.x=animato['pos'][0]
             self.y=animato['pos'][1]
             position=animato['pos']
             self.posizione_iniziale_animato=position
-            if self.vai_incontro:
-                points=[position,self.rendez_vous_punto]
-            else:
-                points = animato['points']
-                self.posizione_di_partenza=points[0]
+            points = animato['points']
             if points:
                 self.lista_destinazioni=self.calcola_points(points,position)
                 self.x=self.lista_destinazioni[0][0]
                 self.y=self.lista_destinazioni[0][1]
             else:
                 self.lista_destinazioni=self.comp_lista_destinazioni(self.x,self.y)
-            
-            self.contatore_destinazioni=0
-            self.listap=[]
-            self.auto=True
-            self.lanciato=False
-            self.inpausa=False
-            self.fotogramma=self.miocing.left_standing
+            #self.fotogramma=self.miocing.left_standing
             self.miocing.moveConductor.play()
             self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
             self.durata_pausa=int(animato['durata_pausa'])
-            try:self.attendi_evento=animato['attendi_evento']
-            except:pass
-            try:self.vai_incontro=animato['vai_incontro']
-            except:pass
-            self.dialogosemp=Dialogosemplice(self)
+            if 'attendi_evento' in animato:
+                self.attendi_evento=animato['attendi_evento']
+            if 'vai_incontro' in animato:
+                self.vai_incontro=animato['vai_incontro']
+            if parlante:self.dialogosemp=Dialogosemplice(self)
 
-        #--------------------------------------------------------------------------------
-        def set_dialogo_btn(self,val=True):
-            if not self.motore:
-                self.dialogosemp.dialogo_btn=val
-            else:
-                if self.motore.dialogo_btn:
-                    self.dialogosemp.dialogo_btn=self.motore.dialogo_btn
             
         #--------------------------------------------------------------------------------
         def calcola_points(self,points,position):
@@ -455,6 +437,19 @@ class MovingBeast(model.Object):
             fotog_sprite.rect.x=self.x-fotog_sprite.rect.width/2
             fotog_sprite.rect.y=self.y-fotog_sprite.rect.height
             return fotog_sprite
+        
+        @property
+        def sprite_fotogrammanew(self):
+            #fotog_sprite=pygame.sprite.Sprite()
+            #fotog_sprite=self.miosprite
+            self.miosprite.image=self.fotogramma
+            self.miosprite.rect=self.fotogramma.get_rect()
+            self.miosprite.rect.x=self.x-self.miosprite.rect.width/2
+            self.miosprite.rect.y=self.y-self.miosprite.rect.height
+            return self.miosprite
+        
+        
+        
         #--------------------------------------------------------------------------------
         @property
         def rect(self):

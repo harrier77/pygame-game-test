@@ -62,18 +62,28 @@ class Example(wx.Frame):
         pnl = wx.Panel(self)
         pnl.SetBackgroundColour((0, 0, 0))
         vbox = wx.BoxSizer(wx.VERTICAL)
-        favicon = wx.Icon('pirate.ico', wx.BITMAP_TYPE_ICO, 16, 16)
+        vbox.Add(pnl, 1, wx.EXPAND)
+        self.SetAutoLayout(True)
+        self.SetSizer(vbox)
+        self.Layout()
+        favicon = wx.Icon('pirate1.ico', wx.BITMAP_TYPE_ICO, 16, 16)
         wx.Frame.SetIcon(self, favicon)
         
-        #self.testo = wx.StaticText(parent=pnl, pos=(50, 50),style=wx.BORDER_SIMPLE,size=(700,500))
-        #self.testo.SetBackgroundColour('white')
+        
         #self.testo.SetLabel(label='')
         #self.testo.SetLabel(label='Qui vengono mostrate le informazioni sul gioco...')
-        self.testo1 = wx.TextCtrl(parent=pnl, value="Qui vengono mostrate le informazioni sul gioco...", pos=(40, 40), size=(700,500),style=wx.TE_MULTILINE|wx.TE_LINEWRAP)
-
+        self.basicText = wx.TextCtrl(pnl, -1, "", size=(175, -1),pos=(40,1))
+        self.testo_immesso=self.basicText.GetValue()
+        self.basicText.SetInsertionPoint(0)
         # A button
-        #self.button =wx.Button(pnl, label="Lancia gioco",pos=(20,20))
-        #self.Bind(wx.EVT_BUTTON, self.OnOpen,self.button)
+        self.button =wx.Button(pnl, label="View Object",pos=(210,1))
+        self.Bind(wx.EVT_BUTTON, self.OnBottone,self.button)
+        self.testo = wx.StaticText(parent=pnl, pos=(40, 30),style=wx.BORDER_SIMPLE,size=(185,20))
+        self.testo.SetBackgroundColour('white')
+        self.testo1 = wx.TextCtrl(parent=pnl, value="Qui vengono mostrate le informazioni sul gioco...", pos=(40, 60), size=(700,500),style=wx.TE_MULTILINE|wx.TE_LINEWRAP)
+
+        
+        
         #self.button1 =wx.Button(pnl, label="Stop",pos=(200,20))
         #self.Bind(wx.EVT_BUTTON, self.OnStop,self.button1)
         #self.button1 =wx.Button(pnl, label="Nascondi",pos=(400,20))
@@ -88,18 +98,19 @@ class Example(wx.Frame):
         self.SetTitle('Pannello comandi')
         #self.Centre()
         self.SetPosition((18,60))
-        #self.Show(True)
-        self.OnOpen()
+        self.Show(True)
+        self.OnOpen(None)
     
-    def OnOpen(self):
+    def OnOpen(self,e):
         print "open"
-        
         pygame.init()
         self.External_Executable = Thread ()
         self.External_Executable.daemon=True
         self.External_Executable.start()
         self.External_Executable.oggetto.wx=self
-    
+        self.oggetto_da_vedere=self.External_Executable.oggetto
+
+        
     def OnStop(self,e):
         pygame.quit()
         self.External_Executable.oggetto.pop()
@@ -112,7 +123,18 @@ class Example(wx.Frame):
         self.Raise() 
         pass
     
+    def OnBottone(self,e):
+        self.testo_immesso=self.basicText.GetValue()
+        print self.testo_immesso
+        if len(self.testo_immesso)>0:
+            self.oggetto_da_vedere=eval("self.External_Executable.oggetto"+"."+self.testo_immesso)
+        else:
+            self.oggetto_da_vedere=self.External_Executable.oggetto 
+        
+        self.OnText(e)
+        
     def OnText(self,e):
+        
         oldtext= self.testo1.GetValue()
         text=self.External_Executable.oggetto.mappa_dirfile
         #self.testo.SetLabel(label=oldtext+"\n"+"Mappa in esecuzione:"+text)
@@ -121,12 +143,12 @@ class Example(wx.Frame):
         foo = WritableObject()                   # a writable object
         original = sys.stdout
         sys.stdout = foo                         # redirection
-        miovar_dump(self.External_Executable.oggetto)
-        for k,beast in beasts.iteritems():
-            print beast
+        miovar_dump(self.oggetto_da_vedere)
         oldtext= self.testo1.GetValue()
         #self.testo.SetLabel(label=oldtext+"\n"+' '.join(foo.content))
-        self.testo1.SetValue(oldtext+"\n"+' '.join(foo.content))
+        #self.testo1.SetValue(oldtext+"\n"+' '.join(foo.content))
+        self.testo1.SetValue(' '.join(foo.content))
+        self.testo.SetLabel(label=str(self.oggetto_da_vedere))
         sys.stdout=original
     def OnQuit(self, e):
         #self.OnHide(e)
@@ -144,9 +166,11 @@ class Example(wx.Frame):
         self.OnHide(e)
     
     def onKey(self, evt):
-        print evt.GetKeyCode()
+        #print evt.GetKeyCode()
         if evt.GetKeyCode()==345:
             self.OnClose(evt)
+        if evt.GetKeyCode()==349:
+            self.testo.SetLabel(label=str(self.oggetto_da_vedere))
         if evt.GetKeyCode() == wx.WXK_DOWN:
             print "Down key pressed"
         else:

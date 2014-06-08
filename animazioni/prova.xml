@@ -25,4 +25,10 @@
                 <messaggio>E' inutile che vi lamentiate</messaggio>
                 <messaggio>Se non pagate morirete!</messaggio>
         </aio>
+        <aio2>
+                <segmento>1</segmento>
+                <messaggio>Il mio discorso parte da un oggetto evento!</messaggio>
+                <messaggio>Non parte dal contatto con l'interlocutore</messaggio>
+                <messaggio>Visto!</messaggio>
+        </aio2>
 </storia>

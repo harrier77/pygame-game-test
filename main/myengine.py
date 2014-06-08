@@ -19,7 +19,7 @@ from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim
 
 from moving_beast import calcola_passi,MovingBeast
-from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
+from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo,AnimatoParlanteConEvento
 from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
@@ -47,23 +47,24 @@ class Magazzino(model.Object):
         self.backvuoto=self.background_magazzino.copy()
     def aggiungi_magazzino(self):
         x=10
-        if not self.motore.dialogo_btn:
-            for obj in self.motore.raccolti:
-                larg=obj.image.get_width()
-                self.background_magazzino.blit(obj.image,(x,15))
-                State.screen.blit(self.background_magazzino,(5,550))
-                x=x+larg
+        #if not self.motore.dialogo_btn:
+        for obj in self.motore.raccolti:
+            larg=obj.image.get_width()
+            self.background_magazzino.blit(obj.image,(x,15))
+            State.screen.blit(self.background_magazzino,(5,550))
+            x=x+larg
 #-------------------------------------------------------------------------------
 
 
 #-------------------------------------------------------------------------------
 class Proiettile(model.Object):
-    freccia=pygame.image.load('immagini/bulletnero.png')
-    #freccia=pygame.transform.scale(freccia,(72,72))
-    pygame.mixer.init()
-    suono=pygame.mixer.Sound('immagini/message.wav')
+    
     #------------------------------------
     def __init__(self,motore,mouse_position):
+        self.freccia=pygame.image.load('immagini/bulletnero.png')
+        #freccia=pygame.transform.scale(freccia,(72,72))
+        pygame.mixer.init()
+        self.suono=pygame.mixer.Sound('immagini/message.wav')
         self.motore=motore
         self.rect=self.image.get_rect()
         #self.rect=self.motore.avatar.rect.copy()
@@ -118,20 +119,20 @@ class Proiettile(model.Object):
 
 #-------------------------------------------------------------------------------
 class Miohero(model.Object):
-        # load the "standing" sprites (these are single images, not animations)
-        sit_standing=pygame.image.load('animazioni/gameimages/crono_sleep.000.gif')
-        front_standing = pygame.image.load('animazioni/gameimages/crono_front.gif')
-        back_standing = pygame.image.load('animazioni/gameimages/crono_back.gif')
-        left_standing = pygame.image.load('animazioni/gameimages/crono_left.gif')
-        right_standing = pygame.transform.flip(left_standing, True, False)
 
-        standing_scelta=sit_standing
-        div_scala=1.8
-        miosprite=pygame.sprite.Sprite()
-        
         #------------------------------------
         def __init__(self,map_pos,screen_pos,parentob,dormi=True):
             model.Object.__init__(self)
+            # load the "standing" sprites (these are single images, not animations)
+            self.sit_standing=pygame.image.load('animazioni/gameimages/crono_sleep.000.gif')
+            self.front_standing = pygame.image.load('animazioni/gameimages/crono_front.gif')
+            self.back_standing = pygame.image.load('animazioni/gameimages/crono_back.gif')
+            self.left_standing = pygame.image.load('animazioni/gameimages/crono_left.gif')
+            self.right_standing = pygame.transform.flip(self.left_standing, True, False)
+
+            self.standing_scelta=self.sit_standing
+            self.div_scala=1.8
+            self.miosprite=pygame.sprite.Sprite()
             self.parent=parentob
             self.dormi=dormi
             self.animated_object=self.crea_giocatore_animato()
@@ -214,18 +215,22 @@ class Miohero(model.Object):
 
 #-------------------------------------------------------------------------------
 class App_gum(Engine):
-    nuova_mappa_caricare=True
-    fringe_i=1
-    xml = open('animazioni\\prova.xml', 'r').read()
-    dic_storia=xmltodict.parse(xml)['storia']
-    lista_beast=[]
-    lista_beast={}
-    godebug=False
-    raccolti=[]
-    #dialogo_btn=False
 
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                             coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True):
+
+        self.nuova_mappa_caricare=True
+        self.fringe_i=1
+        xml = open('animazioni\\prova.xml', 'r').read()
+        self.dic_storia=xmltodict.parse(xml)['storia']
+        self.lista_beast=[]
+        self.lista_beast={}
+        self.godebug=False
+        self.raccolti=[]
+        #dialogo_btn=False
+        self.beast_sprite_group=pygame.sprite.Group()
+        
+        
         #necessario per resettare la condizione messa dalla libreria PGU
         pygame.key.set_repeat()
         
@@ -282,7 +287,6 @@ class App_gum(Engine):
         self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
         Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         self.State=State
-        self.beast_sprite_group=pygame.sprite.Group()
         for O in self.prima_lista_ogg:
             if O.name=="Inizio" or O.name=="inizio":
                 hero_ini_pos= O.rect.x,O.rect.y
@@ -303,12 +307,11 @@ class App_gum(Engine):
                     beast=AnimatoSemplice(animato)
                 elif O.properties['sottotipo']=='parlante':
                     beast=AnimatoParlanteAvvicina(animato)
+                elif O.properties['sottotipo']=='parlanteconevento':
+                    beast=AnimatoParlanteConEvento(animato)
                 elif O.properties['sottotipo']=='parlantefermo':
                     beast=AnimatoParlanteFermo(animato)
-                #else:
-                    #beast=MovingBeast(animato)
-                
-                self.beast_sprite_group.add(beast.sprite_fotogramma)
+                self.beast_sprite_group.add(beast.sprite_fotogrammanew)
                 beast.debug=miodebug
                 beast.dic_storia=animato['dic_storia']
                 beast.staifermo=animato['staifermo']
@@ -316,6 +319,9 @@ class App_gum(Engine):
                 beast.motore=self
                 self.lista_beast[beast.id]=beast
                 self.avatar_group.add(beast)
+        
+
+        
         ## Insert avatar into the Fringe layer.
         self.avatar.rect.x=hero_ini_pos[0]
         self.avatar.rect.y=hero_ini_pos[1]
@@ -343,7 +349,7 @@ class App_gum(Engine):
         self.movex=0
         self.movey=0
         self.cammina=False
-        self.imm_fermo=Miohero.sit_standing
+        self.imm_fermo=self.avatar.sit_standing
         self.animato=self.camera.target.animated_object
         
         #con questa proprietà le collisioni vengono ignorate
@@ -352,7 +358,7 @@ class App_gum(Engine):
 
         ## Create the renderer.
         self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
-        self.dialogo_btn=False
+        #self.dialogo_btn=False
         #self.crea_magazzino()
         self.mag=Magazzino(self)
     #------------------------------------------------------------------ 
@@ -409,6 +415,7 @@ class App_gum(Engine):
         rect = self.avatar.hitbox
         pygame.draw.rect(camera.surface, Color('red'), rect.move(-cx,-cy))
         pygame.draw.polygon(camera.surface, Color('white'), self.speed_box.corners, 1)
+        
     
     #------------------------------------------------------------------ 
     def draw(self, interp):
@@ -425,8 +432,10 @@ class App_gum(Engine):
             if not beast.attendi_evento and not beast.finito_evento:
                 beast.muovi_animato()
                 self.is_talking2(beast)
-                beast.dialogosemp.scrivi_frase()
-        self.mag.aggiungi_magazzino()
+                if hasattr(beast.dialogosemp,'scrivi_frase'):
+                #if callable(beast.dialogosemp.scrivi_frase):
+                    beast.dialogosemp.scrivi_frase()
+        #self.mag.aggiungi_magazzino()
         State.screen.flip()
     #---------------------------------------------------
     def draw_detail(self):
@@ -523,13 +532,22 @@ class App_gum(Engine):
         else:
                 is_walkable=False
         return is_walkable       
+   
     #------------------------------------------------------- 
     def is_event_collide(self):
         newsprite=self.avatar.sprite
         hits=pygame.sprite.spritecollide(newsprite, self.eventi,False)
-        if hits : 
+        if hits: 
             id_animato=hits[0].properties['id_animato']
-            self.lista_beast[id_animato].attendi_evento=False #mette in moto l'animato che era in attesa dell'evento
+            if hasattr(self.lista_beast[id_animato],'effetto_collisione_con_evento'):
+                self.lista_beast[id_animato].effetto_collisione_con_evento(hits[0].properties)
+                
+            #if hits[0].properties['azione']=='attiva_animato':
+            #    self.lista_beast[id_animato].attendi_evento=False #mette in moto l'animato che era in attesa dell'evento
+            #else:
+            #    print hits[0].properties['azione']
+    
+    
     #-------------------------------------------------------        
     def is_raccolto_collide(self):
         newsprite=self.avatar.sprite
@@ -555,26 +573,28 @@ class App_gum(Engine):
     #------------------------------------------------------
     def is_talking2(self,beast):
             hits=self.avatar.rect.colliderect(beast.talk_box)
-           
+            beast.fallo_parlare()
             if self.godebug:
                 cx,cy = self.camera.rect.topleft
                 #pygame.draw.rect(self.camera.surface, Color('red'), beast.talk_box.move(-cx,-cy))
                 #pygame.draw.rect(self.camera.surface, Color('red'), beast.beast_hit_box.move(-cx,-cy))
                 pygame.draw.rect(self.camera.surface, Color('red'), beast.sprite_fotogramma.rect.move(-cx,-cy))
-            if beast.dialogosemp.dialogo_btn:
+            """if beast.dialogosemp.dialogo_btn:
                 if hits:
                     #beast.set_dialogo_btn(True)
                     beast.dialogosemp.is_near=True
                     #beast.dialogosemp.sequenza_messaggi_new()
                     #beast.staifermo=True
                     beast.fermato=True
-                    beast.dialogosemp.sequenza_messaggi_noth()
+                    if hasattr(beast.dialogosemp,'sequenza_messaggi_noth'):
+                        beast.dialogosemp.sequenza_messaggi_noth()
                 else:
                     beast.dialogosemp.is_near=False
-                    beast.set_dialogo_btn(False)
+                    #beast.set_dialogo_btn(False)
+                    beast.dialogosemp.dialogo_btn=False
                     beast.dialogosemp.open=False
                     beast.dialogosemp.idx_mess=0
-                    beast.fermato=False
+                    beast.fermato=False"""
 
     #------------------------------------------------------------------
     def verifica_residuale_tasti_premuti(self,mio_keydown):
@@ -634,21 +654,24 @@ class App_gum(Engine):
                 beast.dialogosemp.incrementa_idx_mess()
         
         elif key == pygame.K_F4:
-            if not self.dialogo_btn:
-                self.dialogo_btn=True
-            else:
-                self.dialogo_btn=False
-                pass
+            #if not self.dialogo_btn:
+                #self.dialogo_btn=True
+            #else:
+                #self.dialogo_btn=False
                 
-            for k,beast in self.lista_beast.iteritems():
-                beast.dialogosemp.dialogo_btn=self.dialogo_btn
-                beast.dialogosemp.incrementa_idx_mess()
+            pass
+                
+            #for k,beast in self.lista_beast.iteritems():
+                #beast.dialogosemp.dialogo_btn=self.dialogo_btn
+                #beast.dialogosemp.incrementa_idx_mess()
             #beast.dialogosemp.suono.play()
+        
         elif key == pygame.K_F5:
             if not self.godebug:
                 self.godebug=True
             else:
                 self.godebug=False
+        
         elif key == pygame.K_F6:
             #self.wx.testo.SetLabel(label=str(self.avatar.hitbox))
             self.wx.Show(True) #mostra la finestra wxpython 
@@ -657,6 +680,9 @@ class App_gum(Engine):
             print 'f7'
             print self.lista_beast['interlocutore'].id
             self.lista_beast['interlocutore'].attendi_evento=False
+        elif key == pygame.K_F9:
+            for k,beast in self.lista_beast.iteritems():
+                print str(beast.id)+str(beast.dialogosemp.dialogo_btn)
         elif key == K_g:
             State.show_grid = not State.show_grid
         elif key == K_l:
@@ -668,11 +694,11 @@ class App_gum(Engine):
 
     #------------------------------------------------------------------ 
     def on_mouse_button_down(self, pos, button):                
-        if button==3:
+        """ if button==3:
             self.mouse_down = True
             self.dialogo_btn=True
             for k,beast in self.lista_beast.iteritems():
-                beast.dialogosemp.dialogo_btn=self.dialogo_btn
+                beast.dialogosemp.dialogo_btn=self.dialogo_btn"""
         if button==1:
             self.freccia=Proiettile(self,pos)
             self.freccia.mostra()

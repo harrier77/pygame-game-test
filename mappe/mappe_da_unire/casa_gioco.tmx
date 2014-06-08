@@ -4260,6 +4260,21 @@
   <object name="aio" type="animato" x="235" y="333">
    <properties>
     <property name="durata_pausa" value="1000"/>
+    <property name="id" value="aio2"/>
+    <property name="orientamento" value="front"/>
+    <property name="sottotipo" value="parlanteconevento"/>
+   </properties>
+   <polyline points="0,0 119,0"/>
+  </object>
+  <object name="eventoparla" type="evento" x="147" y="270" width="297" height="111">
+   <properties>
+    <property name="azione" value="parla"/>
+    <property name="id_animato" value="aio2"/>
+   </properties>
+  </object>
+  <object name="aio" type="animato" x="492" y="301">
+   <properties>
+    <property name="durata_pausa" value="1000"/>
     <property name="id" value="aio"/>
     <property name="orientamento" value="front"/>
     <property name="sottotipo" value="parlantefermo"/>
