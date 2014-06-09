@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <storia>
         <cing1>
                 <segmento>2</segmento>
@@ -31,4 +32,15 @@
                 <messaggio>Non parte dal contatto con l'interlocutore</messaggio>
                 <messaggio>Visto!</messaggio>
         </aio2>
+        <msg1>
+                <segmento>1</segmento>
+                <messaggio>Questo discorso parte da un oggetto evento!</messaggio>
+                <messaggio>Non c'è nessuna animazione</messaggio>
+        </msg1>
+        <msg2>
+                <segmento>1</segmento>
+                <messaggio>Se vuoi andare a caccia</messaggio>
+                <messaggio>devi prendere l'arco in casa</messaggio>
+                <messaggio>sulla parete di fronte alle porte</messaggio>
+        </msg2>
 </storia>

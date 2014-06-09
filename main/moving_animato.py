@@ -2,6 +2,8 @@
 from moving_beast import calcola_passi,MovingBeast,Dialogosemplice
 import datetime
 from random import randint
+import pygame
+from pygame.locals import *
 from miovar_dump import *
 
 #Inizio Classe               
@@ -66,7 +68,6 @@ class AnimatoParlanteAvvicina(MovingBeast):
     #---------------------------------------
     #Animazione di unità che affronta il personaggio avatar
     #iniziando a parlare
-    # 
     #----------------------------------------
     in_uscita=False
     #----------------------------------------
@@ -76,14 +77,12 @@ class AnimatoParlanteAvvicina(MovingBeast):
             return False
         else:
             return True
-    
     def effetto_collisione_con_evento(self,proprieta_oggetto_evento):
         #print proprieta_oggetto_evento
         if proprieta_oggetto_evento['azione']=='attiva_animato':
             self.attendi_evento=False
         else:
             print proprieta_oggetto_evento['azione']
-    
     #-------------------------------------------------------------------------
     def fallo_parlare(self):
         hits=self.motore.avatar.rect.colliderect(self.talk_box)
@@ -103,8 +102,6 @@ class AnimatoParlanteAvvicina(MovingBeast):
                 self.dialogosemp.open=False
                 self.dialogosemp.idx_mess=0
                 self.fermato=False
-    
-    
     #----------------------------------------
     def muovi_animato(self):
         if self.dialogosemp.lista_messaggi==['...']:
@@ -129,13 +126,12 @@ class AnimatoParlanteAvvicina(MovingBeast):
             self.contatore_destinazioni=self.contatore_destinazioni+1 #incrementa il contatore delle destinazioni
             self.auto=False #arresta il cinghiale quando ha fatto una singola camminata
             self.lanciato=False #setta il timer su fermo mentre la camminata è in corso
+        
         #sezione che effettivamente muove l'animazione, ma solo se non èin pausa o non è fermata
         if self.is_walking and not self.fermato and not self.is_persona_collide: 
             self.scegli_fotogramma_animazione(self.miocing,self.direzione)
         elif self.in_uscita:
             if not self.finito_evento:self.scegli_fotogramma_animazione(self.miocing,self.direzione)
-
-
         else:
             if (self.direzione=='right') or (self.direzione=='SE') or (self.direzione=='NE'): 
                 self.fotogramma=self.miocing.animObjs['right_stand'].ritorna_fotogramma()
@@ -172,7 +168,6 @@ class AnimatoParlanteAvvicina(MovingBeast):
 class AnimatoParlanteFermo(MovingBeast):
     direzione='front'
     is_walking=False
-    
     #----------------------------------------
     @property
     def draw_fotogramma(self):
@@ -192,7 +187,6 @@ class AnimatoParlanteFermo(MovingBeast):
             return True
         else:
             return False
-    
     #-------------------------------------------------------------------------
     def fallo_parlare(self):
         hits=self.motore.avatar.rect.colliderect(self.talk_box)
@@ -212,10 +206,8 @@ class AnimatoParlanteFermo(MovingBeast):
                 self.dialogosemp.open=False
                 self.dialogosemp.idx_mess=0
                 self.fermato=False
-    
     #-------------------------------------------------------------------------
     def scegli_fotogramma_animazione(self,miocing,direzione):
-
         self.direzione=direzione
         if direzione=='left':
             self.fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()
@@ -235,7 +227,6 @@ class AnimatoParlanteFermo(MovingBeast):
             self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
         return self.fotogramma
     #--------------------------------------------------------------------------------
-    
     def muovi_animato(self):
         if self.dialogosemp.lista_messaggi==['...']:
                 try:
@@ -243,10 +234,7 @@ class AnimatoParlanteFermo(MovingBeast):
                 except:
                     self.dic_storia['messaggio']=['nulla']
                 self.dialogosemp.lista_messaggi=self.dic_storia['messaggio']
-
-
         direzioni=['left','right','front','back','SW','NW','NE','SE']
-        
         adesso= datetime.datetime.time(datetime.datetime.now()).second
         adesso1= int(adesso%5)
         if adesso1==0:
@@ -268,10 +256,14 @@ class AnimatoParlanteFermo(MovingBeast):
 #---------------------------------------------------
 #Inizio Classe               
 class AnimatoParlanteConEvento(AnimatoParlanteFermo):
+    #--------------------------------------------
+    # Derivato da AnimatoParlanteFermo, con la differenza
+    # che comincia a parlare quando il personaggio avatar entra in
+    # una zona della mappa senza bisogno di contatto diretto
+    #--------------------------------------------
     def __init__(self,animato):
         MovingBeast.__init__(self,animato,parlante=False)
         self.dialogosemp=Dialogosemplice(self)
-        
     #-------------------------------------------------------------------------
     @property
     def is_persona_collide(self):
@@ -282,17 +274,73 @@ class AnimatoParlanteConEvento(AnimatoParlanteFermo):
             self.dialogosemp.is_near=True
             self.fermato=True
             self.dialogosemp.sequenza_messaggi_noth()
-
     #-------------------------------------------------------------------------        
     def effetto_collisione_con_evento(self,proprieta_oggetto_evento):
         if proprieta_oggetto_evento['azione']=='parla':
             self.dialogosemp.dialogo_btn=True
             #self.dialogosemp.finito_dialogo=False
             self.dialogosemp.idx_mess=0
-            print "parla!"
+            #print "parla!"
             self.fallo_parlare()
         else:
             print proprieta_oggetto_evento['azione']
+            
+#EofClass
+#---------------------------------------------------
+
+#---------------------------------------------------
+#Inizio Classe               
+class AnimatoMessaggioDaEvento(AnimatoParlanteFermo):
+    #--------------------------------------------
+    # Derivato da AnimatoParlanteFermo, quando il personaggio avatar entra in
+    # una zona della mappa scattano i messaggi, nessuna animazione, l'animato non esiste
+    #--------------------------------------------
+    def __init__(self,animato):
+        #MovingBeast.__init__(self,animato,parlante=False)
+        self.id=animato['id']
+        self.points = ((0,0),(0,0))
+        self.miosprite=pygame.sprite.Sprite()
+        self.miosprite.image=pygame.Surface((50, 50))
+        self.miosprite.image.set_alpha(0)
+        self.attendi_evento=True
+        self.finito_evento=False
+        self.dialogosemp=Dialogosemplice(self)
+        self.x=animato['pos'][0]++self.image.get_width()/2
+        self.y=animato['pos'][1]+self.image.get_height()
+        #print animato['pos']
+    @property
+    def fotogramma(self):
+        return self.miosprite.image
+    @property
+    def image(self):
+        #image=self.fotogramma
+        return self.miosprite.image
+    @property
+    def sprite_fotogrammanew(self):
+        return self.miosprite
+    #-------------------------------------------------------------------------
+    @property
+    def is_persona_collide(self):
+        pass
+    #--------------------------------------------------------------------------------
+    def muovi_animato(self):
+        pass
+    #-------------------------------------------------------------------------
+    def fallo_parlare(self):
+        self.fermato=True
+        self.dialogosemp.dialogo_btn=True
+        self.dialogosemp.is_near=True
+        #print "parla!"+str(self.dialogosemp.lista_messaggi)
+        if not self.dialogosemp.finito_dialogo:
+            self.attendi_evento=False
+            self.dialogosemp.sequenza_messaggi_noth()
+    #-------------------------------------------------------------------------        
+    def effetto_collisione_con_evento(self,proprieta_oggetto_evento):
+        self.dialogosemp.dialogo_btn=True
+        #self.dialogosemp.finito_dialogo=False
+        self.dialogosemp.idx_mess=0
+        self.fallo_parlare()
+
             
 #EofClass
 #---------------------------------------------------

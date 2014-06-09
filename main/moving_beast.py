@@ -524,7 +524,9 @@ class MovingBeast(model.Object):
         #--------------------------------------------------------------------------------
 
         #----------------------------------------
-        def muovi_animato(self):
+        # metodo unico poi sostituito nelle singole sottoclassi
+        #----------------------------------------
+        """def muovi_animato(self):
             if self.dialogosemp.lista_messaggi==['...']:
                 try:
                     if type(self.dic_storia['messaggio']) is not list: self.dic_storia['messaggio']=[self.dic_storia['messaggio']]
@@ -603,7 +605,7 @@ class MovingBeast(model.Object):
                     self.in_uscita=True
                     print self.lista_destinazioni
                 
-            return self.fotogramma
+            return self.fotogramma"""
         #---------------------------------------------------
 #fine della Classe
 

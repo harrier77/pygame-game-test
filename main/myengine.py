@@ -19,7 +19,7 @@ from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim
 
 from moving_beast import calcola_passi,MovingBeast
-from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo,AnimatoParlanteConEvento
+from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo,AnimatoParlanteConEvento,AnimatoMessaggioDaEvento
 from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
@@ -288,18 +288,33 @@ class App_gum(Engine):
         Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         self.State=State
         for O in self.prima_lista_ogg:
+            animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
+            for p in O.properties:
+                animato[p]=O.properties[p]
             if O.name=="Inizio" or O.name=="inizio":
                 hero_ini_pos= O.rect.x,O.rect.y
                 self.avatar.position=hero_ini_pos
                 ## The avatar is also the camera target.
             if O.type=="warp":
                 self.warps.append(O)
+            
             if O.type=="evento":
                 self.eventi.add(O)
+                #animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
+                #for p in O.properties:
+                    #animato[p]=O.properties[p]
+                if 'sottotipo' in O.properties:
+                    if O.properties['sottotipo']=='AnimatoMessaggioDaEvento':
+                        beast=AnimatoMessaggioDaEvento(animato)
+                        beast.id=O.properties['id']
+                        self.lista_beast[beast.id]=beast
+                        beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
+                        beast.motore=self
+            
             if O.type=="animato":
-                animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
-                for p in O.properties:
-                    animato[p]=O.properties[p]
+                #animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
+                #for p in O.properties:
+                    #animato[p]=O.properties[p]
                 dict_animati[animato.get('id')]=animato
                 dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
                 
@@ -311,6 +326,7 @@ class App_gum(Engine):
                     beast=AnimatoParlanteConEvento(animato)
                 elif O.properties['sottotipo']=='parlantefermo':
                     beast=AnimatoParlanteFermo(animato)
+
                 self.beast_sprite_group.add(beast.sprite_fotogrammanew)
                 beast.debug=miodebug
                 beast.dic_storia=animato['dic_storia']
@@ -319,6 +335,7 @@ class App_gum(Engine):
                 beast.motore=self
                 self.lista_beast[beast.id]=beast
                 self.avatar_group.add(beast)
+
         
 
         

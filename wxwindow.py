@@ -61,27 +61,39 @@ class Example(wx.Frame):
         
         pnl = wx.Panel(self)
         pnl.SetBackgroundColour((0, 0, 0))
-        vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add(pnl, 1, wx.EXPAND)
-        self.SetAutoLayout(True)
-        self.SetSizer(vbox)
-        self.Layout()
+
         favicon = wx.Icon('pirate1.ico', wx.BITMAP_TYPE_ICO, 16, 16)
         wx.Frame.SetIcon(self, favicon)
         
         
         #self.testo.SetLabel(label='')
         #self.testo.SetLabel(label='Qui vengono mostrate le informazioni sul gioco...')
+        
         self.basicText = wx.TextCtrl(pnl, -1, "", size=(175, -1),pos=(40,1))
         self.testo_immesso=self.basicText.GetValue()
         self.basicText.SetInsertionPoint(0)
         # A button
-        self.button =wx.Button(pnl, label="View Object",pos=(210,1))
+        self.button =wx.Button(pnl, label="View Object",pos=(220,1))
         self.Bind(wx.EVT_BUTTON, self.OnBottone,self.button)
-        self.testo = wx.StaticText(parent=pnl, pos=(40, 30),style=wx.BORDER_SIMPLE,size=(185,20))
+        
+        self.basicTextAgg = wx.TextCtrl(pnl, -1, "", size=(175, -1),pos=(380,1))
+        self.testo_immesso_agg=self.basicTextAgg.GetValue()
+        self.basicTextAgg.SetInsertionPoint(0)
+        self.buttonAgg =wx.Button(pnl, label="Change Object",pos=(560,1))
+        self.Bind(wx.EVT_BUTTON, self.OnBottoneAgg,self.buttonAgg)
+        
+        
+        self.testo = wx.StaticText(parent=pnl, pos=(40, 30),style=wx.BORDER_SIMPLE,size=(700,20))
         self.testo.SetBackgroundColour('white')
         self.testo1 = wx.TextCtrl(parent=pnl, value="Qui vengono mostrate le informazioni sul gioco...", pos=(40, 60), size=(700,500),style=wx.TE_MULTILINE|wx.TE_LINEWRAP)
-
+        
+        """vbox = wx.BoxSizer(wx.VERTICAL)
+        vbox.Add(self.basicText, 1, wx.EXPAND)
+        vbox.Add(self.button, 1, wx.EXPAND)
+        vbox.Add(self.testo, 1, wx.EXPAND)
+        vbox.Add(self.testo1, 1, wx.EXPAND)"""
+        #pnl.SetSizer(vbox)
+        #vbox.Fit(self)
         
         
         #self.button1 =wx.Button(pnl, label="Stop",pos=(200,20))
@@ -133,6 +145,16 @@ class Example(wx.Frame):
         
         self.OnText(e)
         
+    def OnBottoneAgg(self,e):
+        testo_immesso=self.basicTextAgg.GetValue()
+        print testo_immesso
+        if len(testo_immesso)>0:
+            #self.External_Executable.oggetto.lista_beast['interlocutore'].attendi_evento=False
+            exec("self.External_Executable.oggetto."+self.basicText.GetValue()+"="+testo_immesso)
+        self.OnText(e)
+        
+        
+    
     def OnText(self,e):
         
         oldtext= self.testo1.GetValue()
