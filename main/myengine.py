@@ -19,7 +19,8 @@ from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim
 
 from moving_beast import calcola_passi,MovingBeast
-from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo,AnimatoParlanteConEvento,AnimatoMessaggioDaEvento
+from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
+from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato
 from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
@@ -288,28 +289,36 @@ class App_gum(Engine):
         Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         self.State=State
         for O in self.prima_lista_ogg:
-            animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
+            animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto",'og_rect':O.rect}
             for p in O.properties:
                 animato[p]=O.properties[p]
             if O.name=="Inizio" or O.name=="inizio":
                 hero_ini_pos= O.rect.x,O.rect.y
                 self.avatar.position=hero_ini_pos
-                ## The avatar is also the camera target.
+                
             if O.type=="warp":
                 self.warps.append(O)
             
             if O.type=="evento":
                 self.eventi.add(O)
-                #animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
-                #for p in O.properties:
-                    #animato[p]=O.properties[p]
                 if 'sottotipo' in O.properties:
-                    if O.properties['sottotipo']=='AnimatoMessaggioDaEvento':
-                        beast=AnimatoMessaggioDaEvento(animato)
-                        beast.id=O.properties['id']
+                    if O.properties['sottotipo']=='MessaggioDaEvento':
+                        beast=MessaggioDaEvento(animato)
                         self.lista_beast[beast.id]=beast
                         beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
                         beast.motore=self
+                    if O.properties['sottotipo']=='FaiParlare':
+                        beast=FaiParlare(animato)
+                        self.lista_beast[beast.id]=beast
+                        beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
+                        beast.motore=self
+                    if O.properties['sottotipo']=='AttivaAnimato':
+                        beast=AttivaAnimato(animato)
+                        self.lista_beast[beast.id]=beast
+                        #if beast.id in self.dic_storia:
+                            #beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
+                        beast.motore=self
+                        
             
             if O.type=="animato":
                 #animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
@@ -336,9 +345,10 @@ class App_gum(Engine):
                 self.lista_beast[beast.id]=beast
                 self.avatar_group.add(beast)
 
-        
 
         
+        #miovar_dump(self.eventi.sprites()[0].rect)
+        #exit()
         ## Insert avatar into the Fringe layer.
         self.avatar.rect.x=hero_ini_pos[0]
         self.avatar.rect.y=hero_ini_pos[1]
@@ -383,6 +393,7 @@ class App_gum(Engine):
   
     #------------------------------------------------------------------ 
     def update(self, dt):
+
         if self.movex or self.movey:
                 if self.is_walkable2():
                     wx=State.camera.target.position[0]+self.movex
@@ -392,7 +403,7 @@ class App_gum(Engine):
                     self.camera.target.herosprite.rect.y=wy
                     self.move_to = State.camera.screen_to_world((wx,wy))
                 self.is_warp()
-                self.is_event_collide()
+                #self.is_event_collide()
                 self.is_raccolto_collide()
         self.update_camera_position()
         State.camera.update()
@@ -400,12 +411,14 @@ class App_gum(Engine):
         self.renderer.set_rect(center=State.camera.rect.center)
 
     #------------------------------------------------------------------                      
+    
     @property
     def mio_move_to(self):
         if self.cammina:
             return self.move_to
         else:
             return None
+    
     #------------------------------------------------------------------    
     def update_camera_position(self):
         """update the camera's position if any movement keys are held down
@@ -551,6 +564,7 @@ class App_gum(Engine):
         return is_walkable       
    
     #------------------------------------------------------- 
+    """
     def is_event_collide(self):
         newsprite=self.avatar.sprite
         hits=pygame.sprite.spritecollide(newsprite, self.eventi,False)
@@ -558,12 +572,12 @@ class App_gum(Engine):
             id_animato=hits[0].properties['id_animato']
             if hasattr(self.lista_beast[id_animato],'effetto_collisione_con_evento'):
                 self.lista_beast[id_animato].effetto_collisione_con_evento(hits[0].properties)
-                
+                self.lista_beast['interlocutore'].prova()
             #if hits[0].properties['azione']=='attiva_animato':
             #    self.lista_beast[id_animato].attendi_evento=False #mette in moto l'animato che era in attesa dell'evento
             #else:
             #    print hits[0].properties['azione']
-    
+    """
     
     #-------------------------------------------------------        
     def is_raccolto_collide(self):

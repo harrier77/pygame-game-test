@@ -6,14 +6,12 @@ import pygame
 from pygame.locals import *
 from miovar_dump import *
 
-#Inizio Classe               
+#---------------------------------------
+#Animazione di unità che non parla e non affronta il personaggio avatar
+#limitandosi a camminare avanti e indietro secondo il percorso della proprietà points
+#della retta con una pausa indicata in durata_pausa
+#----------------------------------------         
 class AnimatoSemplice(MovingBeast):
-    #---------------------------------------
-    #Animazione di unità che non parla e non affronta il personaggio avatar
-    #limitandosi a camminare avanti e indietro secondo il percorso della proprietà points
-    #della retta con una pausa indicata in durata_pausa
-    #----------------------------------------
-    #----------------------------------------
     def __init__(self,animato):
         MovingBeast.__init__(self,animato,parlante=False)
         self.dialogosemp=type('obj', (object,), {'dialogo_btn' : False}) # qui la proprietà dialogo_btn viene settata a False
@@ -26,7 +24,6 @@ class AnimatoSemplice(MovingBeast):
         pass
         #hits=self.motore.avatar.rect.colliderect(self.talk_box)
         #print hits
-    
     #----------------------------------------
     def muovi_animato(self):
         if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
@@ -62,14 +59,17 @@ class AnimatoSemplice(MovingBeast):
 #fine della Classe
 
 
-#---------------------------------------------------
-#Inizio Classe               
+
+#---------------------------------------
+#Animazione di unità che affronta il personaggio avatar
+#iniziando a parlare, viene attivata da un evento AttivaAnimato sulla mappa
+#----------------------------------------              
 class AnimatoParlanteAvvicina(MovingBeast):
-    #---------------------------------------
-    #Animazione di unità che affronta il personaggio avatar
-    #iniziando a parlare
     #----------------------------------------
-    in_uscita=False
+    def __init__(self,animato):
+        MovingBeast.__init__(self,animato,parlante=False)
+        self.dialogosemp=Dialogosemplice(self)
+        self.in_uscita=False  
     #----------------------------------------
     @property
     def draw_fotogramma(self):
@@ -77,16 +77,11 @@ class AnimatoParlanteAvvicina(MovingBeast):
             return False
         else:
             return True
-    def effetto_collisione_con_evento(self,proprieta_oggetto_evento):
-        #print proprieta_oggetto_evento
-        if proprieta_oggetto_evento['azione']=='attiva_animato':
-            self.attendi_evento=False
-        else:
-            print proprieta_oggetto_evento['azione']
     #-------------------------------------------------------------------------
     def fallo_parlare(self):
         hits=self.motore.avatar.rect.colliderect(self.talk_box)
-        if self.dialogosemp.dialogo_btn:
+        #if self.dialogosemp.dialogo_btn:
+        if self.dialogosemp.dialogo_show:
             if hits:
                 #beast.set_dialogo_btn(True)
                 self.dialogosemp.is_near=True
@@ -98,7 +93,8 @@ class AnimatoParlanteAvvicina(MovingBeast):
             else:
                 self.dialogosemp.is_near=False
                 #beast.set_dialogo_btn(False)
-                self.dialogosemp.dialogo_btn=False
+                #self.dialogosemp.dialogo_btn=False
+                self.dialogosemp.dialogo_show=False
                 self.dialogosemp.open=False
                 self.dialogosemp.idx_mess=0
                 self.fermato=False
@@ -148,8 +144,6 @@ class AnimatoParlanteAvvicina(MovingBeast):
         if self.dialogosemp.finito_dialogo:
             self.staifermo=False
             if not self.in_uscita:
-                #points=[(11,82),(11,78)]
-                #self.lista_destinazioni=self.calcola_points(points,self.posizione_iniziale_animato)
                 self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[0])
                 pos_da_raggiungere=self.listap[len(self.listap)-1] #legge la posizione finale di destinazione dalla lista delle destinazioni
                 self.direzione=self.calcola_direzione((self.x,self.y),pos_da_raggiungere) #calcola la direzione della destinazione da raggiungere
@@ -166,8 +160,11 @@ class AnimatoParlanteAvvicina(MovingBeast):
 #---------------------------------------------------
 #Inizio Classe               
 class AnimatoParlanteFermo(MovingBeast):
-    direzione='front'
-    is_walking=False
+    #----------------------------------------
+    def __init__(self,animato):
+        MovingBeast.__init__(self,animato,parlante=False)
+        self.dialogosemp=Dialogosemplice(self)
+        self.direzione='front'
     #----------------------------------------
     @property
     def draw_fotogramma(self):
@@ -175,7 +172,8 @@ class AnimatoParlanteFermo(MovingBeast):
     #-------------------------------------------------------------------------
     @property
     def is_persona_collide(self):
-        self.dialogosemp.dialogo_btn=True
+        #self.dialogosemp.dialogo_btn=True
+        self.dialogosemp.dialogo_show=True
         self.dialogosemp.finito_dialogo=False
         newsprite=self.motore.avatar.sprite
         hits=self.beast_hit_box.colliderect(newsprite.rect)
@@ -190,7 +188,8 @@ class AnimatoParlanteFermo(MovingBeast):
     #-------------------------------------------------------------------------
     def fallo_parlare(self):
         hits=self.motore.avatar.rect.colliderect(self.talk_box)
-        if self.dialogosemp.dialogo_btn:
+        #if self.dialogosemp.dialogo_btn:
+        if self.dialogosemp.dialogo_show:
             if hits:
                 #beast.set_dialogo_btn(True)
                 self.dialogosemp.is_near=True
@@ -277,7 +276,8 @@ class AnimatoParlanteConEvento(AnimatoParlanteFermo):
     #-------------------------------------------------------------------------        
     def effetto_collisione_con_evento(self,proprieta_oggetto_evento):
         if proprieta_oggetto_evento['azione']=='parla':
-            self.dialogosemp.dialogo_btn=True
+            #self.dialogosemp.dialogo_btn=True
+            self.dialogosemp.dialogo_show=True
             #self.dialogosemp.finito_dialogo=False
             self.dialogosemp.idx_mess=0
             #print "parla!"
@@ -288,24 +288,25 @@ class AnimatoParlanteConEvento(AnimatoParlanteFermo):
 #EofClass
 #---------------------------------------------------
 
-#---------------------------------------------------
-#Inizio Classe               
-class AnimatoMessaggioDaEvento(AnimatoParlanteFermo):
-    #--------------------------------------------
-    # Derivato da AnimatoParlanteFermo, quando il personaggio avatar entra in
-    # una zona della mappa scattano i messaggi, nessuna animazione, l'animato non esiste
-    #--------------------------------------------
+
+#--------------------------------------------
+# Derivato da AnimatoParlanteFermo, quando il personaggio avatar entra in
+# una zona della mappa scattano i messaggi, nessuna animazione, l'animato non esiste
+#--------------------------------------------               
+class MessaggioDaEvento(AnimatoParlanteFermo):
     def __init__(self,animato):
         #MovingBeast.__init__(self,animato,parlante=False)
         self.id=animato['id']
         self.points = ((0,0),(0,0))
         self.miosprite=pygame.sprite.Sprite()
-        self.miosprite.image=pygame.Surface((50, 50))
+        self.miosprite.rect=animato['og_rect']
+        self.miosprite.image=pygame.Surface((self.miosprite.rect.width, self.miosprite.rect.height))
         self.miosprite.image.set_alpha(0)
-        self.attendi_evento=True
+        self.attendi_evento=False
         self.finito_evento=False
         self.dialogosemp=Dialogosemplice(self)
-        self.x=animato['pos'][0]++self.image.get_width()/2
+        
+        self.x=animato['pos'][0]+self.image.get_width()/2
         self.y=animato['pos'][1]+self.image.get_height()
         #print animato['pos']
     @property
@@ -318,12 +319,20 @@ class AnimatoMessaggioDaEvento(AnimatoParlanteFermo):
     @property
     def sprite_fotogrammanew(self):
         return self.miosprite
+    @property
+    def evento_hit_box(self):
+        return self.miosprite.rect
     #-------------------------------------------------------------------------
     @property
     def is_persona_collide(self):
-        pass
+        hits=self.evento_hit_box.colliderect(self.motore.avatar.sprite.rect)
+        if hits:
+            self.dialogosemp.dialogo_show=True
+            #print "collisione con evento!"+str(self.dialogosemp.dialogo_show)
     #--------------------------------------------------------------------------------
     def muovi_animato(self):
+        #print self.dialogosemp.dialogo_btn
+        a=self.is_persona_collide
         pass
     #-------------------------------------------------------------------------
     def fallo_parlare(self):
@@ -339,8 +348,45 @@ class AnimatoMessaggioDaEvento(AnimatoParlanteFermo):
         self.dialogosemp.dialogo_btn=True
         #self.dialogosemp.finito_dialogo=False
         self.dialogosemp.idx_mess=0
-        self.fallo_parlare()
-
-            
+        self.fallo_parlare() 
 #EofClass
 #---------------------------------------------------
+
+
+
+
+#---------------------------------------------------
+# E' uguale a MessaggioDaEvento, tranne che
+# i messaggi sono quelli associati ad una animazione
+# che parla quando l'avatar entra nell'area dell'evento
+class FaiParlare(MessaggioDaEvento):
+    def __init__(self,animato):
+        MessaggioDaEvento.__init__(self,animato)
+        self.id=animato['id_animato']
+#EofClass        
+
+
+
+#---------------------------------------------------
+# E' uguale a FaiParlare, tranne che
+# avvia una animazione
+# che prima  appare quando l'avatar entra nell'area dell'evento
+# e poi si avvicina all'avatae e parla quando raggiunge l'avatar a 
+#--------------------------------------------------              
+class AttivaAnimato(MessaggioDaEvento):
+    def __init__(self,animato):
+        MessaggioDaEvento.__init__(self,animato)
+        #self.id=animato['id_animato']
+        self.id_animato=animato['id_animato']
+        #print "attiva animato"
+    #-------------------------------------------------------------------------
+    def fallo_parlare(self):
+        hits=self.motore.avatar.rect.colliderect(self.talk_box)
+        if hits:
+            self.motore.lista_beast[self.id_animato].attendi_evento=False
+
+#EofClass
+
+
+    
+    

@@ -9122,7 +9122,9 @@
   <object name="evento1" type="evento" x="63" y="532" width="678" height="31">
    <properties>
     <property name="azione" value="attiva_animato"/>
+    <property name="id" value="attivatore1"/>
     <property name="id_animato" value="interlocutore"/>
+    <property name="sottotipo" value="AttivaAnimato"/>
    </properties>
   </object>
   <object name="boar" type="animato" x="283" y="601">
@@ -9145,7 +9147,9 @@
   <object name="eventoparla" type="evento" x="147" y="270" width="297" height="111">
    <properties>
     <property name="azione" value="parla"/>
+    <property name="id" value="eventoparla1"/>
     <property name="id_animato" value="aio2"/>
+    <property name="sottotipo" value="FaiParlare"/>
    </properties>
   </object>
   <object name="aio" type="animato" x="492" y="301">
@@ -9191,14 +9195,14 @@
    <properties>
     <property name="id" value="msg1"/>
     <property name="id_animato" value="msg1"/>
-    <property name="sottotipo" value="AnimatoMessaggioDaEvento"/>
+    <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
   <object name="msg2" type="evento" x="152" y="1315" width="246" height="143">
    <properties>
     <property name="id" value="msg2"/>
     <property name="id_animato" value="msg2"/>
-    <property name="sottotipo" value="AnimatoMessaggioDaEvento"/>
+    <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
  </objectgroup>
