@@ -45,20 +45,22 @@ def miovar_dump(oggetto,miotip=0):
         global i
         i=0
         for ogg in testo:
-                if (miotip==2): 
-                        if (ogg[0]=="__dict__"):
-                                pp = pprint.PrettyPrinter(indent=4)
-                                pp.pprint (ogg[1])
-                else:
-                        if ogg[0]=="__dict__":
-                                print "   (__dict__: omitted)"
-                                print "   - - - - - - - - - - - - -"
-                        else: 
-                                if miotip==1:
-                                        if str(type(ogg[1]))=="<type 'instancemethod'>":
-                                                mio_print(ogg)
-                                else:
-                                        mio_print(ogg)
+                if not ogg[0].startswith("__") and not ogg[0].startswith("_"):
+                    #print "nascosto"
+                    if (miotip==2): 
+                            if (ogg[0]=="__dict__"):
+                                    pp = pprint.PrettyPrinter(indent=4)
+                                    pp.pprint (ogg[1])
+                    else:
+                            if ogg[0]=="__dict__":
+                                    print "   (__dict__: omitted)"
+                                    print "   - - - - - - - - - - - - -"
+                            else: 
+                                    if miotip==1:
+                                            if str(type(ogg[1]))=="<type 'instancemethod'>":
+                                                    mio_print(ogg)
+                                    else:
+                                            mio_print(ogg)
 
 if __name__ == '__main__':
     pippo="topolino"

@@ -69,40 +69,42 @@ class Example(wx.Frame):
         #self.testo.SetLabel(label='')
         #self.testo.SetLabel(label='Qui vengono mostrate le informazioni sul gioco...')
         
-        self.basicText = wx.TextCtrl(pnl, -1, "", size=(175, -1),pos=(40,1))
+        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.basicText = wx.TextCtrl(pnl, -1, "", size=(175, -1))
         self.testo_immesso=self.basicText.GetValue()
         self.basicText.SetInsertionPoint(0)
-        # A button
-        self.button =wx.Button(pnl, label="View Object",pos=(220,1))
-        self.Bind(wx.EVT_BUTTON, self.OnBottone,self.button)
+        hbox1.Add(self.basicText, flag=wx.RIGHT, border=8)
         
-        self.basicTextAgg = wx.TextCtrl(pnl, -1, "", size=(175, -1),pos=(380,1))
+        self.button =wx.Button(pnl, label="View Object")
+        self.Bind(wx.EVT_BUTTON, self.OnBottone,self.button)
+        hbox1.Add(self.button, flag=wx.RIGHT, border=8)
+        
+        self.basicTextAgg = wx.TextCtrl(pnl, -1, "", size=(175, -1))
         self.testo_immesso_agg=self.basicTextAgg.GetValue()
         self.basicTextAgg.SetInsertionPoint(0)
-        self.buttonAgg =wx.Button(pnl, label="Change Object",pos=(560,1))
+        hbox1.Add(self.basicTextAgg, flag=wx.RIGHT, border=8)
+        
+        self.buttonAgg =wx.Button(pnl, label="Change Object")
         self.Bind(wx.EVT_BUTTON, self.OnBottoneAgg,self.buttonAgg)
+        hbox1.Add(self.buttonAgg, flag=wx.RIGHT, border=8)
         
+        hbox2= wx.BoxSizer(wx.HORIZONTAL)
+        #self.testo = wx.StaticText(parent=pnl, pos=(0, 0),style=wx.BORDER_SIMPLE,size=(0,0))
+        #self.testo.SetBackgroundColour('white')
+        #self.testo.SetFont(wx.Font(13, wx.SWISS, wx.NORMAL, wx.NORMAL,False, u'Tahoma'))
+        #hbox2.Add(self.testo, flag=wx.RIGHT, border=8)
         
-        self.testo = wx.StaticText(parent=pnl, pos=(40, 30),style=wx.BORDER_SIMPLE,size=(700,20))
-        self.testo.SetBackgroundColour('white')
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        vbox.Add(hbox1, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)
+        #vbox.Add(hbox2, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP, border=10)       
+        
         self.testo1 = wx.TextCtrl(parent=pnl, value="Qui vengono mostrate le informazioni sul gioco...", pos=(40, 60), size=(700,500),style=wx.TE_MULTILINE|wx.TE_LINEWRAP)
-        
-        """vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add(self.basicText, 1, wx.EXPAND)
-        vbox.Add(self.button, 1, wx.EXPAND)
-        vbox.Add(self.testo, 1, wx.EXPAND)
-        vbox.Add(self.testo1, 1, wx.EXPAND)"""
-        #pnl.SetSizer(vbox)
+        self.testo1.SetFont(wx.Font(13, wx.SWISS, wx.NORMAL, wx.NORMAL,False, u'Tahoma'))
+        vbox.Add(self.testo1, 1, wx.EXPAND)
+        pnl.SetSizer(vbox)
         #vbox.Fit(self)
-        
-        
-        #self.button1 =wx.Button(pnl, label="Stop",pos=(200,20))
-        #self.Bind(wx.EVT_BUTTON, self.OnStop,self.button1)
-        #self.button1 =wx.Button(pnl, label="Nascondi",pos=(400,20))
-        #self.Bind(wx.EVT_BUTTON, self.OnHide,self.button1)
-        
-        #vbox.Add(self.version, flag=wx.ALL, border=5)
-        #pnl.SetSizer(vbox)
+
+
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.Bind(wx.EVT_SHOW, self.OnShow)
         self.Bind(wx.EVT_CHAR_HOOK, self.onKey)
@@ -170,7 +172,7 @@ class Example(wx.Frame):
         #self.testo.SetLabel(label=oldtext+"\n"+' '.join(foo.content))
         #self.testo1.SetValue(oldtext+"\n"+' '.join(foo.content))
         self.testo1.SetValue(' '.join(foo.content))
-        self.testo.SetLabel(label=str(self.oggetto_da_vedere))
+        #self.testo.SetLabel(label=str(self.oggetto_da_vedere))
         sys.stdout=original
     def OnQuit(self, e):
         #self.OnHide(e)
