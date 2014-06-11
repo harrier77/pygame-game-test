@@ -388,6 +388,7 @@ class App_gum(Engine):
         #self.dialogo_btn=False
         #self.crea_magazzino()
         self.mag=Magazzino(self)
+        self.app_salvata=None
     #------------------------------------------------------------------ 
     
   
@@ -722,6 +723,7 @@ class App_gum(Engine):
                     self.toggle_layer(key - K_0)                    
         elif key == K_ESCAPE: 
                 context.pop()
+                
 
     #------------------------------------------------------------------ 
     def on_mouse_button_down(self, pos, button):                
@@ -765,7 +767,14 @@ class App_gum(Engine):
     
     #------------------------------------------------------------------ 
     def on_quit(self):
-            context.pop()
+        self.app_salvata=context.top()
+        context.pop()
+    
+    def mio_riprendi(self):
+        context.push(self.app_salvata)
+        while context.top():
+            State.clock.tick()
+
     #----------------------------------------------------------------------
 #Eofclass#-----------------------------------------------------------------------------------			
 
@@ -774,6 +783,7 @@ def miomain(debug=True):
     icon=pygame.image.load(".\immagini\\icona2.gif")
     pygame.display.set_icon(icon)
     gummworld2.run(oggetto)
+    return oggetto
         
 
 if __name__ == '__main__':

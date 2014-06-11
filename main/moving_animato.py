@@ -165,6 +165,7 @@ class AnimatoParlanteFermo(MovingBeast):
         MovingBeast.__init__(self,animato,parlante=False)
         self.dialogosemp=Dialogosemplice(self)
         self.direzione='front'
+
     #----------------------------------------
     @property
     def draw_fotogramma(self):
@@ -244,6 +245,7 @@ class AnimatoParlanteFermo(MovingBeast):
         else:
             self.giacambiato=False
         #sezione che effettivamente muove l'animazione, ma solo se non èin pausa o non è fermata
+
         self.scegli_fotogramma_animazione(self.miocing,self.direzione)
         if self.is_persona_collide:
             pass
@@ -263,6 +265,7 @@ class AnimatoParlanteConEvento(AnimatoParlanteFermo):
     def __init__(self,animato):
         MovingBeast.__init__(self,animato,parlante=False)
         self.dialogosemp=Dialogosemplice(self)
+        self.direzione='front'
     #-------------------------------------------------------------------------
     @property
     def is_persona_collide(self):
@@ -363,6 +366,7 @@ class FaiParlare(MessaggioDaEvento):
     def __init__(self,animato):
         MessaggioDaEvento.__init__(self,animato)
         self.id=animato['id_animato']
+        #print self.id
 #EofClass        
 
 

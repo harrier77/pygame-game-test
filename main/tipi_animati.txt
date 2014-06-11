@@ -1,0 +1,17 @@
+TIPI DI ANIMATO
+Fatti:
+1. Semplice: non parla e si muove avanti e indietro.
+2. Parlante_che_avvicina: si avvicina al personaggio e gli parla; poi finisce il suo percorso e scompare.
+3. Parlante_fermo:sta fermo e aspetta che il personaggio si avvicini per parlare, solo col personaggio vicino.
+4. Parlante_con_evento: con avvio discorso da evento invece che da contatto.
+5. Messaggi_da_luoghi (senza animazione): non c'è un'animazione, però quando il personaggio si avvicina ad un certo luogo scattano dei messaggi in sequenza che danno istruzioni sulla storia.
+
+Da fare:
+6. Attacca: l'animazione quando il personaggio entra in una certa zona lo aggredisce, senza messaggi. 
+7. Preda: l'animazione colpita dalle frecce si indebolisce gradualmente e poi muore
+
+
+TIPI EVENTI
+1. MessaggioDaEvento: Derivato da AnimatoParlanteFermo, quando il personaggio avatar entra in una zona della mappa scattano i messaggi, nessuna animazione, l'animato non esiste
+2. FaiParlare: e' uguale a MessaggioDaEvento, tranne che i messaggi sono quelli associati ad una animazione che parla quando l'avatar entra nell'area dell'evento
+3. AttivaAnimato:  E' uguale a FaiParlare, tranne che avvia una animazione che prima appare quando l'avatar entra nell'area dell'evento e poi si avvicina all'avatar e poi gli parla
