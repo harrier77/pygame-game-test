@@ -159,7 +159,7 @@ class PygAnimation(object):
         if self.isFinished():
             self.state = STOPPED
         if not self.visibility or self.state == STOPPED:
-            return
+            return self.getFrame(self.numFrames-1)
         frameNum = findStartTime(self._startTimes, self.elapsed)
         return self.getFrame(frameNum)
 
@@ -720,7 +720,11 @@ class PygConductor(object):
 
         for animObj in self._animations:
             animObj.pause(startTime)
-
+    
+    def mio_set_loop(self):
+        for animObj in self._animations:
+            animObj.loop=False
+            
     def stop(self):
         for animObj in self._animations:
             animObj.stop()

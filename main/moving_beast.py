@@ -180,7 +180,7 @@ class Dialogosemplice():
 #inizio classe
 class Beast2():
     
-    def __init__(self,dir_name="missionario"):
+    def __init__(self,dir_name="missionario",duration=0.1):
         try:
                 os.stat('animazioni')
         except:
@@ -208,7 +208,8 @@ class Beast2():
         self.animObjs = {}
         for animType in animTypes:
             conteggio_fotog= len(glob.glob('animazioni/animation/'+variable_path_name+"/"+animType+"*.png"))
-            imagesAndDurations = [('animazioni/animation/'+variable_path_name+'%s.%s.png' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(conteggio_fotog)]
+            
+            imagesAndDurations = [('animazioni/animation/'+variable_path_name+'%s.%s.png' % (animType, str(num).rjust(3, '0')), duration) for num in range(conteggio_fotog)]
             self.animObjs[animType] = pyganim.PygAnimation(imagesAndDurations)
         #my_aniType=['left_stand']
         #for animType in my_aniType:
@@ -311,7 +312,14 @@ class MovingBeast(model.Object):
             model.Object.__init__(self)
             self.miosprite=pygame.sprite.Sprite()
             dir_name=animato['dir']
-            self.miocing=Beast2(dir_name=dir_name)
+            
+            self.miocing=Beast2(dir_name=dir_name,duration=0.1)
+            
+            dir_name_dying='animazioni\\animation\\'+dir_name+'d'
+            if os.path.exists(dir_name_dying):
+                self.miocingdying=Beast2(dir_name=dir_name+'d',duration=0.3)
+                self.miocingdying.moveConductor.play()
+            
             self.id=animato['id']
             #exclpng=pygame.image.load('immagini/exclam1.png').convert_alpha()
             #self.exclamation=pygame.transform.scale(exclpng,(50,38))
@@ -330,7 +338,10 @@ class MovingBeast(model.Object):
             #self.fotogramma=self.miocing.left_standing
             self.miocing.moveConductor.play()
             self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
-            self.durata_pausa=int(animato['durata_pausa'])
+            if 'durata_pausa' in animato:
+                self.durata_pausa=int(animato['durata_pausa'])
+            else:
+                self.durata_pausa=1
             if 'attendi_evento' in animato:
                 self.attendi_evento=animato['attendi_evento']
             if 'vai_incontro' in animato:
@@ -394,8 +405,8 @@ class MovingBeast(model.Object):
         #--------------------------------------------------------------------------------
         @property
         def sprite_fotogramma(self):
-            #fotog_sprite=pygame.sprite.Sprite()
             fotog_sprite=self.miosprite
+            #if self.fotogramma is not None:
             fotog_sprite.image=self.fotogramma
             fotog_sprite.rect=self.fotogramma.get_rect()
             fotog_sprite.rect.x=self.x-fotog_sprite.rect.width/2
@@ -502,7 +513,7 @@ class MovingBeast(model.Object):
                     #endifclause
                 #end_if_clause
                 
-                miocing.moveConductor.play()
+                #miocing.moveConductor.play()
                 #di seguito viene selezionata l'iimmagine a seconda della direzione della camminata; x e y sono già stati impostati
                 if direzione=='left':
                     self.fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()

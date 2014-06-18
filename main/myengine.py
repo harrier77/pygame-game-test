@@ -20,7 +20,7 @@ from librerie import pyganim
 
 from moving_beast import calcola_passi,MovingBeast
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
-from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato
+from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo,AnimatoMorente
 from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
@@ -335,6 +335,10 @@ class App_gum(Engine):
                     beast=AnimatoParlanteConEvento(animato)
                 elif O.properties['sottotipo']=='parlantefermo':
                     beast=AnimatoParlanteFermo(animato)
+                elif O.properties['sottotipo']=='semplicefermo':
+                    beast=AnimatoFermo(animato)
+                elif O.properties['sottotipo']=='morente':
+                    beast=AnimatoMorente(animato)
 
                 self.beast_sprite_group.add(beast.sprite_fotogrammanew)
                 beast.debug=miodebug

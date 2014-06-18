@@ -227,8 +227,8 @@
    <properties>
     <property name="durata_pausa" value="1"/>
     <property name="id" value="aio"/>
-    <property name="staifermo" value="1"/>
     <property name="sottotipo" value="semplice"/>
+    <property name="staifermo" value="1"/>
    </properties>
    <polyline points="-16,63 50,45"/>
   </object>
@@ -237,8 +237,8 @@
     <property name="durata_pausa" value="20"/>
     <property name="id" value="a"/>
     <property name="orientamento" value="back"/>
-    <property name="staifermo" value="1"/>
     <property name="sottotipo" value="semplice"/>
+    <property name="staifermo" value="1"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -255,8 +255,8 @@
     <property name="durata_pausa" value="20"/>
     <property name="id" value="b"/>
     <property name="orientamento" value="front"/>
-    <property name="staifermo" value="1"/>
     <property name="sottotipo" value="semplice"/>
+    <property name="staifermo" value="1"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -265,8 +265,8 @@
     <property name="durata_pausa" value="20"/>
     <property name="id" value="c"/>
     <property name="orientamento" value="back"/>
-    <property name="staifermo" value="1"/>
     <property name="sottotipo" value="semplice"/>
+    <property name="staifermo" value="1"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -275,8 +275,8 @@
     <property name="durata_pausa" value="20"/>
     <property name="id" value="d"/>
     <property name="orientamento" value="back"/>
-    <property name="staifermo" value="1"/>
     <property name="sottotipo" value="semplice"/>
+    <property name="staifermo" value="1"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -285,8 +285,8 @@
     <property name="durata_pausa" value="20"/>
     <property name="id" value="e"/>
     <property name="orientamento" value="front"/>
-    <property name="staifermo" value="1"/>
     <property name="sottotipo" value="semplice"/>
+    <property name="staifermo" value="1"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -295,8 +295,8 @@
     <property name="durata_pausa" value="20"/>
     <property name="id" value="g"/>
     <property name="orientamento" value="left"/>
-    <property name="staifermo" value="1"/>
     <property name="sottotipo" value="semplice"/>
+    <property name="staifermo" value="1"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -305,8 +305,8 @@
     <property name="durata_pausa" value="20"/>
     <property name="id" value="1a"/>
     <property name="orientamento" value="right"/>
-    <property name="staifermo" value="1"/>
     <property name="sottotipo" value="semplice"/>
+    <property name="staifermo" value="1"/>
    </properties>
    <polyline points="0,0 35,-1"/>
   </object>
@@ -324,6 +324,20 @@
   </object>
   <object x="3855" y="4151">
    <polyline points="0,0 11,-3"/>
+  </object>
+  <object name="jaguar_fermo" type="animato" x="2753" y="3040">
+   <properties>
+    <property name="id" value="jag1"/>
+    <property name="sottotipo" value="semplicefermo"/>
+   </properties>
+   <polyline points="-47,-23 -236,119"/>
+  </object>
+  <object name="drago" type="animato" x="2865" y="3285">
+   <properties>
+    <property name="id" value="drago1"/>
+    <property name="sottotipo" value="semplice"/>
+   </properties>
+   <polyline points="0,0 -224,-262 -466,-261 -463,4 "/>
   </object>
  </objectgroup>
 </map>

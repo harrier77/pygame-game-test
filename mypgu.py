@@ -11,6 +11,7 @@ from miovar_dump import miovar_dump
 import sys; sys.path.insert(0, "D:\\the_assassins_land_of_fire\\new-trunk\\librerie")
 import gui
 import os
+from miovar_dump import *
 
 class Quit(gui.Button):
     def __init__(self,**params):
@@ -39,21 +40,57 @@ class Lancia(gui.Button):
             self.genitore.app_gioco.mio_riprendi()
         self.pgu.repaint()
 
+class Settaggi(gui.Button):
+    def __init__(self,genitore):
+        gui.Button.__init__(self,value='Settaggi')
+        self.genitore=genitore
+        self.connect(gui.CLICK,self.go)
+    def go(self):
+        foo = WritableObject()   # a writable object
+        original = sys.stdout
+        sys.stdout = foo           # redirection
+        #miovar_dump(self.genitore.app_gioco)
+        sys.stdout=original
+        tabella = gui.Table(width=600,height=400)
+        tabella.tr()
+        b=gui.Button(value='Prova')
+        tabella.td(b)
+        tabella.tr()
+        miodoc=gui.Document()
+        #miodoc.add(' '.join(foo.content))
+        #miodoc.block(align=0)
+        title = gui.Label("About Cuzco's Paint")
+        space = title.style.font.size(" ")
+        #for word in (' '.join(foo.content).split(" ")):
+        for word in ("Pippo Topolino Pluto Pippo \n Topolino Pluto Pippo Topolino Pluto Pippo Topolino Pluto Pippo Topolino Pluto Pippo Topolino Pluto Pippo Topolino Pluto".split(" ")):
+            if word=='\n':
+                miodoc.br(space[1])
+            else:
+                miodoc.add(gui.Label(word))
+                miodoc.space(space)
+        
+        
+        tabella.td(miodoc)
+        #print foo.content
+        self.genitore.app.init(tabella)
+        
+
 class MioMenu():
     def __init__(self):
         x,y = 20,80
         os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)
         
-        app = gui.Desktop(width=800,height=600)
-        app.connect(gui.QUIT,app.quit,None)
+        self.app = gui.Desktop(width=800,height=600)
+        self.app.connect(gui.QUIT,self.app.quit,None)
         tabella = gui.Table(width=600,height=400)
         
         tabella.tr()
-        b=Lancia(pgu=app,genitore=self)
+        b=Lancia(pgu=self.app,genitore=self)
         tabella.td(b)
        
         tabella.tr()
-        settaggi=gui.Button(value='Settaggi')
+        #settaggi=gui.Button(value='Settaggi')
+        settaggi=Settaggi(self)
         tabella.td(settaggi)
         
         tabella.tr()
@@ -68,7 +105,7 @@ class MioMenu():
         e = Quit(miomenu=self)
         tabella.td(e)
 
-        app.init(tabella)
+        self.app.init(tabella)
         self.mioloop=True
         clock = pygame.time.Clock()
         while self.mioloop:
@@ -84,8 +121,8 @@ class MioMenu():
                         elif event.type == pygame.KEYDOWN:
                                 if event.key == pygame.K_ESCAPE:
                                         self.mioloop = False
-                        app.event(event)
-                        app.loop()
+                        self.app.event(event)
+                        self.app.loop()
                         clock.tick(60)
 
 o=MioMenu()

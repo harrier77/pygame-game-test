@@ -9205,5 +9205,20 @@
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
+  <object name="mucca" type="animato" x="608" y="516">
+   <properties>
+    <property name="id" value="mucca1"/>
+    <property name="sottotipo" value="semplice"/>
+   </properties>
+   <polyline points="0,0 -324,-15 -477,96 -2,102"/>
+  </object>
+  <object name="boar" type="animato" x="563" y="485">
+   <properties>
+    <property name="durata_pausa" value="1500"/>
+    <property name="id" value="boar2"/>
+    <property name="sottotipo" value="morente"/>
+   </properties>
+   <polyline points="0,0 77,-101"/>
+  </object>
  </objectgroup>
 </map>
