@@ -79,7 +79,7 @@ class MioMenu():
     def __init__(self):
         x,y = 20,80
         os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)
-        
+
         self.app = gui.Desktop(width=800,height=600)
         self.app.connect(gui.QUIT,self.app.quit,None)
         tabella = gui.Table(width=600,height=400)

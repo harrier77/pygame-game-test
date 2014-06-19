@@ -441,39 +441,21 @@ class AnimatoMorente(MovingBeast):
         pass
         #hits=self.motore.avatar.rect.colliderect(self.talk_box)
         #print hits
-    
     #-------------------------------------------------------------------------
-    """def scegli_fotogramma_animazione(self,miocing,direzione):
-        self.direzione=direzione
-        if direzione=='left':
-            self.fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()
-        elif direzione=='front':
-            self.fotogramma=miocing.animObjs['front_walk'].ritorna_fotogramma()
-        elif direzione=='right':
-            self.fotogramma=miocing.animObjs['right_walk'].ritorna_fotogramma()
-        elif direzione=='back':
-            self.fotogramma=miocing.animObjs['back_walk'].ritorna_fotogramma()
-        elif direzione=='SW':
-            self.fotogramma=miocing.animObjs['SW'].ritorna_fotogramma()
-        elif direzione=='NW':
-            self.fotogramma=miocing.animObjs['NW'].ritorna_fotogramma()
-        elif direzione=='SE':
-            self.fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
-        elif direzione=='NE':
-            self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
-        return self.fotogramma"""
-    
     def intercetta_evento_mortale(self):
-        event=self.motore.State.mioevento
-        if event:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_F4:
-                    print 'f4'
-                    self.staifermo=True
-                    self.miocingdying.moveConductor.mio_set_loop()
-                    self.miocing=self.miocingdying
+        if hasattr(self.motore.State,'mioevento'):
+            evento=self.motore.State.mioevento
+            if evento:
+                if evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_F4:
+                        #print 'f4'
+                        self.staifermo=True
+                        self.miocingdying.moveConductor.mio_set_loop()
+                        self.miocing=self.miocingdying
+        else:
+            #print "Manca la proprietà evento di self.motore"
+            pass
                     
-            
     #--------------------------------------------------------------------------------
     def scegli_fotogramma_animazione(self,miocing,direzione):
         self.direzione=direzione
