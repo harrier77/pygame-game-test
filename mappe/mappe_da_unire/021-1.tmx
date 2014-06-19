@@ -325,7 +325,7 @@
   <object x="3855" y="4151">
    <polyline points="0,0 11,-3"/>
   </object>
-  <object name="jaguar_fermo" type="animato" x="2753" y="3040">
+  <object name="jaguar" type="animato" x="2753" y="3040">
    <properties>
     <property name="id" value="jag1"/>
     <property name="sottotipo" value="semplicefermo"/>
@@ -337,7 +337,7 @@
     <property name="id" value="drago1"/>
     <property name="sottotipo" value="semplice"/>
    </properties>
-   <polyline points="0,0 -224,-262 -466,-261 -463,4 "/>
+   <polyline points="0,0 -224,-262 -466,-261 -463,4"/>
   </object>
  </objectgroup>
 </map>

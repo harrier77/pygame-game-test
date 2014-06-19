@@ -103,6 +103,12 @@ class Dialogosemplice():
             #self.gestione_eventi(event)  
     #-----------------------------------------------------
     def scrivi_frase(self):	
+        if self.dialogo_show:
+            #print self.dialogo_show,self.moving_beast_genitore.motore.blockedkeys
+            self.moving_beast_genitore.motore.blockedkeys=True #qui viene bloccata la tastiera fino alla fine della sequenza messaggi
+        if self.finito_dialogo:
+            self.moving_beast_genitore.motore.blockedkeys=False #serve a riabilitare e disabilitare la tastiera
+            
         if self.is_near:
             #if self.dialogo_btn==True:
             if self.dialogo_show==True:
@@ -181,11 +187,6 @@ class Dialogosemplice():
 class Beast2():
     
     def __init__(self,dir_name="missionario",duration=0.1):
-        try:
-                os.stat('animazioni')
-        except:
-                print 'cambio dir a ..\\'
-                os.chdir('..\\') 
         
         self.motore=None
         #anim_file_name=dir_name
@@ -313,11 +314,12 @@ class MovingBeast(model.Object):
             self.miosprite=pygame.sprite.Sprite()
             dir_name=animato['dir']
             
-            self.miocing=Beast2(dir_name=dir_name,duration=0.1)
+            self.miocing=Beast2(dir_name=dir_name+"/cammina/",duration=0.1)
             
-            dir_name_dying='animazioni\\animation\\'+dir_name+'d'
+            dir_name_dying='animazioni/animation/'+dir_name+'/muore/'
+
             if os.path.exists(dir_name_dying):
-                self.miocingdying=Beast2(dir_name=dir_name+'d',duration=0.3)
+                self.miocingdying=Beast2(dir_name=dir_name+"/muore/",duration=0.3)
                 self.miocingdying.moveConductor.play()
             
             self.id=animato['id']

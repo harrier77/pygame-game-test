@@ -393,12 +393,20 @@ class App_gum(Engine):
         #self.crea_magazzino()
         self.mag=Magazzino(self)
         self.app_salvata=None
+        self.blockedkeys=False
     #------------------------------------------------------------------ 
     
   
     #------------------------------------------------------------------ 
     def update(self, dt):
-
+        if self.blockedkeys:
+            self.movex=self.movey=0
+            self.cammina=False
+            e=State.mioevento
+            if e:
+                typ = e.type
+                if typ == KEYDOWN or typ == KEYUP:
+                    self.on_key_up(e.key,e.mod)
         if self.movex or self.movey:
                 if self.is_walkable2():
                     wx=State.camera.target.position[0]+self.movex
@@ -634,28 +642,34 @@ class App_gum(Engine):
 
     #------------------------------------------------------------------
     def verifica_residuale_tasti_premuti(self,mio_keydown):
-        keys = pygame.key.get_pressed()
-        #print keys[K_LEFT]
-        #self.camera_target.moveConductor.play()
-        if (keys[K_LEFT] or keys[K_a]):
-                self.camera.target.giocatore_animato=self.animato['left_walk']
+        if not self.blockedkeys:
+            keys = pygame.key.get_pressed()
+            #print keys[K_LEFT]
+            #self.camera_target.moveConductor.play()
+            if (keys[K_LEFT] or keys[K_a]):
+                    self.camera.target.giocatore_animato=self.animato['left_walk']
+                    self.cammina=True
+                    self.movex += -State.speed
+            if (keys[K_RIGHT] or keys[K_d]):
+                    self.camera.target.giocatore_animato=self.animato['right_walk']
+                    self.cammina=True
+                    self.movex += State.speed
+            if (keys[K_DOWN] or keys[K_s]):
+                    self.camera.target.giocatore_animato=self.animato['front_walk']
+                    self.cammina=True
+                    self.movey += State.speed
+            if (keys[K_UP] or keys[K_w]):
+                self.camera.target.giocatore_animato=self.animato['back_walk']
                 self.cammina=True
-                self.movex += -State.speed
-        if (keys[K_RIGHT] or keys[K_d]):
-                self.camera.target.giocatore_animato=self.animato['right_walk']
-                self.cammina=True
-                self.movex += State.speed
-        if (keys[K_DOWN] or keys[K_s]):
-                self.camera.target.giocatore_animato=self.animato['front_walk']
-                self.cammina=True
-                self.movey += State.speed
-        if (keys[K_UP] or keys[K_w]):
-            self.camera.target.giocatore_animato=self.animato['back_walk']
-            self.cammina=True
-            self.movey += -State.speed
+                self.movey += -State.speed
 
     #------------------------------------------------------------------ 
     def on_key_down(self, unicode, key, mod):
+        if not self.blockedkeys:
+            self.on_key_down_incondizionato(unicode, key, mod)
+
+    #------------------------------------------------------------------ 
+    def on_key_down_incondizionato(self, unicode, key, mod):
         if key == K_DOWN or key == K_s:               
             self.cammina=True
             self.camera.target.giocatore_animato=self.animato['front_walk']

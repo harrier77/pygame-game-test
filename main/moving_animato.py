@@ -360,6 +360,7 @@ class MessaggioDaEvento(AnimatoParlanteFermo):
         if hits:
             self.dialogosemp.dialogo_show=True
             #print "collisione con evento!"+str(self.dialogosemp.dialogo_show)
+            
     #--------------------------------------------------------------------------------
     def muovi_animato(self):
         #print self.dialogosemp.dialogo_btn
@@ -416,6 +417,11 @@ class AttivaAnimato(MessaggioDaEvento):
         hits=self.motore.avatar.rect.colliderect(self.talk_box)
         if hits:
             self.motore.lista_beast[self.id_animato].attendi_evento=False
+            if self.motore.lista_beast[self.id_animato].dialogosemp.finito_dialogo:
+                self.motore.lista_beast[self.id_animato].dialogosemp.dialogo_show=False
+                self.dialogosemp.dialogo_show=False
+                self.motore.blockedkeys=False
+                #print "collisione con area attiva animato!"+str(self.motore.blockedkeys)
 
 #EofClass
 
