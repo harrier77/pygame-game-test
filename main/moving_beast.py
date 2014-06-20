@@ -423,6 +423,7 @@ class MovingBeast(model.Object):
             self.miosprite.rect=self.fotogramma.get_rect()
             self.miosprite.rect.x=self.x-self.miosprite.rect.width/2
             self.miosprite.rect.y=self.y-self.miosprite.rect.height
+            self.miosprite.id=self.id
             return self.miosprite
 
         #--------------------------------------------------------------------------------

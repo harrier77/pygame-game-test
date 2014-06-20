@@ -20,7 +20,7 @@ from librerie import pyganim
 
 from moving_beast import calcola_passi,MovingBeast
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
-from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo,AnimatoMorente
+from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
 from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
@@ -46,6 +46,7 @@ class Magazzino(model.Object):
         square=pygame.image.load('.\\immagini\\square1.png').convert_alpha()
         self.background_magazzino =pygame.transform.scale(square,(State.screen.size[0]-1,100))
         self.backvuoto=self.background_magazzino.copy()
+        self.suono=pygame.mixer.Sound('suoni/message.wav')
     def aggiungi_magazzino(self):
         x=10
         #if not self.motore.dialogo_btn:
@@ -65,7 +66,9 @@ class Proiettile(model.Object):
         self.freccia=pygame.image.load('immagini/bulletnero.png')
         #freccia=pygame.transform.scale(freccia,(72,72))
         pygame.mixer.init()
-        self.suono=pygame.mixer.Sound('immagini/message.wav')
+        #self.suono=pygame.mixer.Sound('suoni/message.wav')
+        self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
+        self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito.wav')
         self.motore=motore
         self.rect=self.image.get_rect()
         #self.rect=self.motore.avatar.rect.copy()
@@ -104,9 +107,15 @@ class Proiettile(model.Object):
             self.rect.y=self.rect.y+self.dy*10
             hits= pygame.sprite.spritecollide(self.sprite,self.motore.beast_sprite_group, False)
             if hits:
+                print hits[0].id
+                if hasattr(self.motore.lista_beast[hits[0].id],'miocingdying'):
+                    self.motore.lista_beast[hits[0].id].fallo_morire()
+                    self.suono_colpito.play()
+                else:
+                    self.suono_noncolpito.play()
                 self.colpito=True
                 self.motore.avatar_group.objects.remove(self)
-                self.suono.play()
+                
             #con coefficiente angolare
             #self.rect.x=self.rect.x+4
             #self.rect.y=self.rect.y+4*self.coefa
@@ -338,7 +347,7 @@ class App_gum(Engine):
                 elif O.properties['sottotipo']=='semplicefermo':
                     beast=AnimatoFermo(animato)
                 elif O.properties['sottotipo']=='morente':
-                    beast=AnimatoMorente(animato)
+                    beast=AnimatoSemplice(animato)
 
                 self.beast_sprite_group.add(beast.sprite_fotogrammanew)
                 beast.debug=miodebug
@@ -602,6 +611,7 @@ class App_gum(Engine):
                 print self.raccoglibili_dict[str(obj.img_idx)]
                 self.raccolti.append(obj)
                 self.raccolto_spathash.remove(obj)
+                self.mag.suono.play()
     
     #-------------------------------------------------------
     @property

@@ -24,6 +24,13 @@ class AnimatoSemplice(MovingBeast):
         pass
         #hits=self.motore.avatar.rect.colliderect(self.talk_box)
         #print hits
+    
+    def fallo_morire(self):
+        self.staifermo=True
+        if hasattr(self, 'miocingdying'):
+            self.miocingdying.moveConductor.mio_set_loop()
+            self.miocing=self.miocingdying
+
     #----------------------------------------
     def muovi_animato(self):
         if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
@@ -426,110 +433,6 @@ class AttivaAnimato(MessaggioDaEvento):
 #EofClass
 
 
-class AnimatoMorente(MovingBeast):
-    def __init__(self,animato):
-        MovingBeast.__init__(self,animato,parlante=False)
-        self.dialogosemp=type('obj', (object,), {'dialogo_btn' : False}) # qui la proprietà dialogo_btn viene settata a False
-        self.direzione='right'
-        #self.miocing=self.miocingdying
-    #----------------------------------------
-    @property
-    def draw_fotogramma(self):
-        return True
-    #-------------------------------------------------------------------------
-    def fallo_parlare(self):
-        pass
-        #hits=self.motore.avatar.rect.colliderect(self.talk_box)
-        #print hits
-    #-------------------------------------------------------------------------
-    def intercetta_evento_mortale(self):
-        if hasattr(self.motore.State,'mioevento'):
-            evento=self.motore.State.mioevento
-            if evento:
-                if evento.type == pygame.KEYDOWN:
-                    if evento.key == pygame.K_F4:
-                        #print 'f4'
-                        self.staifermo=True
-                        self.miocingdying.moveConductor.mio_set_loop()
-                        self.miocing=self.miocingdying
-        else:
-            #print "Manca la proprietà evento di self.motore"
-            pass
-                    
-    #--------------------------------------------------------------------------------
-    def scegli_fotogramma_animazione(self,miocing,direzione):
-        self.direzione=direzione
-        if len(self.listap)>0:  ##inizia la camminata
-            if not self.staifermo:
-                #qui vengono impostati x e y del fotogramma da proiettare prendendoli dalla lista della camminata self.listap
-                pos= self.listap.pop(0)
-                self.x,self.y=pos #qui vengono impostati x e y del fotogramma da proiettare sullo schermo prendendoli dalla lista della camminata self.listap
-                #fine impostazione ---------------------------------------------------------------------------------------------------
-                if self.vai_incontro:
-                        #self.mostra_esclamazione()
-                        if self.motore:
-                                self.lista_destinazioni=[self.lista_destinazioni[0],(self.motore.avatar.hitbox.bottomleft[0],self.motore.avatar.hitbox.bottomleft[1])]
-                        #endifclause
-                #endifclause
-            #end_if_clause
-            
-            #miocing.moveConductor.play()
-            #di seguito viene selezionata l'iimmagine a seconda della direzione della camminata; x e y sono già stati impostati
-            if direzione=='left':
-                self.fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()
-            elif direzione=='front':
-                self.fotogramma=miocing.animObjs['front_walk'].ritorna_fotogramma()
-            elif direzione=='right':
-                self.fotogramma=miocing.animObjs['right_walk'].ritorna_fotogramma()
-            elif direzione=='back':
-                self.fotogramma=miocing.animObjs['back_walk'].ritorna_fotogramma()
-            elif direzione=='SW':
-                self.fotogramma=miocing.animObjs['SW'].ritorna_fotogramma()
-            elif direzione=='NW':
-                self.fotogramma=miocing.animObjs['NW'].ritorna_fotogramma()
-            elif direzione=='SE':
-                self.fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
-            elif direzione=='NE':
-                self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
-        #endifclause
-        #-------------------------------------------------------------------------
-    
-    #----------------------------------------
-    def muovi_animato(self):
-        self.intercetta_evento_mortale()
-        if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
-            if self.contatore_destinazioni>len(self.lista_destinazioni)-1: 
-                    self.contatore_destinazioni=0 #resetta il contatore della lista delle destinazioni automatiche
-                    self.segmento=0
-            if (self.x,self.y)==self.lista_destinazioni[self.contatore_destinazioni]:
-                    #print "destinazione uguale a partenza"
-                    self.x=self.x+3
-                    self.y=self.y+3
-                    #exit()
-            self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[self.contatore_destinazioni])  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
-            pos_da_raggiungere=self.listap[len(self.listap)-1] #legge la posizione finale di destinazione dalla lista delle destinazioni
-            self.direzione=self.calcola_direzione((self.x,self.y),pos_da_raggiungere) #calcola la direzione della destinazione da raggiungere
-            self.contatore_destinazioni=self.contatore_destinazioni+1 #incrementa il contatore delle destinazioni
-            self.auto=False #arresta il cinghiale quando ha fatto una singola camminata
-            self.lanciato=False #setta il timer su fermo mentre la camminata è in corso
-        
-        #sezione che effettivamente muove l'animazione, ma solo se non èin pausa o non è fermata
-        if self.is_walking and not self.fermato and not self.is_persona_collide: 
-            self.scegli_fotogramma_animazione(self.miocing,self.direzione)
-        else:
-            if (self.direzione=='right') or (self.direzione=='SE') or (self.direzione=='NE'): 
-                self.fotogramma=self.miocing.animObjs['right_stand'].ritorna_fotogramma()
-            elif (self.direzione=='left') or (self.direzione=='SW') or (self.direzione=='NW'): 
-                self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
-        
-        if (self.lanciato==False) and (self.is_walking==False) and (self.staifermo==False):
-                self.mio_timer_pausa() #lancia il timer che conta i secondi della pausa passati come parametro a MovingBeast()
-                fotog_sprite=self.sprite_fotogramma
-        if self.miotimer: #controlla ad ogni ciclo se è attivo un timer e se la pausa di quel timer è scaduta
-            self.miotimer.check_time()
-        return self.fotogramma
-#---------------------------------------------------
-#fine della Classe
     
     
     
