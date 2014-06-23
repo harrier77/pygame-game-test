@@ -13964,5 +13964,13 @@
    </properties>
    <polyline points="-47,-23 -555,54"/>
   </object>
+  <object name="wolf" type="animato" x="850" y="2404">
+   <properties>
+    <property name="durata_pausa" value="10"/>
+    <property name="id" value="j2"/>
+    <property name="sottotipo" value="animatosegue"/>
+   </properties>
+   <polyline points="0,0 -157,-4"/>
+  </object>
  </objectgroup>
 </map>

@@ -53,7 +53,7 @@ except:
 import os.path
 import struct
 import array
-from miovar_dump import miovar_dump
+
 
 #  -----------------------------------------------------------------------------
 class TileMap(object):

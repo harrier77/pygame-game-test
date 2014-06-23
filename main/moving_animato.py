@@ -4,7 +4,7 @@ import datetime
 from random import randint
 import pygame
 from pygame.locals import *
-from miovar_dump import *
+from gummworld2 import geometry,model,data
 
 #---------------------------------------
 #Animazione di unità che non parla e non affronta il personaggio avatar
@@ -131,8 +131,16 @@ class AnimatoParlanteAvvicina(MovingBeast):
                 self.dialogosemp.open=False
                 self.dialogosemp.idx_mess=0
                 self.fermato=False
+    
+    def aggiorna_pos_da_seguire(self):
+        pos_partenza=self.lista_destinazioni[0]
+        pos_arrivo_x=self.motore.avatar.hitbox.bottomleft[0]
+        pos_arrivo_y=self.motore.avatar.hitbox.bottomleft[1]
+        self.lista_destinazioni=[pos_partenza,(pos_arrivo_x,pos_arrivo_y)]
+    
     #----------------------------------------
     def muovi_animato(self):
+        self.aggiorna_pos_da_seguire()
         if self.dialogosemp.lista_messaggi==['...']:
                 try:
                     if type(self.dic_storia['messaggio']) is not list: self.dic_storia['messaggio']=[self.dic_storia['messaggio']]
@@ -189,6 +197,58 @@ class AnimatoParlanteAvvicina(MovingBeast):
         return self.fotogramma
         #---------------------------------------------------
 #EofClass
+
+
+#---------------------------------------
+#Animazione di unità che segue il personaggio avatar
+#----------------------------------------              
+class AnimatoSegue(MovingBeast):
+    #----------------------------------------
+    def __init__(self,animato):
+        MovingBeast.__init__(self,animato,parlante=False)
+        self.dialogosemp=Dialogosemplice(self)
+        self.in_uscita=False
+        self.cliccato=False
+        self.draw_fotogramma=True
+    
+    def passi(self,or_pos=(300,200),target_pos=(200,200)):
+        distanza=int(geometry.distance(or_pos,target_pos))
+        lista_posizioni=[]
+        for progress_distance in range(1,distanza):  
+                p= geometry.step_toward_point(or_pos, target_pos, progress_distance)
+                lista_posizioni.append(p)
+        return lista_posizioni
+    
+    #----------------------------------------
+    def aggiorna_pos_da_seguire(self):
+        pos_partenza=self.x,self.y
+        pos_arrivo_x=self.motore.avatar.hitbox.bottomleft[0]
+        pos_arrivo_y=self.motore.avatar.hitbox.bottomleft[1]
+        pos_da_raggiungere=pos_arrivo_x,pos_arrivo_y
+        self.lista_destinazioni=[pos_partenza,pos_da_raggiungere]
+        self.listap=self.passi(pos_partenza,pos_da_raggiungere)  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
+        self.direzione=self.calcola_direzione(pos_partenza,pos_da_raggiungere) #calcola la direzione della destinazione da raggiungere
+
+    #----------------------------------------
+    def muovi_animato(self):
+        self.aggiorna_pos_da_seguire()
+        #sezione che effettivamente muove l'animazione, ma solo se la lista delle posizioni da seguire non è vuota
+        if self.is_p_in_listap: 
+            self.scegli_fotogramma_animazione(self.miocing,self.direzione)
+        else:
+            if (self.direzione=='right') or (self.direzione=='SE') or (self.direzione=='NE'): 
+                self.fotogramma=self.miocing.animObjs['right_stand'].ritorna_fotogramma()
+            elif (self.direzione=='left') or (self.direzione=='SW') or (self.direzione=='NW'): 
+                self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
+        
+        return self.fotogramma
+        
+    #-------------------------------------------------------------------------
+    def fallo_parlare(self):
+        return True
+
+#EofClass
+
 
 #---------------------------------------------------
 #Inizio Classe               
@@ -289,6 +349,11 @@ class AnimatoParlanteFermo(MovingBeast):
 
 
 class AnimatoFermo(AnimatoParlanteFermo):
+    #----------------------------------------
+    def __init__(self,animato):
+        AnimatoParlanteFermo.__init__(self,animato)
+        self.miocing=self.miocingfermo
+    
     def fallo_parlare(self):
         pass
     

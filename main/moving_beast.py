@@ -18,7 +18,7 @@ from random import randint
 #import threading
 import datetime
 from pygame.sprite import Sprite
-from miovar_dump import *
+
 #from beast1 import Beast
 #from beast2 import Beast2
 import glob
@@ -317,11 +317,16 @@ class MovingBeast(model.Object):
             
             self.miocing=Beast2(dir_name=dir_name+"/cammina/",duration=0.1)
             
+            dir_name_fermo='animazioni/animation/'+dir_name+'/fermo/'
+            if os.path.exists(dir_name_fermo):
+                self.miocingfermo=Beast2(dir_name=dir_name+"/fermo/",duration=0.1)
+                self.miocingfermo.moveConductor.play()
+            
             dir_name_dying='animazioni/animation/'+dir_name+'/muore/'
-
             if os.path.exists(dir_name_dying):
                 self.miocingdying=Beast2(dir_name=dir_name+"/muore/",duration=0.3)
                 self.miocingdying.moveConductor.play()
+            
             
             self.id=animato['id']
             #exclpng=pygame.image.load('immagini/exclam1.png').convert_alpha()
@@ -406,6 +411,11 @@ class MovingBeast(model.Object):
                 return True
             else:
                 return False
+        
+        @property
+        def is_p_in_listap(self):
+            return self.is_walking
+            
         #--------------------------------------------------------------------------------
         @property
         def sprite_fotogramma(self):
@@ -510,10 +520,9 @@ class MovingBeast(model.Object):
                     pos= self.listap.pop(0)
                     self.x,self.y=pos #qui vengono impostati x e y del fotogramma da proiettare sullo schermo prendendoli dalla lista della camminata self.listap
                     #fine impostazione ---------------------------------------------------------------------------------------------------
-                    if self.vai_incontro:
-                            #self.mostra_esclamazione()
+                    """if self.vai_incontro:
                             if self.motore:
-                                    self.lista_destinazioni=[self.lista_destinazioni[0],(self.motore.avatar.hitbox.bottomleft[0],self.motore.avatar.hitbox.bottomleft[1])]
+                                    self.lista_destinazioni=[self.lista_destinazioni[0],(self.motore.avatar.hitbox.bottomleft[0],self.motore.avatar.hitbox.bottomleft[1])]"""
                             #endifclause
                     #endifclause
                 #end_if_clause

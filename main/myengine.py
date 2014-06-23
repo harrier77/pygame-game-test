@@ -17,11 +17,12 @@ import cProfile, pstats
 from gummworld2 import context, data, model, geometry, toolkit
 from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim,gui
+from miovardump import miovar_dump
 
 from moving_beast import calcola_passi,MovingBeast
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
-from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
-from miovar_dump import *
+from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo,AnimatoSegue
+#from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
 import subprocess
@@ -35,7 +36,7 @@ except:
     try:
         os.stat('animation')
     except:
-        print 'cambio dir a '+os.getcwd()
+        #print 'cambio dir a '+os.getcwd()
         os.chdir('..\\') 
         
 #-------------------------------------------------------------------------------
@@ -45,8 +46,9 @@ class PguApp():
         #mytheme = gui.Theme(dirs="gray")
         self.app = gui.Desktop(width=800,height=600)
         self.app.connect(gui.QUIT,self.app.quit,None)
-        self.tabella = gui.Table(width=200,height=300)
-        
+        self.tabella = gui.Table(width=200,height=300,valign=-1,y=50)
+        self.tabella.style.margin_top=150
+        #print self.tabella.style.margin_top
         if inizio=="inventario":
             self.inventario()
         else:
@@ -84,26 +86,35 @@ class PguApp():
         tornabtn=gui.Button(value='Torna al gioco')
         tornabtn.connect(gui.CLICK,self.quit)
         self.tabella.td(tornabtn)
+        nrighe=self.tabella.getRows()
+        self.tabella.style.height=nrighe*50
+
+        
     
     def inventario(self):
         #miovar_dump(self.tabella.resize)
         self.tabella.clear()
-        #self.tabella.tr()
-        #etichetta=gui.Label("cosa")
-        #self.tabella.td(etichetta)
+        self.tabella.tr()
+        etichetta=gui.Label("Inventario oggetti raccolti")
+        
+        self.tabella.td(etichetta,colspan=2)
         for cosa in self.motore.raccolti:
-                print cosa
                 eti=gui.Label(cosa[0]['nome'])
+                #eti.style.border_bottom=1
                 immagine=gui.Image(cosa[1].image)
+                #immagine.style.border_bottom=1
                 self.tabella.tr()
                 self.tabella.td(eti)
-                
                 self.tabella.td(immagine)
-        #self.app.paint()
-        pass
+        nrighe=self.tabella.getRows()
+        self.tabella.style.height=nrighe*10
+        #self.tabella.rect.x=0
+        #self.tabella.reupdate()
+        
+
     #-------------------------------------------------------------------------------
     def quit(self):
-        print 'quit'
+        #print 'quit'
         self.mioloop=False
 #-------------------------------------------------------------------------------
 
@@ -176,7 +187,7 @@ class Proiettile(model.Object):
             self.rect.y=self.rect.y+self.dy*10
             hits= pygame.sprite.spritecollide(self.sprite,self.motore.beast_sprite_group, False)
             if hits:
-                print hits[0].id
+                #print hits[0].id
                 if hasattr(self.motore.lista_beast[hits[0].id],'miocingdying'):
                     self.motore.lista_beast[hits[0].id].fallo_morire()
                     self.suono_colpito.play()
@@ -187,9 +198,11 @@ class Proiettile(model.Object):
             hitsover=pygame.sprite.spritecollide(self.sprite,self.motore.over_group,False)
             if hitsover:
                 if hitsover[0].img_idx in self.motore.dict_gid_to_properties:
-                        print self.motore.dict_gid_to_properties[hitsover[0].img_idx]['nome']
+                        #print self.motore.dict_gid_to_properties[hitsover[0].img_idx]['nome']
+                        pass
                 else:
-                        print hitsover[0].img_idx
+                        #print hitsover[0].img_idx
+                        pass
                 self.suono_colpito.play()
                 self.motore.avatar_group.objects.remove(self)
             #con coefficiente angolare
@@ -345,7 +358,7 @@ class App_gum(Engine):
         self.dict_gid_to_properties={}
         for tileset in self.tiled_map.raw_map.tile_sets:
                 for tile in tileset.tiles:
-                        print tile
+                        #print tile
                         tile.properties['parent_tileset_name']=tileset.name
                         gid=int(tileset.firstgid)+int(tile.id)
                         self.dict_gid_to_properties[gid]=tile.properties
@@ -432,6 +445,8 @@ class App_gum(Engine):
                     beast=AnimatoFermo(animato)
                 elif O.properties['sottotipo']=='morente':
                     beast=AnimatoSemplice(animato)
+                elif O.properties['sottotipo']=='animatosegue':
+                    beast=AnimatoSegue(animato)
 
                 self.beast_sprite_group.add(beast.sprite_fotogrammanew)
                 beast.debug=miodebug
@@ -630,7 +645,7 @@ class App_gum(Engine):
                         mappa=warp.properties['dest_map']+".tmx"
                         destx=int(warp.properties['dest_tile_x'])*32
                         desty=int(warp.properties['dest_tile_y'])*32
-                        print self.mappa_dirfile
+                        #print self.mappa_dirfile
                         if self.mappa_dirfile==dir+mappa:
                                 self.nuova_mappa_caricare=False
                                 self.avatar.rect.x=destx
@@ -694,7 +709,7 @@ class App_gum(Engine):
                 #print "indice che punta alla posizione dell'immagine nel tileset png "+str(obj.img_idx)
                 #print self.raccoglibili_dict[str(obj.img_idx)]
                 prop_ogg= self.dict_gid_to_properties[obj.img_idx]
-                print prop_ogg
+                #print prop_ogg
                 self.raccolti.append((prop_ogg,obj))
                 self.raccolto_spathash.remove(obj)
                 self.mag.suono.play()
@@ -795,7 +810,7 @@ class App_gum(Engine):
                     self.movex += -State.speed
                     self.camera.target.giocatore_animato=self.animato['left_run']
         elif key==pygame.K_z:
-            print "z"
+            #print "z"
             for k,beast in self.lista_beast.iteritems():
                 beast.dialogosemp.incrementa_idx_mess()
         
@@ -823,13 +838,14 @@ class App_gum(Engine):
             self.wx.Show(True) #mostra la finestra wxpython 
             #print pygame.display.get_wm_info()
         elif key == pygame.K_F7:
-            print 'f7'
+            #print 'f7'
             pgu=PguApp(self)
         elif key == pygame.K_e:
             pgu=PguApp(self,inizio="inventario")
-        elif key == pygame.K_F9:
-            for k,beast in self.lista_beast.iteritems():
-                print str(beast.id)+str(beast.dialogosemp.dialogo_btn)
+        #elif key == pygame.K_F9:
+            #for k,beast in self.lista_beast.iteritems():
+                #print str(beast.id)+str(beast.dialogosemp.dialogo_btn)
+                #pass
         elif key == K_g:
             State.show_grid = not State.show_grid
         elif key == K_l:
