@@ -10,14 +10,20 @@ from miovar_dump import *
 #Animazione di unità che non parla e non affronta il personaggio avatar
 #limitandosi a camminare avanti e indietro secondo il percorso della proprietà points
 #della retta con una pausa indicata in durata_pausa
+#Se c'è l'animazione, se colpito cade e muore restando sul terreno.
 #----------------------------------------         
 class AnimatoSemplice(MovingBeast):
     def __init__(self,animato):
         MovingBeast.__init__(self,animato,parlante=False)
-        self.dialogosemp=type('obj', (object,), {'dialogo_btn' : False}) # qui la proprietà dialogo_btn viene settata a False
+        self.dialogosemp=type('obj', (object,), {'dialogo_show' : False}) # qui la proprietà dialogo_show viene settata a False
+        #self.linearossa=pygame.image.load('immagini/linearossa.png').convert()
+        
+        self.salute=3
+        self.sotto_tiro=False
     #----------------------------------------
     @property
     def draw_fotogramma(self):
+        self.disegna_linea_salute()
         return True
     #-------------------------------------------------------------------------
     def fallo_parlare(self):
@@ -26,11 +32,25 @@ class AnimatoSemplice(MovingBeast):
         #print hits
     
     def fallo_morire(self):
-        self.staifermo=True
         if hasattr(self, 'miocingdying'):
-            self.miocingdying.moveConductor.mio_set_loop()
-            self.miocing=self.miocingdying
-
+            self.sotto_tiro=True
+            if self.salute>0:
+                    self.salute=self.salute-1
+                    if self.salute<1:
+                        self.miocingdying.moveConductor.mio_set_loop()
+                        self.miocing=self.miocingdying
+                        self.staifermo=True
+    
+    def disegna_linea_salute(self):
+        if hasattr(self, 'miocingdying'):
+            if self.salute>0 and self.sotto_tiro:
+                basicfont = pygame.font.SysFont(None, 16)
+                text = basicfont.render(str(self.salute), True, (0, 255, 0))
+                lung=self.salute*20
+                cx,cy=self.motore.State.camera.rect.topleft
+                self.motore.State.screen.blit(text,(self.rect.x-cx,self.rect.y-cy-10))
+                pygame.draw.line(self.motore.State.screen.surface,(0,255,0),(self.rect.x-cx,self.rect.y-cy),(self.rect.x-cx+lung,self.rect.y-cy))
+    
     #----------------------------------------
     def muovi_animato(self):
         if self.auto: ##verifica se deve procedere a calcolare una nuova sequenza di passi
@@ -51,6 +71,7 @@ class AnimatoSemplice(MovingBeast):
         #sezione che effettivamente muove l'animazione, ma solo se non èin pausa o non è fermata
         if self.is_walking and not self.fermato and not self.is_persona_collide: 
             self.scegli_fotogramma_animazione(self.miocing,self.direzione)
+            
         else:
             if (self.direzione=='right') or (self.direzione=='SE') or (self.direzione=='NE'): 
                 self.fotogramma=self.miocing.animObjs['right_stand'].ritorna_fotogramma()
@@ -61,6 +82,7 @@ class AnimatoSemplice(MovingBeast):
                 fotog_sprite=self.sprite_fotogramma
         if self.miotimer: #controlla ad ogni ciclo se è attivo un timer e se la pausa di quel timer è scaduta
             self.miotimer.check_time()
+     
         return self.fotogramma
 #---------------------------------------------------
 #fine della Classe

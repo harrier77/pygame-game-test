@@ -16,7 +16,7 @@ import gummworld2
 import cProfile, pstats
 from gummworld2 import context, data, model, geometry, toolkit
 from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
-from librerie import pyganim
+from librerie import pyganim,gui
 
 from moving_beast import calcola_passi,MovingBeast
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
@@ -27,6 +27,7 @@ from librerie import xmltodict
 import subprocess
 import math
 from math import atan2,pi
+
 DEBUG=False
 try:
     __builtin__.miavar
@@ -37,8 +38,76 @@ except:
         print 'cambio dir a '+os.getcwd()
         os.chdir('..\\') 
         
+#-------------------------------------------------------------------------------
+class PguApp():
+    def __init__(self,motore_genitore,inizio='menu'):
+        self.motore=motore_genitore
+        #mytheme = gui.Theme(dirs="gray")
+        self.app = gui.Desktop(width=800,height=600)
+        self.app.connect(gui.QUIT,self.app.quit,None)
+        self.tabella = gui.Table(width=200,height=300)
         
+        if inizio=="inventario":
+            self.inventario()
+        else:
+            self.menu()
         
+        self.app.init(self.tabella)
+        self.mioloop=True
+        clock = pygame.time.Clock()
+        while self.mioloop:
+                mousemotions = pygame.event.get(MOUSEMOTION)
+                if mousemotions: #checks if the list is nonempty
+                        mousemotion = mousemotions[-1]
+                coda_eventi=pygame.event.get()
+                for event in coda_eventi:
+                        if event.type == pygame.QUIT:
+                                self.mioloop = False
+                        elif event.type == pygame.USEREVENT:
+                                continue
+                        elif event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_ESCAPE:
+                                        self.mioloop = False
+                        self.app.event(event)
+                        self.app.paint()
+                        pygame.display.flip()
+                        clock.tick(60)
+        pygame.key.set_repeat()
+     #-------------------------------------------------------------------------------   
+    def menu(self):
+        self.tabella.tr()
+        inventario=gui.Button(value='Inventario')
+        inventario.connect(gui.CLICK,self.inventario)
+        self.tabella.td(inventario)
+        
+        self.tabella.tr()
+        tornabtn=gui.Button(value='Torna al gioco')
+        tornabtn.connect(gui.CLICK,self.quit)
+        self.tabella.td(tornabtn)
+    
+    def inventario(self):
+        #miovar_dump(self.tabella.resize)
+        self.tabella.clear()
+        #self.tabella.tr()
+        #etichetta=gui.Label("cosa")
+        #self.tabella.td(etichetta)
+        for cosa in self.motore.raccolti:
+                print cosa
+                eti=gui.Label(cosa[0]['nome'])
+                immagine=gui.Image(cosa[1].image)
+                self.tabella.tr()
+                self.tabella.td(eti)
+                
+                self.tabella.td(immagine)
+        #self.app.paint()
+        pass
+    #-------------------------------------------------------------------------------
+    def quit(self):
+        print 'quit'
+        self.mioloop=False
+#-------------------------------------------------------------------------------
+
+
 #-------------------------------------------------------------------------------
 class Magazzino(model.Object):
     def __init__(self,motore):
@@ -63,7 +132,7 @@ class Proiettile(model.Object):
     
     #------------------------------------
     def __init__(self,motore,mouse_position):
-        self.freccia=pygame.image.load('immagini/bulletnero.png')
+        self.freccia=pygame.image.load('immagini/frnera.png')
         #freccia=pygame.transform.scale(freccia,(72,72))
         pygame.mixer.init()
         #self.suono=pygame.mixer.Sound('suoni/message.wav')
@@ -115,7 +184,14 @@ class Proiettile(model.Object):
                     self.suono_noncolpito.play()
                 self.colpito=True
                 self.motore.avatar_group.objects.remove(self)
-                
+            hitsover=pygame.sprite.spritecollide(self.sprite,self.motore.over_group,False)
+            if hitsover:
+                if hitsover[0].img_idx in self.motore.dict_gid_to_properties:
+                        print self.motore.dict_gid_to_properties[hitsover[0].img_idx]['nome']
+                else:
+                        print hitsover[0].img_idx
+                self.suono_colpito.play()
+                self.motore.avatar_group.objects.remove(self)
             #con coefficiente angolare
             #self.rect.x=self.rect.x+4
             #self.rect.y=self.rect.y+4*self.coefa
@@ -260,15 +336,22 @@ class App_gum(Engine):
                         self.collision_group_i= mylayer.layeri
                 if mylayer.name=="Fringe":
                         self.fringe_i= mylayer.layeri
+                if mylayer.name=="Over":
+                        self.over_i= mylayer.layeri
                 if mylayer.name=="raccolto": 
                         self.raccolto_layer=mylayer
                         self.raccolto_spathash=mylayer.objects
-                        tileset_raccoglibili=self.tiled_map.raw_map.tile_sets[mylayer.layeri]
-                        self.raccoglibili_dict={}
-                        for r in tileset_raccoglibili.tiles:
-                            indice=str(int(r.id)+int(tileset_raccoglibili.firstgid))
-                            self.raccoglibili_dict[indice]=r.properties['nome']
-       
+
+        self.dict_gid_to_properties={}
+        for tileset in self.tiled_map.raw_map.tile_sets:
+                for tile in tileset.tiles:
+                        print tile
+                        tile.properties['parent_tileset_name']=tileset.name
+                        gid=int(tileset.firstgid)+int(tile.id)
+                        self.dict_gid_to_properties[gid]=tile.properties
+        #print self.dict_gid_to_properties
+        #exit()
+        
         #carica in una lista i lvelli degli oggetti 
         self.lista_oggetti=list()
         myappend=self.lista_oggetti.append
@@ -282,6 +365,7 @@ class App_gum(Engine):
         ## Save special layers.
         self.all_groups = self.tiled_map.layers[:]
         self.avatar_group = self.tiled_map.layers[self.fringe_i]
+        self.over_group=self.tiled_map.layers[self.over_i]
         self.collision_group = self.tiled_map.layers[self.collision_group_i]
         num_layers=len(self.all_groups)-1
         self.overlays = self.tiled_map.layers[1:num_layers]
@@ -607,9 +691,11 @@ class App_gum(Engine):
         hits=pygame.sprite.spritecollide(newsprite, self.raccolto_spathash.objects,False)
         if hits:
             for obj in hits:
-                print "indice che punta alla posizione dell'immagine nel tileset png "+str(obj.img_idx)
-                print self.raccoglibili_dict[str(obj.img_idx)]
-                self.raccolti.append(obj)
+                #print "indice che punta alla posizione dell'immagine nel tileset png "+str(obj.img_idx)
+                #print self.raccoglibili_dict[str(obj.img_idx)]
+                prop_ogg= self.dict_gid_to_properties[obj.img_idx]
+                print prop_ogg
+                self.raccolti.append((prop_ogg,obj))
                 self.raccolto_spathash.remove(obj)
                 self.mag.suono.play()
     
@@ -738,8 +824,9 @@ class App_gum(Engine):
             #print pygame.display.get_wm_info()
         elif key == pygame.K_F7:
             print 'f7'
-            print self.lista_beast['interlocutore'].id
-            self.lista_beast['interlocutore'].attendi_evento=False
+            pgu=PguApp(self)
+        elif key == pygame.K_e:
+            pgu=PguApp(self,inizio="inventario")
         elif key == pygame.K_F9:
             for k,beast in self.lista_beast.iteritems():
                 print str(beast.id)+str(beast.dialogosemp.dialogo_btn)

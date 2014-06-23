@@ -248,6 +248,7 @@ class Beast2():
         self.animObjs['right_stand'].makeTransformsPermanent()
    
         self.moveConductor = pyganim.PygConductor(self.animObjs)
+        
 
         
 #fine classe -------------------------------------
@@ -349,6 +350,7 @@ class MovingBeast(model.Object):
             if 'vai_incontro' in animato:
                 self.vai_incontro=animato['vai_incontro']
             if parlante:self.dialogosemp=Dialogosemplice(self)
+            
             
         #--------------------------------------------------------------------------------
         def calcola_points(self,points,position):
