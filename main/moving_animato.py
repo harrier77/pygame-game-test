@@ -110,7 +110,6 @@ class AnimatoParlanteAvvicina(MovingBeast):
         else:
             return True
     
-    
     #-------------------------------------------------------------------------
     def fallo_parlare(self):
         hits=self.motore.avatar.rect.colliderect(self.talk_box)  
@@ -222,8 +221,8 @@ class AnimatoSegue(MovingBeast):
     #----------------------------------------
     def aggiorna_pos_da_seguire(self):
         pos_partenza=self.x,self.y
-        pos_arrivo_x=self.motore.avatar.hitbox.bottomleft[0]
-        pos_arrivo_y=self.motore.avatar.hitbox.bottomleft[1]
+        pos_arrivo_x=self.motore.avatar.hitbox.bottomleft[0]+32
+        pos_arrivo_y=self.motore.avatar.hitbox.bottomleft[1]+32
         pos_da_raggiungere=pos_arrivo_x,pos_arrivo_y
         self.lista_destinazioni=[pos_partenza,pos_da_raggiungere]
         self.listap=self.passi(pos_partenza,pos_da_raggiungere)  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
@@ -347,7 +346,8 @@ class AnimatoParlanteFermo(MovingBeast):
         return True
 #EofClass
 
-
+#---------------------------------------------------
+#Inizio Classe            come AnimatoParlanteFermo solo che non parla
 class AnimatoFermo(AnimatoParlanteFermo):
     #----------------------------------------
     def __init__(self,animato):
@@ -358,18 +358,7 @@ class AnimatoFermo(AnimatoParlanteFermo):
         pass
     
     def muovi_animato(self):
-        """direzioni=['left','right','front','back','SW','NW','NE','SE']
-        adesso= datetime.datetime.time(datetime.datetime.now()).second
-        
-        adesso1= int(adesso%5)
-        if adesso1==0:
-            if not self.giacambiato:
-                print adesso
-                numdirez=len(direzioni)
-                self.direzione=direzioni[randint(0,numdirez-1)]
-                self.giacambiato=True
-        else:
-            self.giacambiato=False"""
+       
         #sezione che effettivamente muove l'animazione, ma solo se non èin pausa o non è fermata
         self.scegli_fotogramma_animazione(self.miocing,self.direzione)
 

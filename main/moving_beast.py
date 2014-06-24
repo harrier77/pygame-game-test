@@ -386,15 +386,15 @@ class MovingBeast(model.Object):
         def calcola_direzione(self,pos,mousepos):
             angolo= geometry.angle_of(pos,mousepos)
             ore=(angolo*100/360)*12
-            if ore>100 and ore<200:
+            if ore>50 and ore<200:
                     direzione='NE'
             elif ore>400 and ore<500:
                     direzione='SE'
             elif ore>700 and ore<800:
                     direzione='SW'
-            elif ore>1000 and ore<1100:
+            elif ore>950 and ore<1150:
                     direzione='NW'
-            elif ore>1100 or ore<100:
+            elif ore>1150 or ore<50:
                     direzione='back'
             elif ore>500 and ore<700:
                     direzione='front'

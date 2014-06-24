@@ -108,6 +108,7 @@ class PguApp():
                 self.tabella.td(immagine)
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*10
+        #print self.tabella
         #self.tabella.rect.x=0
         #self.tabella.reupdate()
         
@@ -186,15 +187,17 @@ class Proiettile(model.Object):
             self.rect.x=self.rect.x+self.dx*10
             self.rect.y=self.rect.y+self.dy*10
             hits= pygame.sprite.spritecollide(self.sprite,self.motore.beast_sprite_group, False)
+            
             if hits:
-                #print hits[0].id
-                if hasattr(self.motore.lista_beast[hits[0].id],'miocingdying'):
-                    self.motore.lista_beast[hits[0].id].fallo_morire()
-                    self.suono_colpito.play()
-                else:
-                    self.suono_noncolpito.play()
-                self.colpito=True
-                self.motore.avatar_group.objects.remove(self)
+                ogg_colpito=self.motore.lista_beast[hits[0].id]
+                if ogg_colpito.id<>'wolf':
+                    if hasattr(ogg_colpito,'miocingdying'):
+                        ogg_colpito.fallo_morire()
+                        self.suono_colpito.play()
+                    else:
+                        self.suono_noncolpito.play()
+                    self.colpito=True
+                    self.motore.avatar_group.objects.remove(self)
             hitsover=pygame.sprite.spritecollide(self.sprite,self.motore.over_group,False)
             if hitsover:
                 if hitsover[0].img_idx in self.motore.dict_gid_to_properties:
@@ -631,6 +634,7 @@ class App_gum(Engine):
         dummy = self.avatar
         newhitbox=dummy.hitbox.copy()
         newhitbox.x=dummy.hitbox.x+self.movex
+        
         for warp in self.warps:
                 if warp.rect.colliderect(newhitbox):
                         scrittaor=pygame.image.load('immagini/loading4.gif').convert()
@@ -657,6 +661,9 @@ class App_gum(Engine):
                                 wx = max(min(wx,rect.right), rect.left)
                                 wy = max(min(wy,rect.bottom), rect.top)
                                 camera.position = wx,wy
+                                if 'wolf' in self.lista_beast:
+                                    self.lista_beast['wolf'].x=self.avatar.hitbox.bottomleft[0]+32
+                                    self.lista_beast['wolf'].y=self.avatar.hitbox.bottomleft[1]+32
                         else:
                                 self.nuova_mappa_caricare=True
                                 self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)

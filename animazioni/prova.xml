@@ -28,9 +28,8 @@
         </aio>
         <aio2>
                 <segmento>1</segmento>
-                <messaggio>Il mio discorso parte da un oggetto evento!</messaggio>
-                <messaggio>Non parte dal contatto con l'interlocutore</messaggio>
-                <messaggio>Visto!</messaggio>
+                <messaggio>la birra è gratis!</messaggio>
+                <messaggio>prendila!</messaggio>
         </aio2>
         <msg1>
                 <segmento>1</segmento>
@@ -39,6 +38,7 @@
         </msg1>
         <msg2>
                 <segmento>1</segmento>
+                <messaggio>Il cane Wolf ti segue ovunque.</messaggio>
                 <messaggio>Nell'armeria puoi prendere arco e frecce</messaggio>
                 <messaggio>poi li devi provare e mettere a punto</messaggio>
                 <messaggio>nel poligono di tiro...</messaggio>
