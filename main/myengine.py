@@ -19,7 +19,7 @@ from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim,gui
 from miovardump import miovar_dump
 
-from moving_beast import calcola_passi,MovingBeast
+from moving_beast import calcola_passi,MovingBeast,Dialogosemplice
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
 from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo,AnimatoSegue
 #from miovar_dump import *
@@ -315,12 +315,26 @@ class Miohero(model.Object):
         
 #FineClasse -------------------------------------------------------------------------------
 
+class Dialogo_gioco(Dialogosemplice):
+    def __init__(self,motore,lista_messaggi=['primo','secondo']):
+        moving_beast_genitore= type('moving_beast_genitore', (object,), {'motore' : motore})()
+        #moving_beast.gemotore=motore
+        Dialogosemplice.__init__(self,moving_beast_genitore)
+        self.lista_messaggi=lista_messaggi
+        self.testo=self.lista_messaggi[0]
+        self.scrivi_frase()
+    #-----------------------------------------------------
+    def scrivi_frase(self):	
+        if self.dialogo_show and not self.finito_dialogo:
+            self.mywrite()
+
+
 #-------------------------------------------------------------------------------
 class App_gum(Engine):
-
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
-                            coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True):
-
+                            coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True,\
+                            discorso_iniziale=None):
+       
         self.nuova_mappa_caricare=True
         self.fringe_i=1
         xml = open('animazioni\\prova.xml', 'r').read()
@@ -331,16 +345,12 @@ class App_gum(Engine):
         self.raccolti=[]
         #dialogo_btn=False
         self.beast_sprite_group=pygame.sprite.Group()
-        
-        
         #necessario per resettare la condizione messa dalla libreria PGU
         pygame.key.set_repeat()
-        
         x = 20
         y = 80
         #import os
         os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)    
-        
         
         resolution = Vec2d(resolution)
         self.mappa_dirfile=dir+mappa
@@ -395,6 +405,7 @@ class App_gum(Engine):
         self.eventi=pygame.sprite.Group()
         #self.lista_beast=[]
         self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
+        self.direzione_avatar='front'
         Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         self.State=State
         for O in self.prima_lista_ogg:
@@ -428,7 +439,6 @@ class App_gum(Engine):
                             #beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
                         beast.motore=self
                         
-            
             if O.type=="animato":
                 #animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
                 #for p in O.properties:
@@ -460,8 +470,6 @@ class App_gum(Engine):
                 self.lista_beast[beast.id]=beast
                 self.avatar_group.add(beast)
 
-
-        
         #miovar_dump(self.eventi.sprites()[0].rect)
         #exit()
         ## Insert avatar into the Fringe layer.
@@ -505,6 +513,11 @@ class App_gum(Engine):
         self.mag=Magazzino(self)
         self.app_salvata=None
         self.blockedkeys=False
+        print discorso_iniziale
+        #exit()
+        if discorso_iniziale:
+            self.dialogogioco=Dialogo_gioco(self,lista_messaggi=discorso_iniziale)
+            self.dialogogioco.dialogo_show=True
     #------------------------------------------------------------------ 
     
   
@@ -589,6 +602,8 @@ class App_gum(Engine):
                 if hasattr(beast.dialogosemp,'scrivi_frase'):
                 #if callable(beast.dialogosemp.scrivi_frase):
                     beast.dialogosemp.scrivi_frase()
+        if hasattr(self,'dialogogioco'):
+            self.dialogogioco.scrivi_frase()
         #self.mag.aggiungi_magazzino()
         State.screen.flip()
     #---------------------------------------------------
@@ -662,8 +677,20 @@ class App_gum(Engine):
                                 wy = max(min(wy,rect.bottom), rect.top)
                                 camera.position = wx,wy
                                 if 'wolf' in self.lista_beast:
-                                    self.lista_beast['wolf'].x=self.avatar.hitbox.bottomleft[0]+32
-                                    self.lista_beast['wolf'].y=self.avatar.hitbox.bottomleft[1]+32
+                                    if self.direzione_avatar=='front':
+                                         incx=incy=-20
+                                    elif self.direzione_avatar=='back':
+                                        incx=+16
+                                        incy=+42
+                                    elif self.direzione_avatar=='left':
+                                        incx=+16
+                                        incy=+42
+                                    elif self.direzione_avatar=='right':
+                                        incx=-32
+                                        incy=+42
+                                    self.lista_beast['wolf'].x=self.avatar.hitbox.bottomleft[0]+incx
+                                    self.lista_beast['wolf'].y=self.avatar.hitbox.bottomleft[1]+incy
+                                    
                         else:
                                 self.nuova_mappa_caricare=True
                                 self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)
@@ -795,6 +822,7 @@ class App_gum(Engine):
             if self.corsa: 
                     self.movey += State.speed
                     self.camera.target.giocatore_animato=self.animato['front_run']
+            self.direzione_avatar='front'
         elif key == K_UP or key == K_w: 
             self.cammina=True
             self.camera.target.giocatore_animato=self.animato['back_walk']
@@ -802,6 +830,7 @@ class App_gum(Engine):
             if self.corsa:
                     self.movey += -State.speed
                     self.camera.target.giocatore_animato=self.animato['back_run']
+            self.direzione_avatar='back'
         elif key == K_RIGHT or key == K_d: 
             self.cammina=True
             self.camera.target.giocatore_animato=self.animato['right_walk']
@@ -809,6 +838,7 @@ class App_gum(Engine):
             if self.corsa: 
                     self.camera.target.giocatore_animato=self.animato['right_run']
                     self.movex += State.speed
+            self.direzione_avatar='right'
         elif key == K_LEFT or key == K_a: 
             self.cammina=True
             self.camera.target.giocatore_animato=self.animato['left_walk']
@@ -816,6 +846,7 @@ class App_gum(Engine):
             if self.corsa:
                     self.movex += -State.speed
                     self.camera.target.giocatore_animato=self.animato['left_run']
+            self.direzione_avatar='left'
         elif key==pygame.K_z:
             #print "z"
             for k,beast in self.lista_beast.iteritems():
@@ -849,10 +880,10 @@ class App_gum(Engine):
             pgu=PguApp(self)
         elif key == pygame.K_e:
             pgu=PguApp(self,inizio="inventario")
-        #elif key == pygame.K_F9:
-            #for k,beast in self.lista_beast.iteritems():
-                #print str(beast.id)+str(beast.dialogosemp.dialogo_btn)
-                #pass
+        elif key == pygame.K_F9:
+            print 'f9'
+            self.dialogogioco=Dialogo_gioco(self)
+            self.dialogogioco.dialogo_show=True
         elif key == K_g:
             State.show_grid = not State.show_grid
         elif key == K_l:
@@ -916,8 +947,8 @@ class App_gum(Engine):
     #----------------------------------------------------------------------
 #Eofclass#-----------------------------------------------------------------------------------			
 
-def miomain(debug=True):
-    oggetto=App_gum(resolution=(800,600),miodebug=debug)
+def miomain(debug=True,discorso_iniziale=None):
+    oggetto=App_gum(resolution=(800,600),miodebug=debug,discorso_iniziale=discorso_iniziale)
     icon=pygame.image.load(".\immagini\\icona2.gif")
     pygame.display.set_icon(icon)
     gummworld2.run(oggetto)
@@ -925,7 +956,15 @@ def miomain(debug=True):
         
 
 if __name__ == '__main__':
-    #import profile
-    miomain(debug=DEBUG)
+
+    discorso_iniziale=[\
+    'Sei un soldato che ha appena finito la guerra nel deserto',\
+    'il tuo villaggio e stato bruciato e raso al suolo',\
+    'tua moglie e stata decapitata, i tuoi figli sono stati presi come schiavi.',\
+    'Siete soppravisssuti solo in 20, divisi, e tu sei arrivato in questo villaggio.',\
+    'Ti ritrovi in una casa decadente. '
+    ]
+    
+    miomain(debug=DEBUG,discorso_iniziale=discorso_iniziale)
         
      

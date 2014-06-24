@@ -97,10 +97,7 @@ class Dialogosemplice():
         type_filter=pygame.MOUSEBUTTONDOWN
         e=self.moving_beast_genitore.motore.State.mioevento
         self.gestione_eventi(e)
-        
-        #for event in pygame.event.get(type_filter): # event handling loop
-            #print 'pippo'
-            #self.gestione_eventi(event)  
+
     #-----------------------------------------------------
     def scrivi_frase(self):	
         if self.dialogo_show:
@@ -108,9 +105,7 @@ class Dialogosemplice():
             self.moving_beast_genitore.motore.blockedkeys=True #qui viene bloccata la tastiera fino alla fine della sequenza messaggi
         if self.finito_dialogo:
             self.moving_beast_genitore.motore.blockedkeys=False #serve a riabilitare e disabilitare la tastiera
-            
-        if self.is_near:
-            #if self.dialogo_btn==True:
+        if self.is_near:            
             if self.dialogo_show==True:
                 if not self.finito_dialogo:
                     self.mywrite()
@@ -118,22 +113,6 @@ class Dialogosemplice():
         else:
             self.scritto=False
         
-        
-    #-----------------------------------------------------
-    """def sequenza_messaggi_new(self):
-        if self.lista_messaggi[0]=='nulla':
-            self.is_near=False
-            return
-        else:
-            if not self.sequenza_partita:
-                #self.testo=beast.dic_storia['messaggio'][0]
-                self.seq=MessageTimerClass(self.lista_messaggi,self)
-                self.seq.daemon=True
-                self.seq.start()
-                self.sequenza_partita=True
-                self.sequenza_finita=False
-            if self.sequenza_finita:
-                self.sequenza_partita=False"""
     
     #-----------------------------------------------------
     def sequenza_messaggi_noth(self):

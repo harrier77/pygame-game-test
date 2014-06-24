@@ -209,6 +209,7 @@ class AnimatoSegue(MovingBeast):
         self.in_uscita=False
         self.cliccato=False
         self.draw_fotogramma=True
+        self.direzione="inizio"
     
     def passi(self,or_pos=(300,200),target_pos=(200,200)):
         distanza=int(geometry.distance(or_pos,target_pos))
@@ -221,8 +222,21 @@ class AnimatoSegue(MovingBeast):
     #----------------------------------------
     def aggiorna_pos_da_seguire(self):
         pos_partenza=self.x,self.y
-        pos_arrivo_x=self.motore.avatar.hitbox.bottomleft[0]+32
-        pos_arrivo_y=self.motore.avatar.hitbox.bottomleft[1]+32
+        incx=incy=0
+        if self.motore.direzione_avatar=='front':
+            incx=incy=-20
+        elif self.motore.direzione_avatar=='back':
+            incx=+16
+            incy=+42
+        elif self.motore.direzione_avatar=='left':
+            incx=+16
+            incy=+42
+        elif self.motore.direzione_avatar=='right':
+            incx=-32
+            incy=+42
+            
+        pos_arrivo_x=self.motore.avatar.hitbox.bottomleft[0]+incx
+        pos_arrivo_y=self.motore.avatar.hitbox.bottomleft[1]+incy
         pos_da_raggiungere=pos_arrivo_x,pos_arrivo_y
         self.lista_destinazioni=[pos_partenza,pos_da_raggiungere]
         self.listap=self.passi(pos_partenza,pos_da_raggiungere)  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
