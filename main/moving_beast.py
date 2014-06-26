@@ -26,6 +26,28 @@ import glob
 
 #evento_timer = USEREVENT
 
+#-----------------------------------------
+# converts a state 
+# (for example "collission detected")
+# into an event 
+#----------------------------------------
+class StateToEvent():
+    def __init__(self,id):
+        self.id=id
+        self.stack=['False']
+    def check_state(self,state):
+        if state<>self.stack[0]:
+            self.stack.insert(0,state)
+            ultimo=len(self.stack)-1
+            self.stack.pop(ultimo)
+            return self.toggle_ev(self.stack[0])
+    def toggle_ev(self,stato):
+        if stato:
+            mioev=True
+        else:
+            mioev=False
+        return mioev
+#----------------------------------------
 
 
 #ClassDialogoSemplice
@@ -66,6 +88,9 @@ class Dialogosemplice():
         pygame.mixer.init()
         self.suono=pygame.mixer.Sound('immagini/message.wav')
         #self.seq=MessageTimerClass(self.lista_messaggi,self)
+        self.st_to_e1=StateToEvent(moving_beast_genitore.id)
+        self.st_to_e2=StateToEvent(moving_beast_genitore.id)
+        
     
     """
     def disegna_crocetta(self):
@@ -100,16 +125,19 @@ class Dialogosemplice():
 
     #-----------------------------------------------------
     def scrivi_frase(self):	
-        if self.dialogo_show:
-            #print self.dialogo_show,self.moving_beast_genitore.motore.blockedkeys
+        
+        #if self.dialogo_show:
+        if self.st_to_e1.check_state(self.dialogo_show):
             self.moving_beast_genitore.motore.blockedkeys=True #qui viene bloccata la tastiera fino alla fine della sequenza messaggi
-        if self.finito_dialogo:
-            self.moving_beast_genitore.motore.blockedkeys=False #serve a riabilitare e disabilitare la tastiera
+        elif self.st_to_e2.check_state(self.finito_dialogo):
+            self.moving_beast_genitore.motore.blockedkeys=False #serve a riabilitare  la tastiera
+        #il problema è che la tastiere è unica e sta sul motore e le variabili di tutti i dialoghi vengono controllate ogni volta e ce nè sempre un'altra che sblocca la tastiera
+        #serve verificare se è entrato o uscito dalla collisione,  Ma anche se si fa, non esce più perché è bloccato, serve comunque una seconda variabile self.finito_dialogo che metta fine al blocco
+        
         if self.is_near:            
             if self.dialogo_show==True:
                 if not self.finito_dialogo:
                     self.mywrite()
-                    pass
         else:
             self.scritto=False
         
@@ -124,7 +152,7 @@ class Dialogosemplice():
             self.testo=self.lista_messaggi[self.idx_mess]
             #if self.sequenza_finita:
             #    self.sequenza_partita=False
-    
+     #-----------------------------------------------------
     def disegna_triangolo(self):
         x=self.background_txt.get_width()-self.triangle.get_width()-10
         y=self.background_txt.get_height()-self.triangle.get_height()-10
@@ -141,6 +169,7 @@ class Dialogosemplice():
             self.moving_beast_genitore.staifermo=False
             self.moving_beast_genitore.fermato=False
             self.finito_dialogo=True
+            self.dialogo_show=False
         else:
             self.conta_click=self.conta_click+1
             self.idx_mess=self.conta_click
@@ -155,11 +184,7 @@ class Dialogosemplice():
             if event.type==pygame.MOUSEBUTTONDOWN and event.button == 3:
                 self.incrementa_idx_mess()
                 self.moving_beast_genitore.motore.State.mioevento=None
-                #self.suono.play()
-                #pos=pygame.mouse.get_pos()
-                #if self.crossrect.collidepoint(pos):
-                #    self.close_clicked=True
-                #    self.open=False
+
 #FineCLasse
 
 #inizio classe
@@ -169,7 +194,8 @@ class Beast2():
         
         self.motore=None
         #anim_file_name=dir_name
-        variable_path_name=dir_name+"/"
+        variable_path_name=dir_name
+        self.animatlabel=variable_path_name
         self.front_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'front_walk.001.png')
         self.back_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'back_walk.001.png')
         self.left_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'left_walk.001.png')
@@ -268,265 +294,289 @@ class Pseudo_async_timer():
 
 #Inizio Classe               
 class MovingBeast(model.Object):
-        #--------------------------------------------------------------------------------
-        def __init__(self,animato=None,parlante=True):
-            self.debug=False
-            self.miotimer=None
-            self.segmento=0
-            self.dic_storia={'messaggio':'...'}
-            self.messaggio_dato=False
-            self.fermato=False
-            self.staifermo=False
-            self.giacambiato=False
-            self.orientamento="vuoto"
-            self.motore=None
-            self.attendi_evento=False
-            self.vai_incontro=False
-            self.rendez_vous_punto=(200,200)
-            self.in_uscita=False
-            self.finito_evento=False
-            self.contatore_destinazioni=0
-            self.listap=[]
-            self.auto=True
-            self.lanciato=False
-            self.inpausa=False
-            model.Object.__init__(self)
-            self.miosprite=pygame.sprite.Sprite()
-            dir_name=animato['dir']
-            
-            self.miocing=Beast2(dir_name=dir_name+"/cammina/",duration=0.1)
-            
-            dir_name_fermo='animazioni/animation/'+dir_name+'/fermo/'
-            if os.path.exists(dir_name_fermo):
-                self.miocingfermo=Beast2(dir_name=dir_name+"/fermo/",duration=0.1)
-                self.miocingfermo.moveConductor.play()
-            
-            dir_name_dying='animazioni/animation/'+dir_name+'/muore/'
-            if os.path.exists(dir_name_dying):
-                self.miocingdying=Beast2(dir_name=dir_name+"/muore/",duration=0.3)
-                self.miocingdying.moveConductor.play()
-            
-            
-            self.id=animato['id']
-            #exclpng=pygame.image.load('immagini/exclam1.png').convert_alpha()
-            #self.exclamation=pygame.transform.scale(exclpng,(50,38))
-            #self.exclamation=exclpng
-            self.x=animato['pos'][0]
-            self.y=animato['pos'][1]
-            position=animato['pos']
-            self.posizione_iniziale_animato=position
-            points = animato['points']
-            if points:
-                self.lista_destinazioni=self.calcola_points(points,position)
-                self.x=self.lista_destinazioni[0][0]
-                self.y=self.lista_destinazioni[0][1]
-            else:
-                self.lista_destinazioni=self.comp_lista_destinazioni(self.x,self.y)
-            #self.fotogramma=self.miocing.left_standing
-            self.miocing.moveConductor.play()
-            self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
-            if 'durata_pausa' in animato:
-                self.durata_pausa=int(animato['durata_pausa'])
-            else:
-                self.durata_pausa=1
-            if 'attendi_evento' in animato:
-                self.attendi_evento=animato['attendi_evento']
-            if 'vai_incontro' in animato:
-                self.vai_incontro=animato['vai_incontro']
-            if parlante:self.dialogosemp=Dialogosemplice(self)
-            
-            
-        #--------------------------------------------------------------------------------
-        def calcola_points(self,points,position):
-            real_points=[]
-            for singlepos in points:
-                newx=position[0]+singlepos[0]
-                newy=position[1]+singlepos[1]
-                couple=(newx,newy)
-                real_points.append(couple)
-            return real_points
+    #--------------------------------------------------------------------------------
+    def __init__(self,animato=None,parlante=True):
+        self.debug=False
+        self.miotimer=None
+        self.segmento=0
+        self.dic_storia={'messaggio':'...'}
+        self.messaggio_dato=False
+        self.fermato=False
+        self.staifermo=False
+        self.giacambiato=False
+        self.orientamento="vuoto"
+        self.motore=None
+        self.attendi_evento=False
+        self.vai_incontro=False
+        self.rendez_vous_punto=(200,200)
+        self.in_uscita=False
+        self.finito_evento=False
+        self.contatore_destinazioni=0
+        self.listap=[]
+        self.auto=True
+        self.lanciato=False
+        self.inpausa=False
+        model.Object.__init__(self)
+        self.miosprite=pygame.sprite.Sprite()
+        dir_name=animato['dir']
+        self.sottotipo=animato['sottotipo']
+        
+        self.miocing=Beast2(dir_name=dir_name+"/cammina/",duration=0.1)
+        
+        dir_name_fermo='animazioni/animation/'+dir_name+'/fermo/'
+        if os.path.exists(dir_name_fermo):
+            self.miocingfermo=Beast2(dir_name=dir_name+"/fermo/",duration=0.1)
+            self.miocingfermo.moveConductor.play()
+        
+        dir_name_dying='animazioni/animation/'+dir_name+'/muore/'
+        if os.path.exists(dir_name_dying):
+            self.miocingdying=Beast2(dir_name=dir_name+"/muore/",duration=0.3)
+            self.miocingdying.moveConductor.play()
+        dir_name_attacca='animazioni/animation/'+dir_name+'/attacca/'
+        if os.path.exists(dir_name_attacca):
+            self.miocingattacca=Beast2(dir_name=dir_name+"/attacca/",duration=0.1)
+            self.miocingattacca.moveConductor.play()
+        
+        
+        self.id=animato['id']
+        #exclpng=pygame.image.load('immagini/exclam1.png').convert_alpha()
+        #self.exclamation=pygame.transform.scale(exclpng,(50,38))
+        #self.exclamation=exclpng
+        self.x=animato['pos'][0]
+        self.y=animato['pos'][1]
+        position=animato['pos']
+        self.posizione_iniziale_animato=position
+        points = animato['points']
+        if points:
+            self.lista_destinazioni=self.calcola_points(points,position)
+            self.x=self.lista_destinazioni[0][0]
+            self.y=self.lista_destinazioni[0][1]
+        else:
+            self.lista_destinazioni=self.comp_lista_destinazioni(self.x,self.y)
+        #self.fotogramma=self.miocing.left_standing
+        self.miocing.moveConductor.play()
+        self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
+        self.morto=False
+        if 'durata_pausa' in animato:
+            self.durata_pausa=int(animato['durata_pausa'])
+        else:
+            self.durata_pausa=1
+        if 'attendi_evento' in animato:
+            self.attendi_evento=animato['attendi_evento']
+        if 'vai_incontro' in animato:
+            self.vai_incontro=animato['vai_incontro']
+        if parlante:self.dialogosemp=Dialogosemplice(self)
+        
+        
+    #--------------------------------------------------------------------------------
+    def calcola_points(self,points,position):
+        real_points=[]
+        for singlepos in points:
+            newx=position[0]+singlepos[0]
+            newy=position[1]+singlepos[1]
+            couple=(newx,newy)
+            real_points.append(couple)
+        return real_points
+    
+    #-------------------------------------------------------------------------
+    def passi(self,or_pos=(300,200),target_pos=(200,200)):
+        distanza=int(geometry.distance(or_pos,target_pos))
+        lista_posizioni=[]
+        for progress_distance in range(1,distanza):  
+                p= geometry.step_toward_point(or_pos, target_pos, progress_distance)
+                lista_posizioni.append(p)
+        return lista_posizioni
+    
+    
+    #--------------------------------------------------------------------------------
+    def comp_lista_destinazioni(self,x,y):
+        lista_destinazioni=[]
+        x=x-50
+        y=y
+        lista_destinazioni.append((x,y))
+        y=y+50
+        lista_destinazioni.append((x,y))
+        x=x+150
+        lista_destinazioni.append((x,y))
+        x=x-100
+        y=y-100
+        lista_destinazioni.append((x,y))
+        return lista_destinazioni
+    
+    #--------------------------------------------------------------------------------
+    def calcola_direzione(self,pos,mousepos):
+        angolo= geometry.angle_of(pos,mousepos)
+        ore=(angolo*100/360)*12
+        if ore>100 and ore<200:
+                direzione='NE'
+        elif ore>400 and ore<500:
+                direzione='SE'
+        elif ore>700 and ore<800:
+                direzione='SW'
+        elif ore>1000 and ore<1150:
+                direzione='NW'
+        elif ore>1150 or ore<100:
+                direzione='back'
+        elif ore>500 and ore<700:
+                direzione='front'
+        elif ore>200 and ore<400:
+                direzione='right'
+        elif ore>800 and ore<1000:
+                direzione='left'
+        distanza=geometry.distance(pos,mousepos)
+        #if  distanza>55:
+            #print distanza
+        return direzione
+    
+    #--------------------------------------------------------------------------------
+    @property
+    def is_walking(self):
+        if len(self.listap)>0:
+            return True
+        else:
+            return False
+    
+    @property
+    def is_p_in_listap(self):
+        return self.is_walking
+        
+    #--------------------------------------------------------------------------------
+    @property
+    def sprite_fotogramma(self):
+        fotog_sprite=self.miosprite
+        #if self.fotogramma is not None:
+        fotog_sprite.image=self.fotogramma
+        fotog_sprite.rect=self.fotogramma.get_rect()
+        fotog_sprite.rect.x=self.x-fotog_sprite.rect.width/2
+        fotog_sprite.rect.y=self.y-fotog_sprite.rect.height
+        return fotog_sprite
+    
+    @property
+    def sprite_fotogrammanew(self):
+        #fotog_sprite=pygame.sprite.Sprite()
+        #fotog_sprite=self.miosprite
+        self.miosprite.image=self.fotogramma
+        self.miosprite.rect=self.fotogramma.get_rect()
+        self.miosprite.rect.x=self.x-self.miosprite.rect.width/2
+        self.miosprite.rect.y=self.y-self.miosprite.rect.height
+        self.miosprite.id=self.id
+        return self.miosprite
 
-        #--------------------------------------------------------------------------------
-        def comp_lista_destinazioni(self,x,y):
-            lista_destinazioni=[]
-            x=x-50
-            y=y
-            lista_destinazioni.append((x,y))
-            y=y+50
-            lista_destinazioni.append((x,y))
-            x=x+150
-            lista_destinazioni.append((x,y))
-            x=x-100
-            y=y-100
-            lista_destinazioni.append((x,y))
-            return lista_destinazioni
-        
-        #--------------------------------------------------------------------------------
-        def calcola_direzione(self,pos,mousepos):
-            angolo= geometry.angle_of(pos,mousepos)
-            ore=(angolo*100/360)*12
-            if ore>50 and ore<200:
-                    direzione='NE'
-            elif ore>400 and ore<500:
-                    direzione='SE'
-            elif ore>700 and ore<800:
-                    direzione='SW'
-            elif ore>950 and ore<1150:
-                    direzione='NW'
-            elif ore>1150 or ore<50:
-                    direzione='back'
-            elif ore>500 and ore<700:
-                    direzione='front'
-            elif ore>200 and ore<400:
-                    direzione='right'
-            elif ore>800 and ore<1000:
-                    direzione='left'
-            return direzione
-        
-        #--------------------------------------------------------------------------------
-        @property
-        def is_walking(self):
-            if len(self.listap)>0:
-                return True
-            else:
-                return False
-        
-        @property
-        def is_p_in_listap(self):
-            return self.is_walking
-            
-        #--------------------------------------------------------------------------------
-        @property
-        def sprite_fotogramma(self):
-            fotog_sprite=self.miosprite
-            #if self.fotogramma is not None:
-            fotog_sprite.image=self.fotogramma
-            fotog_sprite.rect=self.fotogramma.get_rect()
-            fotog_sprite.rect.x=self.x-fotog_sprite.rect.width/2
-            fotog_sprite.rect.y=self.y-fotog_sprite.rect.height
-            return fotog_sprite
-        
-        @property
-        def sprite_fotogrammanew(self):
-            #fotog_sprite=pygame.sprite.Sprite()
-            #fotog_sprite=self.miosprite
-            self.miosprite.image=self.fotogramma
-            self.miosprite.rect=self.fotogramma.get_rect()
-            self.miosprite.rect.x=self.x-self.miosprite.rect.width/2
-            self.miosprite.rect.y=self.y-self.miosprite.rect.height
-            self.miosprite.id=self.id
-            return self.miosprite
+    #--------------------------------------------------------------------------------
+    @property
+    def rect(self):
+        rect=self.sprite_fotogramma.rect
+        return rect
+    #--------------------------------------------------------------------------------
+    @property
+    def image(self):
+        image=self.fotogramma
+        return image
+    #--------------------------------------------------------------------------------
+    @property
+    def talk_box(self):
+        talk_box=self.rect
+        if self.rect.height<100: talk_box.height=self.rect.height+10
+        else:talk_box.height=self.rect.height
+        if talk_box.width<100:talk_box.width=self.rect.width+10
+        else: talk_box.width=self.rect.width
+        y = self.rect.y
+        x= self.rect.x
+        talk_box.y=y
+        talk_box.x=x
+        return talk_box
+    #--------------------------------------------------------------------------------
+    @property
+    def beast_hit_box(self):
+        beast_hit_box=self.rect.copy()
+        beast_hit_box.height=20
+        beast_hit_box.width=30
+        beast_hit_box.x=beast_hit_box.x+beast_hit_box.width/2
+        beast_hit_box.y=beast_hit_box.y+beast_hit_box.height
+        return beast_hit_box
+    
+    #--------------------------------------------------------------------------------
+    def mostra_esclamazione(self):
+        cx,cy=self.motore.State.camera.rect.topleft
+        self.motore.State.screen.blit(self.exclamation,(self.rect.x-cx+3,self.rect.y-cy-25))
+    #--------------------------------------------------------------------------------
+    @property
+    def is_persona_collide(self):
+        newsprite=self.motore.avatar.sprite
+        hits=self.beast_hit_box.colliderect(newsprite.rect)
+        #hits=pygame.sprite.collide_rect(newsprite, self.sprite_fotogramma)
+        if hits:
+            #self.mostra_esclamazione()
+            #self.dialogosemp.dialogo_btn=True
+            self.dialogosemp.dialogo_show=True
+            self.dialogosemp.idx_mess=0
+            return True
+        else:
+            return False
 
-        #--------------------------------------------------------------------------------
-        @property
-        def rect(self):
-            rect=self.sprite_fotogramma.rect
-            return rect
-        #--------------------------------------------------------------------------------
-        @property
-        def image(self):
-            image=self.fotogramma
-            return image
-        #--------------------------------------------------------------------------------
-        @property
-        def talk_box(self):
-            talk_box=self.rect
-            if self.rect.height<100: talk_box.height=self.rect.height+10
-            else:talk_box.height=self.rect.height
-            if talk_box.width<100:talk_box.width=self.rect.width+10
-            else: talk_box.width=self.rect.width
-            y = self.rect.y
-            x= self.rect.x
-            talk_box.y=y
-            talk_box.x=x
-            return talk_box
-        #--------------------------------------------------------------------------------
-        @property
-        def beast_hit_box(self):
-            beast_hit_box=self.rect.copy()
-            beast_hit_box.height=20
-            beast_hit_box.width=30
-            beast_hit_box.x=beast_hit_box.x+beast_hit_box.width/2
-            beast_hit_box.y=beast_hit_box.y+beast_hit_box.height
-            return beast_hit_box
-        
-        #--------------------------------------------------------------------------------
-        def mostra_esclamazione(self):
-            cx,cy=self.motore.State.camera.rect.topleft
-            self.motore.State.screen.blit(self.exclamation,(self.rect.x-cx+3,self.rect.y-cy-25))
-        #--------------------------------------------------------------------------------
-        @property
-        def is_persona_collide(self):
-            newsprite=self.motore.avatar.sprite
-            hits=self.beast_hit_box.colliderect(newsprite.rect)
-            #hits=pygame.sprite.collide_rect(newsprite, self.sprite_fotogramma)
-            if hits:
-                #self.mostra_esclamazione()
-                #self.dialogosemp.dialogo_btn=True
-                self.dialogosemp.dialogo_show=True
-                self.dialogosemp.idx_mess=0
-                return True
-            else:
-                return False
-  
-        #--------------------------------------------------------------------------------
-        def mio_timer_pausa(self):
-            adesso= datetime.datetime.time(datetime.datetime.now())
-            if self.debug:print "timer per la pausa del oggetto partito "+str(adesso)
-            self.lanciato=True
-            self.inpausa=True
-            self.auto=False  ##con auto=false il ciclo di muovi_cinghiale() non gira
-            fun_callback=self.fine_pausa
-            self.miotimer=Pseudo_async_timer(self.durata_pausa,fun_callback,1) #crea l'ggetto timer con la pausa presa dai par di MovingBeast()
-            #print "segmento completato n. "+str(self.segmento)
-            self.segmento=self.segmento+1
-        
-        #--------------------------------------------------------------------------------        
-        def fine_pausa(self): ##questa procedura si avvia ogni n secondi e fa muovere il cinghiale e poi fermarsi
-            self.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale() quindi è finita la pausa
-            self.lanciato=False
-            self.inpausa=False
-            adesso= datetime.datetime.time(datetime.datetime.now())
-            if self.debug:print "finita pausa del oggetto "+str(adesso)
-            self.miotimer=None
-        
-        #--------------------------------------------------------------------------------
-        def scegli_fotogramma_animazione(self,miocing,direzione):
-            self.direzione=direzione
-            if len(self.listap)>0:  ##inizia la camminata
-                if not self.staifermo:
-                    #qui vengono impostati x e y del fotogramma da proiettare prendendoli dalla lista della camminata self.listap
-                    pos= self.listap.pop(0)
-                    self.x,self.y=pos #qui vengono impostati x e y del fotogramma da proiettare sullo schermo prendendoli dalla lista della camminata self.listap
-                    #fine impostazione ---------------------------------------------------------------------------------------------------
-                    """if self.vai_incontro:
-                            if self.motore:
-                                    self.lista_destinazioni=[self.lista_destinazioni[0],(self.motore.avatar.hitbox.bottomleft[0],self.motore.avatar.hitbox.bottomleft[1])]"""
-                            #endifclause
-                    #endifclause
-                #end_if_clause
-                
-                #miocing.moveConductor.play()
-                #di seguito viene selezionata l'iimmagine a seconda della direzione della camminata; x e y sono già stati impostati
-                if direzione=='left':
-                    self.fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()
-                elif direzione=='front':
-                    self.fotogramma=miocing.animObjs['front_walk'].ritorna_fotogramma()
-                elif direzione=='right':
-                    self.fotogramma=miocing.animObjs['right_walk'].ritorna_fotogramma()
-                elif direzione=='back':
-                    self.fotogramma=miocing.animObjs['back_walk'].ritorna_fotogramma()
-                elif direzione=='SW':
-                    self.fotogramma=miocing.animObjs['SW'].ritorna_fotogramma()
-                elif direzione=='NW':
-                    self.fotogramma=miocing.animObjs['NW'].ritorna_fotogramma()
-                elif direzione=='SE':
-                    self.fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
-                elif direzione=='NE':
-                    self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
-            #endifclause
-        #-------------------------------------------------------------------------
-        #EndofClass
+    #--------------------------------------------------------------------------------
+    def mio_timer_pausa(self):
+        adesso= datetime.datetime.time(datetime.datetime.now())
+        if self.debug:print "timer per la pausa del oggetto partito "+str(adesso)
+        self.lanciato=True
+        self.inpausa=True
+        self.auto=False  ##con auto=false il ciclo di muovi_cinghiale() non gira
+        fun_callback=self.fine_pausa
+        self.miotimer=Pseudo_async_timer(self.durata_pausa,fun_callback,1) #crea l'ggetto timer con la pausa presa dai par di MovingBeast()
+        #print "segmento completato n. "+str(self.segmento)
+        self.segmento=self.segmento+1
+    
+    #--------------------------------------------------------------------------------        
+    def fine_pausa(self): ##questa procedura si avvia ogni n secondi e fa muovere il cinghiale e poi fermarsi
+        self.auto=True  ##con auto=True può girare il ciclo in muovi_cinghiale() quindi è finita la pausa
+        self.lanciato=False
+        self.inpausa=False
+        adesso= datetime.datetime.time(datetime.datetime.now())
+        if self.debug:print "finita pausa del oggetto "+str(adesso)
+        self.miotimer=None
+    
+    #--------------------------------------------------------------------------------
+    def scegli_fotogramma_animazione(self,miocing,direzione):
+        self.direzione=direzione
+        if len(self.listap)>0:  ##inizia la camminata
+            if not self.staifermo:
+                #qui vengono impostati x e y del fotogramma da proiettare prendendoli dalla lista della camminata self.listap
+                pos= self.listap.pop(0)
+                self.x,self.y=pos #qui vengono impostati x e y del fotogramma da proiettare sullo schermo prendendoli dalla lista della camminata self.listap
+                #fine impostazione ---------------------------------------------------------------------------------------------------
+                """if self.vai_incontro:
+                        if self.motore:
+                                self.lista_destinazioni=[self.lista_destinazioni[0],(self.motore.avatar.hitbox.bottomleft[0],self.motore.avatar.hitbox.bottomleft[1])]"""
+                        #endifclause
+                #endifclause
+            #end_if_clause
+            
+            #miocing.moveConductor.play()
+            #di seguito viene selezionata l'iimmagine a seconda della direzione della camminata; x e y sono già stati impostati
+            if direzione=='left':
+                self.fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()
+            elif direzione=='front':
+                self.fotogramma=miocing.animObjs['front_walk'].ritorna_fotogramma()
+            elif direzione=='right':
+                self.fotogramma=miocing.animObjs['right_walk'].ritorna_fotogramma()
+            elif direzione=='back':
+                self.fotogramma=miocing.animObjs['back_walk'].ritorna_fotogramma()
+            elif direzione=='SW':
+                self.fotogramma=miocing.animObjs['SW'].ritorna_fotogramma()
+            elif direzione=='NW':
+                self.fotogramma=miocing.animObjs['NW'].ritorna_fotogramma()
+            elif direzione=='SE':
+                self.fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
+            elif direzione=='NE':
+                self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
+        #endifclause
+    
+    #-------------------------------------------------------------------------
+    def fallo_parlare(self):
+        return True
+    #-------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
+    #EndofClass
         
         
         

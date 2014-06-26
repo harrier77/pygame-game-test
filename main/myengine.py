@@ -21,7 +21,8 @@ from miovardump import miovar_dump
 
 from moving_beast import calcola_passi,MovingBeast,Dialogosemplice
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
-from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo,AnimatoSegue
+from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
+from moving_animato import AnimatoSegue,AnimatoAttacca,AnimatoCambiaTipo
 #from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
@@ -38,7 +39,8 @@ except:
     except:
         #print 'cambio dir a '+os.getcwd()
         os.chdir('..\\') 
-        
+
+
 #-------------------------------------------------------------------------------
 class PguApp():
     def __init__(self,motore_genitore,inizio='menu'):
@@ -68,8 +70,11 @@ class PguApp():
                         elif event.type == pygame.USEREVENT:
                                 continue
                         elif event.type == pygame.KEYDOWN:
+                                if event.key == pygame.K_e:
+                                        self.mioloop = False
                                 if event.key == pygame.K_ESCAPE:
                                         self.mioloop = False
+                                        
                         self.app.event(event)
                         self.app.paint()
                         pygame.display.flip()
@@ -89,16 +94,26 @@ class PguApp():
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
 
-        
+    def scarica(self,id_cosa_raccolta,i,tab_riga,eti,immagine):
+        if id_cosa_raccolta in self.motore.lista_beast:
+            self.motore.lista_beast[id_cosa_raccolta].segui=False
+            del self.motore.raccolti[i]
+        else:
+            del self.motore.raccolti[i]
+        print self.motore.raccolti
+        self.tabella.remove(tab_riga)
+        self.tabella.remove(eti)
+        self.tabella.remove(immagine)
     
     def inventario(self):
         #miovar_dump(self.tabella.resize)
         self.tabella.clear()
         self.tabella.tr()
-        etichetta=gui.Label("Inventario oggetti raccolti")
+        etichetta=gui.Label("Inventario oggetti raccolti:")
+
         
         self.tabella.td(etichetta,colspan=2)
-        for cosa in self.motore.raccolti:
+        for i,cosa in enumerate(self.motore.raccolti):
                 eti=gui.Label(cosa[0]['nome'])
                 #eti.style.border_bottom=1
                 immagine=gui.Image(cosa[1].image)
@@ -106,6 +121,12 @@ class PguApp():
                 self.tabella.tr()
                 self.tabella.td(eti)
                 self.tabella.td(immagine)
+                font = pygame.font.SysFont("Tahoma", 12)
+                L=gui.Link(value='Scarica',font=font)
+                
+                L.connect(gui.CLICK,self.scarica,cosa[0]['nome'],i,L,eti,immagine)
+                self.tabella.td(L)
+                
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*10
         #print self.tabella
@@ -148,8 +169,6 @@ class Proiettile(model.Object):
         #freccia=pygame.transform.scale(freccia,(72,72))
         pygame.mixer.init()
         #self.suono=pygame.mixer.Sound('suoni/message.wav')
-        self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
-        self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito.wav')
         self.motore=motore
         self.rect=self.image.get_rect()
         #self.rect=self.motore.avatar.rect.copy()
@@ -190,14 +209,15 @@ class Proiettile(model.Object):
             
             if hits:
                 ogg_colpito=self.motore.lista_beast[hits[0].id]
-                if ogg_colpito.id<>'wolf':
-                    if hasattr(ogg_colpito,'miocingdying'):
-                        ogg_colpito.fallo_morire()
-                        self.suono_colpito.play()
-                    else:
-                        self.suono_noncolpito.play()
+                
+                if ogg_colpito.id<>'Wolf':
+                    #if hasattr(ogg_colpito,'miocingdying'):
+                    if hasattr(ogg_colpito,'evento_colpito'):
+                        ogg_colpito.evento_colpito()
                     self.colpito=True
                     self.motore.avatar_group.objects.remove(self)
+                if self.motore.lista_beast[hits[0].id].sottotipo=='attaccante':
+                    self.motore.lista_beast[hits[0].id].vaiattacca=True
             hitsover=pygame.sprite.spritecollide(self.sprite,self.motore.over_group,False)
             if hitsover:
                 if hitsover[0].img_idx in self.motore.dict_gid_to_properties:
@@ -206,7 +226,7 @@ class Proiettile(model.Object):
                 else:
                         #print hitsover[0].img_idx
                         pass
-                self.suono_colpito.play()
+                self.motore.suono_colpito.play()
                 self.motore.avatar_group.objects.remove(self)
             #con coefficiente angolare
             #self.rect.x=self.rect.x+4
@@ -221,120 +241,103 @@ class Proiettile(model.Object):
 
 #-------------------------------------------------------------------------------
 class Miohero(model.Object):
+    #------------------------------------
+    def __init__(self,map_pos,screen_pos,parentob,dormi=True):
+        model.Object.__init__(self)
+        # load the "standing" sprites (these are single images, not animations)
+        self.sit_standing=pygame.image.load('animazioni/gameimages/crono_sleep.000.gif')
+        self.front_standing = pygame.image.load('animazioni/gameimages/crono_front.gif')
+        self.back_standing = pygame.image.load('animazioni/gameimages/crono_back.gif')
+        self.left_standing = pygame.image.load('animazioni/gameimages/crono_left.gif')
+        self.right_standing = pygame.transform.flip(self.left_standing, True, False)
 
-        #------------------------------------
-        def __init__(self,map_pos,screen_pos,parentob,dormi=True):
-            model.Object.__init__(self)
-            # load the "standing" sprites (these are single images, not animations)
-            self.sit_standing=pygame.image.load('animazioni/gameimages/crono_sleep.000.gif')
-            self.front_standing = pygame.image.load('animazioni/gameimages/crono_front.gif')
-            self.back_standing = pygame.image.load('animazioni/gameimages/crono_back.gif')
-            self.left_standing = pygame.image.load('animazioni/gameimages/crono_left.gif')
-            self.right_standing = pygame.transform.flip(self.left_standing, True, False)
-
-            self.standing_scelta=self.sit_standing
-            self.div_scala=1.8
-            self.miosprite=pygame.sprite.Sprite()
-            self.parent=parentob
-            self.dormi=dormi
-            self.animated_object=self.crea_giocatore_animato()
-            self.giocatore_animato=self.animated_object['front_walk']
-            #self.image= self.giocatore_animato.ritorna_fotogramma()
-            self.rect=self.image.get_rect()
-            #self.hitbox = self.rect
-            self.herosprite=pygame.sprite.Sprite()
-            self.herosprite.image=self.image
-            self.herosprite.rect=self.rect
-            self.position = map_pos
-            self.screen_position = screen_pos
+        self.standing_scelta=self.sit_standing
+        self.div_scala=1.8
+        self.miosprite=pygame.sprite.Sprite()
+        self.parent=parentob
+        self.dormi=dormi
+        self.animated_object=self.crea_giocatore_animato()
+        self.giocatore_animato=self.animated_object['front_walk']
+        #self.image= self.giocatore_animato.ritorna_fotogramma()
+        self.rect=self.image.get_rect()
+        #self.hitbox = self.rect
+        self.herosprite=pygame.sprite.Sprite()
+        self.herosprite.image=self.image
+        self.herosprite.rect=self.rect
+        self.position = map_pos
+        self.screen_position = screen_pos
+            
+    #------------------------------------       
+    def crea_giocatore_animato(self):
+        #playerWidth, playerHeight = self.front_standing.get_size()
+        # creating the PygAnimation objects for walking/running in all directions
+        animTypes = 'back_run back_walk front_run front_walk left_run left_walk'.split()
+        animObjs = {}
+        for animType in animTypes:
+            imagesAndDurations = [('animazioni/gameimages/crono_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
+            animObjs[animType] = pyganim.PygAnimation(imagesAndDurations)
+        
+        imagesAndDurations = [('animazioni/gameimages/crono_sleep.000.gif',1),('animazioni/gameimages/crono_sleep.001.gif',1)]
+        animObjs['sleep']=pyganim.PygAnimation(imagesAndDurations)
+        
+        for id in animObjs:
+                dim_meta=(int(animObjs[id].getRect().width/self.div_scala),int(animObjs[id].getRect().height/self.div_scala))
+                animObjs[id].scale(dim_meta)
                 
-        #------------------------------------       
-        def crea_giocatore_animato(self):
-            #playerWidth, playerHeight = self.front_standing.get_size()
-            # creating the PygAnimation objects for walking/running in all directions
-            animTypes = 'back_run back_walk front_run front_walk left_run left_walk'.split()
-            animObjs = {}
-            for animType in animTypes:
-                imagesAndDurations = [('animazioni/gameimages/crono_%s.%s.gif' % (animType, str(num).rjust(3, '0')), 0.1) for num in range(6)]
-                animObjs[animType] = pyganim.PygAnimation(imagesAndDurations)
-            
-            imagesAndDurations = [('animazioni/gameimages/crono_sleep.000.gif',1),('animazioni/gameimages/crono_sleep.001.gif',1)]
-            animObjs['sleep']=pyganim.PygAnimation(imagesAndDurations)
-            
-            for id in animObjs:
-                    dim_meta=(int(animObjs[id].getRect().width/self.div_scala),int(animObjs[id].getRect().height/self.div_scala))
-                    animObjs[id].scale(dim_meta)
-                    
-            # create the right-facing sprites by copying and flipping the left-facing sprites
-            animObjs['right_walk'] = animObjs['left_walk'].getCopy()
-            animObjs['right_walk'].flip(True, False)
-            animObjs['right_walk'].makeTransformsPermanent()
-            animObjs['right_run'] = animObjs['left_run'].getCopy()
-            animObjs['right_run'].flip(True, False)
-            animObjs['right_run'].makeTransformsPermanent()
+        # create the right-facing sprites by copying and flipping the left-facing sprites
+        animObjs['right_walk'] = animObjs['left_walk'].getCopy()
+        animObjs['right_walk'].flip(True, False)
+        animObjs['right_walk'].makeTransformsPermanent()
+        animObjs['right_run'] = animObjs['left_run'].getCopy()
+        animObjs['right_run'].flip(True, False)
+        animObjs['right_run'].makeTransformsPermanent()
 
-            self.moveConductor = pyganim.PygConductor(animObjs)
-            self.moveConductor.play()
-            return animObjs
-        #------------------------------------
-        @property
-        def image(self):
-            if self.parent.cammina:
-                image= self.giocatore_animato.ritorna_fotogramma()
-                self.dormi=False
-            elif self.dormi:
-                self.giocatore_animato=self.animated_object['sleep']
-                image=self.giocatore_animato.ritorna_fotogramma()
-            else:
-                image=self.standing_scelta
-                dim_meta= (int(image.get_size()[0]/self.div_scala),int(image.get_size()[1]/self.div_scala))
-                image=pygame.transform.scale(image,dim_meta)
-            return image
-        #------------------------------------ 
-        @property
-        def hitbox(self):
-            hitbox=self.rect.copy()
-            hitbox.height=12
-            hitbox.width=10
-            #y = self.rect.y+(hitbox.height/2)
-            y = self.rect.y+hitbox.height/2
-            x= self.rect.x-(hitbox.width/2)
-            
-            hitbox.y=y
-            hitbox.x=x
-            #print hitbox.midbottom
-            return hitbox
+        self.moveConductor = pyganim.PygConductor(animObjs)
+        self.moveConductor.play()
+        return animObjs
+    #------------------------------------
+    @property
+    def image(self):
+        if self.parent.cammina:
+            image= self.giocatore_animato.ritorna_fotogramma()
+            self.dormi=False
+        elif self.dormi:
+            self.giocatore_animato=self.animated_object['sleep']
+            image=self.giocatore_animato.ritorna_fotogramma()
+        else:
+            image=self.standing_scelta
+            dim_meta= (int(image.get_size()[0]/self.div_scala),int(image.get_size()[1]/self.div_scala))
+            image=pygame.transform.scale(image,dim_meta)
+        return image
+    #------------------------------------ 
+    @property
+    def hitbox(self):
+        hitbox=self.rect.copy()
+        hitbox.height=12
+        hitbox.width=10
+        #y = self.rect.y+(hitbox.height/2)
+        y = self.rect.y+hitbox.height/2
+        x= self.rect.x-(hitbox.width/2)
         
-        @property
-        def sprite(self):
-            miosprite=self.miosprite
-            miosprite.image=self.image
-            miosprite.rect=self.hitbox
-            return miosprite
+        hitbox.y=y
+        hitbox.x=x
+        #print hitbox.midbottom
+        return hitbox
+    
+    @property
+    def sprite(self):
+        miosprite=self.miosprite
+        miosprite.image=self.image
+        miosprite.rect=self.hitbox
+        return miosprite
         
-        
-#FineClasse -------------------------------------------------------------------------------
-
-class Dialogo_gioco(Dialogosemplice):
-    def __init__(self,motore,lista_messaggi=['primo','secondo']):
-        moving_beast_genitore= type('moving_beast_genitore', (object,), {'motore' : motore})()
-        #moving_beast.gemotore=motore
-        Dialogosemplice.__init__(self,moving_beast_genitore)
-        self.lista_messaggi=lista_messaggi
-        self.testo=self.lista_messaggi[0]
-        self.scrivi_frase()
-    #-----------------------------------------------------
-    def scrivi_frase(self):	
-        if self.dialogo_show and not self.finito_dialogo:
-            self.mywrite()
-
-
 #-------------------------------------------------------------------------------
 class App_gum(Engine):
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                             coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True,\
                             discorso_iniziale=None):
-       
+        self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
+        self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito.wav')
         self.nuova_mappa_caricare=True
         self.fringe_i=1
         xml = open('animazioni\\prova.xml', 'r').read()
@@ -403,6 +406,7 @@ class App_gum(Engine):
         dict_animati={}
         self.warps=[]
         self.eventi=pygame.sprite.Group()
+        self.catturabili=pygame.sprite.Group()
         #self.lista_beast=[]
         self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
         self.direzione_avatar='front'
@@ -412,6 +416,7 @@ class App_gum(Engine):
             animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto",'og_rect':O.rect}
             for p in O.properties:
                 animato[p]=O.properties[p]
+                
             if O.name=="Inizio" or O.name=="inizio":
                 hero_ini_pos= O.rect.x,O.rect.y
                 self.avatar.position=hero_ini_pos
@@ -426,18 +431,16 @@ class App_gum(Engine):
                         beast=MessaggioDaEvento(animato)
                         self.lista_beast[beast.id]=beast
                         beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
-                        beast.motore=self
                     if O.properties['sottotipo']=='FaiParlare':
                         beast=FaiParlare(animato)
                         self.lista_beast[beast.id]=beast
                         beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
-                        beast.motore=self
                     if O.properties['sottotipo']=='AttivaAnimato':
                         beast=AttivaAnimato(animato)
                         self.lista_beast[beast.id]=beast
                         #if beast.id in self.dic_storia:
                             #beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
-                        beast.motore=self
+                    beast.motore=self
                         
             if O.type=="animato":
                 #animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
@@ -460,6 +463,10 @@ class App_gum(Engine):
                     beast=AnimatoSemplice(animato)
                 elif O.properties['sottotipo']=='animatosegue':
                     beast=AnimatoSegue(animato)
+                elif O.properties['sottotipo']=='attaccante':
+                    beast=AnimatoAttacca(animato)
+                elif O.properties['sottotipo']=='catturabile':
+                    beast=AnimatoCambiaTipo(animato)
 
                 self.beast_sprite_group.add(beast.sprite_fotogrammanew)
                 beast.debug=miodebug
@@ -513,11 +520,12 @@ class App_gum(Engine):
         self.mag=Magazzino(self)
         self.app_salvata=None
         self.blockedkeys=False
-        print discorso_iniziale
+
         #exit()
-        if discorso_iniziale:
-            self.dialogogioco=Dialogo_gioco(self,lista_messaggi=discorso_iniziale)
-            self.dialogogioco.dialogo_show=True
+        #discorso_iniziale=None
+        #if discorso_iniziale:
+            #self.dialogogioco=Dialogo_gioco(self,lista_messaggi=discorso_iniziale)
+            #self.dialogogioco.dialogo_show=True
     #------------------------------------------------------------------ 
     
   
@@ -602,8 +610,6 @@ class App_gum(Engine):
                 if hasattr(beast.dialogosemp,'scrivi_frase'):
                 #if callable(beast.dialogosemp.scrivi_frase):
                     beast.dialogosemp.scrivi_frase()
-        if hasattr(self,'dialogogioco'):
-            self.dialogogioco.scrivi_frase()
         #self.mag.aggiungi_magazzino()
         State.screen.flip()
     #---------------------------------------------------
@@ -643,57 +649,60 @@ class App_gum(Engine):
                         else:
                             blit(s.image, s.rect.move(-cx,-cy))
                             pass
-
     #---------------------------------------------------
+    def warp_del_seguito(self):
+        for i in self.raccolti:
+            id_raccolto=i[0]['nome']
+            if id_raccolto in self.lista_beast: 
+                if self.direzione_avatar=='front':
+                     incx=incy=-20
+                elif self.direzione_avatar=='back':
+                    incx=+16
+                    incy=+42
+                elif self.direzione_avatar=='left':
+                    incx=+16
+                    incy=+42
+                elif self.direzione_avatar=='right':
+                    incx=-32
+                    incy=+42
+                self.lista_beast[id_raccolto].x=self.avatar.hitbox.bottomleft[0]+incx
+                self.lista_beast[id_raccolto].y=self.avatar.hitbox.bottomleft[1]+incy
+        
+    
     def is_warp(self):
         dummy = self.avatar
         newhitbox=dummy.hitbox.copy()
         newhitbox.x=dummy.hitbox.x+self.movex
-        
         for warp in self.warps:
-                if warp.rect.colliderect(newhitbox):
-                        scrittaor=pygame.image.load('immagini/loading4.gif').convert()
-                        scritta=pygame.transform.scale(scrittaor,(100,100))
-                        self.warping=True
-                        State.screen.clear()
-                        centerpos=State.screen.center[0]-scritta.get_width()/2,State.screen.center[1]-scritta.get_height()/2
-                        State.screen.blit(scritta,centerpos)
-                        State.screen.flip()
-                        try:dir=warp.properties['dir']
-                        except:dir=".\\mappe\\mappe_da_unire\\"
-                        mappa=warp.properties['dest_map']+".tmx"
-                        destx=int(warp.properties['dest_tile_x'])*32
-                        desty=int(warp.properties['dest_tile_y'])*32
-                        #print self.mappa_dirfile
-                        if self.mappa_dirfile==dir+mappa:
-                                self.nuova_mappa_caricare=False
-                                self.avatar.rect.x=destx
-                                self.avatar.rect.y=desty
-                                camera = State.camera
-                                wx,wy = destx,desty
-                                # Keep avatar inside map bounds.
-                                rect = State.world.rect
-                                wx = max(min(wx,rect.right), rect.left)
-                                wy = max(min(wy,rect.bottom), rect.top)
-                                camera.position = wx,wy
-                                if 'wolf' in self.lista_beast:
-                                    if self.direzione_avatar=='front':
-                                         incx=incy=-20
-                                    elif self.direzione_avatar=='back':
-                                        incx=+16
-                                        incy=+42
-                                    elif self.direzione_avatar=='left':
-                                        incx=+16
-                                        incy=+42
-                                    elif self.direzione_avatar=='right':
-                                        incx=-32
-                                        incy=+42
-                                    self.lista_beast['wolf'].x=self.avatar.hitbox.bottomleft[0]+incx
-                                    self.lista_beast['wolf'].y=self.avatar.hitbox.bottomleft[1]+incy
-                                    
-                        else:
-                                self.nuova_mappa_caricare=True
-                                self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)
+            if warp.rect.colliderect(newhitbox):
+                scrittaor=pygame.image.load('immagini/loading4.gif').convert()
+                scritta=pygame.transform.scale(scrittaor,(100,100))
+                self.warping=True
+                State.screen.clear()
+                centerpos=State.screen.center[0]-scritta.get_width()/2,State.screen.center[1]-scritta.get_height()/2
+                State.screen.blit(scritta,centerpos)
+                State.screen.flip()
+                try:dir=warp.properties['dir']
+                except:dir=".\\mappe\\mappe_da_unire\\"
+                mappa=warp.properties['dest_map']+".tmx"
+                destx=int(warp.properties['dest_tile_x'])*32
+                desty=int(warp.properties['dest_tile_y'])*32
+                #print self.mappa_dirfile
+                if self.mappa_dirfile==dir+mappa:
+                        self.nuova_mappa_caricare=False
+                        self.avatar.rect.x=destx
+                        self.avatar.rect.y=desty
+                        camera = State.camera
+                        wx,wy = destx,desty
+                        # Keep avatar inside map bounds.
+                        rect = State.world.rect
+                        wx = max(min(wx,rect.right), rect.left)
+                        wy = max(min(wy,rect.bottom), rect.top)
+                        camera.position = wx,wy
+                        self.warp_del_seguito() #verifica se nel passaggio di mappa deve portarsi dietro il cane o altro seguito
+                else:
+                        self.nuova_mappa_caricare=True
+                        self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)
 
     #------------------------------------------------------
     def is_walkable2(self):
@@ -718,21 +727,6 @@ class App_gum(Engine):
                 is_walkable=False
         return is_walkable       
    
-    #------------------------------------------------------- 
-    """
-    def is_event_collide(self):
-        newsprite=self.avatar.sprite
-        hits=pygame.sprite.spritecollide(newsprite, self.eventi,False)
-        if hits: 
-            id_animato=hits[0].properties['id_animato']
-            if hasattr(self.lista_beast[id_animato],'effetto_collisione_con_evento'):
-                self.lista_beast[id_animato].effetto_collisione_con_evento(hits[0].properties)
-                self.lista_beast['interlocutore'].prova()
-            #if hits[0].properties['azione']=='attiva_animato':
-            #    self.lista_beast[id_animato].attendi_evento=False #mette in moto l'animato che era in attesa dell'evento
-            #else:
-            #    print hits[0].properties['azione']
-    """
     
     #-------------------------------------------------------        
     def is_raccolto_collide(self):
@@ -740,10 +734,7 @@ class App_gum(Engine):
         hits=pygame.sprite.spritecollide(newsprite, self.raccolto_spathash.objects,False)
         if hits:
             for obj in hits:
-                #print "indice che punta alla posizione dell'immagine nel tileset png "+str(obj.img_idx)
-                #print self.raccoglibili_dict[str(obj.img_idx)]
                 prop_ogg= self.dict_gid_to_properties[obj.img_idx]
-                #print prop_ogg
                 self.raccolti.append((prop_ogg,obj))
                 self.raccolto_spathash.remove(obj)
                 self.mag.suono.play()
@@ -761,7 +752,7 @@ class App_gum(Engine):
 
     #------------------------------------------------------
     def is_talking2(self,beast):
-            hits=self.avatar.rect.colliderect(beast.talk_box)
+            #hits=self.avatar.rect.colliderect(beast.talk_box)
             beast.fallo_parlare()
             if self.godebug:
                 cx,cy = self.camera.rect.topleft
@@ -810,6 +801,7 @@ class App_gum(Engine):
 
     #------------------------------------------------------------------ 
     def on_key_down(self, unicode, key, mod):
+        #print "on_key_down"+str(self.blockedkeys)
         if not self.blockedkeys:
             self.on_key_down_incondizionato(unicode, key, mod)
 
@@ -882,8 +874,7 @@ class App_gum(Engine):
             pgu=PguApp(self,inizio="inventario")
         elif key == pygame.K_F9:
             print 'f9'
-            self.dialogogioco=Dialogo_gioco(self)
-            self.dialogogioco.dialogo_show=True
+            self.lista_beast['jag1'].vaiattacca=True
         elif key == K_g:
             State.show_grid = not State.show_grid
         elif key == K_l:
@@ -947,8 +938,8 @@ class App_gum(Engine):
     #----------------------------------------------------------------------
 #Eofclass#-----------------------------------------------------------------------------------			
 
-def miomain(debug=True,discorso_iniziale=None):
-    oggetto=App_gum(resolution=(800,600),miodebug=debug,discorso_iniziale=discorso_iniziale)
+def miomain(debug=True):
+    oggetto=App_gum(resolution=(800,600),miodebug=debug)
     icon=pygame.image.load(".\immagini\\icona2.gif")
     pygame.display.set_icon(icon)
     gummworld2.run(oggetto)
@@ -957,14 +948,8 @@ def miomain(debug=True,discorso_iniziale=None):
 
 if __name__ == '__main__':
 
-    discorso_iniziale=[\
-    'Sei un soldato che ha appena finito la guerra nel deserto',\
-    'il tuo villaggio e stato bruciato e raso al suolo',\
-    'tua moglie e stata decapitata, i tuoi figli sono stati presi come schiavi.',\
-    'Siete soppravisssuti solo in 20, divisi, e tu sei arrivato in questo villaggio.',\
-    'Ti ritrovi in una casa decadente. '
-    ]
+
     
-    miomain(debug=DEBUG,discorso_iniziale=discorso_iniziale)
+    miomain(debug=DEBUG)
         
      

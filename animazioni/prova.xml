@@ -38,9 +38,17 @@
         </msg1>
         <msg2>
                 <segmento>1</segmento>
-                <messaggio>Il cane Wolf ti segue ovunque.</messaggio>
-                <messaggio>Nell'armeria puoi prendere arco e frecce</messaggio>
-                <messaggio>poi li devi provare e mettere a punto</messaggio>
-                <messaggio>nel poligono di tiro...</messaggio>
+                <messaggio>Il cane Wolf ti seguirà ovunque.</messaggio>
+                <messaggio>se gli vai vicino per prenderlo con te.</messaggio>
+                <messaggio>Nell'armeria puoi prendere armi </messaggio>
+                <messaggio>da provare nel poligono di tiro...</messaggio>
         </msg2>
+         <msginiziale>
+                <segmento>1</segmento>
+                <messaggio>Sei un soldato che ha appena finito la guerra nel deserto</messaggio>
+                <messaggio>il tuo villaggio e stato bruciato e raso al suolo.</messaggio>
+                <messaggio>tua moglie e stata decapitata, i tuoi figli sono stati presi come schiavi.</messaggio>
+                <messaggio>Siete soppravissuti solo in 20. Vi siete divisi. Sei arrivato in questo villaggio.</messaggio>
+                <messaggio>Ti ritrovi in una casa decadente.</messaggio>
+        </msginiziale>
 </storia>

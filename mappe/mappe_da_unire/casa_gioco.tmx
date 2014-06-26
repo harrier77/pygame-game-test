@@ -10946,6 +10946,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
+   <tile gid="520"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -10975,7 +10976,6 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="123"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -11004,7 +11004,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="139"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -16606,7 +16606,7 @@
     <property name="dest_tile_y" value="92"/>
    </properties>
   </object>
-  <object name="Inizio" x="489" y="2957" width="32" height="32">
+  <object name="Inizio" x="455" y="3009" width="28" height="29">
    <ellipse/>
   </object>
   <object name="priest" type="animato" x="227" y="582">
@@ -16698,7 +16698,7 @@
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
-  <object name="msg2" type="evento" x="356" y="2362" width="251" height="133">
+  <object name="msg2" type="evento" x="197" y="2438" width="529" height="16">
    <properties>
     <property name="id" value="msg2"/>
     <property name="id_animato" value="msg2"/>
@@ -16741,20 +16741,20 @@
     <property name="dest_tile_y" value="71"/>
    </properties>
   </object>
-  <object name="jaguar" type="animato" x="712" y="1299">
+  <object name="jaguar" type="animato" x="802" y="1371">
    <properties>
     <property name="id" value="jag1"/>
-    <property name="sottotipo" value="semplice"/>
+    <property name="sottotipo" value="attaccante"/>
    </properties>
-   <polyline points="-47,-23 -555,54"/>
+   <polyline points="-51,26 -164,25"/>
   </object>
-  <object name="wolf" type="animato" x="636" y="2976">
+  <object name="wolf" type="animato" x="610" y="2987">
    <properties>
     <property name="durata_pausa" value="10"/>
-    <property name="id" value="wolf"/>
+    <property name="id" value="Wolf"/>
     <property name="sottotipo" value="animatosegue"/>
    </properties>
-   <polyline points="-157,-43 -157,-4"/>
+   <polyline points="-169,-28 -157,-23"/>
   </object>
   <object name="AllaHall" type="warp" x="384" y="641" width="34" height="23">
    <properties>
@@ -16770,11 +16770,25 @@
     <property name="dest_tile_y" value="77"/>
    </properties>
   </object>
-  <object name="toroom" type="warp" x="415" y="2505" width="65" height="22">
+  <object name="toroom" type="warp" x="415" y="2505" width="93" height="20">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="15"/>
     <property name="dest_tile_y" value="91"/>
+   </properties>
+  </object>
+  <object name="camel" type="animato" x="460" y="1360">
+   <properties>
+    <property name="id" value="camel1"/>
+    <property name="sottotipo" value="catturabile"/>
+   </properties>
+   <polyline points="138,29 -164,25"/>
+  </object>
+  <object name="msginiziale" type="evento" x="461" y="2928" width="73" height="34">
+   <properties>
+    <property name="id" value="msginiziale"/>
+    <property name="id_animato" value="msginiziale"/>
+    <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
  </objectgroup>
