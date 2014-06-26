@@ -26,6 +26,11 @@
     <property name="nome" value="frecce"/>
    </properties>
   </tile>
+  <tile id="3">
+   <properties>
+    <property name="nome" value="lasso"/>
+   </properties>
+  </tile>
   <tile id="5">
    <properties>
     <property name="nome" value="spada"/>
@@ -4841,6 +4846,8 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
+   <tile gid="12"/>
+   <tile gid="31"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -4868,10 +4875,8 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="28"/>
+   <tile gid="47"/>
    <tile gid="0"/>
    <tile gid="1097"/>
    <tile gid="1098"/>
@@ -4900,7 +4905,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="63"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -13060,38 +13065,38 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="2"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="2"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
    <tile gid="2"/>
    <tile gid="2"/>
-   <tile gid="0"/>
    <tile gid="2"/>
-   <tile gid="0"/>
+   <tile gid="2"/>
    <tile gid="2"/>
    <tile gid="2"/>
    <tile gid="2"/>
@@ -14055,7 +14060,7 @@
    <tile gid="0"/>
    <tile gid="581"/>
    <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="582"/>
    <tile gid="584"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -15848,8 +15853,36 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="581"/>
    <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="582"/>
    <tile gid="584"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -15879,35 +15912,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="581"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -16708,7 +16713,7 @@
   <object name="mucca" type="animato" x="795" y="1237">
    <properties>
     <property name="id" value="mucca1"/>
-    <property name="sottotipo" value="semplice"/>
+    <property name="sottotipo" value="catturabile"/>
    </properties>
    <polyline points="0,0 -324,-15 -477,96 -2,102"/>
   </object>
@@ -16788,6 +16793,13 @@
    <properties>
     <property name="id" value="msginiziale"/>
     <property name="id_animato" value="msginiziale"/>
+    <property name="sottotipo" value="MessaggioDaEvento"/>
+   </properties>
+  </object>
+  <object name="msg3" type="evento" x="590" y="1503" width="61" height="17">
+   <properties>
+    <property name="id" value="msg3"/>
+    <property name="id_animato" value="msg3"/>
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>

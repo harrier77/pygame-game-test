@@ -43,6 +43,12 @@
                 <messaggio>Nell'armeria puoi prendere armi </messaggio>
                 <messaggio>da provare nel poligono di tiro...</messaggio>
         </msg2>
+        <msg3>
+                <segmento>1</segmento>
+                <messaggio>Puoi tirare con l'arco agli animali selvatici</messaggio>
+                <messaggio>oppure puoi prendere gli animali domestici</messaggio>
+                <messaggio>usando il lasso (tasto L) </messaggio>
+        </msg3>
          <msginiziale>
                 <segmento>1</segmento>
                 <messaggio>Sei un soldato che ha appena finito la guerra nel deserto</messaggio>

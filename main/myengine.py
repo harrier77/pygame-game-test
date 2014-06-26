@@ -164,16 +164,21 @@ class Magazzino(model.Object):
 class Proiettile(model.Object):
     
     #------------------------------------
-    def __init__(self,motore,mouse_position):
-        self.freccia=pygame.image.load('immagini/frnera.png')
+    def __init__(self,motore,mouse_position,tipo='f'):
+        self.freccia1=pygame.image.load('immagini/frnera.png')
+        lasso=pygame.image.load('immagini/lasso.png')
+        self.lasso=pygame.transform.scale(lasso,(64,15))
+        if tipo=='f':self.dalanciare=self.freccia1
+        elif tipo=='l':self.dalanciare=self.lasso
+        else: self.dalanciare=self.freccia1
         #freccia=pygame.transform.scale(freccia,(72,72))
+        
         pygame.mixer.init()
-        #self.suono=pygame.mixer.Sound('suoni/message.wav')
         self.motore=motore
         self.rect=self.image.get_rect()
-        #self.rect=self.motore.avatar.rect.copy()
-        self.rect.x=self.motore.avatar.rect.x-self.freccia.get_width()/2
-        self.rect.y=self.motore.avatar.rect.y-self.freccia.get_height()/2
+
+        self.rect.x=self.motore.avatar.rect.x-self.dalanciare.get_width()/2
+        self.rect.y=self.motore.avatar.rect.y-self.dalanciare.get_height()/2
         pos= self.motore.camera.screen_to_world(mouse_position)
         self.mouse_position=pos
         dify= (pos[1]-self.rect.y) 
@@ -183,9 +188,9 @@ class Proiettile(model.Object):
 
         self.dx=math.cos(angolo_rads)
         self.dy=math.sin(angolo_rads)
-        self.freccia=pygame.transform.rotate(self.freccia, 360-angolo_rads*57.29)
+        self.dalanciare=pygame.transform.rotate(self.dalanciare, 360-angolo_rads*57.29)
         self.sprite=pygame.sprite.Sprite()
-        self.sprite.image=self.freccia
+        self.sprite.image=self.dalanciare
         self.sprite.rect=self.rect
         self.colpito=False
 
@@ -236,7 +241,7 @@ class Proiettile(model.Object):
     @property
     def image(self):
         #self.freccia=pygame.transform.rotate(self.freccia, 360-self.arcotangente*57.29)
-        return self.freccia
+        return self.dalanciare
 #-------------------------------------------------------------------------------#end of class
 
 #-------------------------------------------------------------------------------
@@ -520,6 +525,7 @@ class App_gum(Engine):
         self.mag=Magazzino(self)
         self.app_salvata=None
         self.blockedkeys=False
+        self.tipofreccia='f'
 
         #exit()
         #discorso_iniziale=None
@@ -839,10 +845,11 @@ class App_gum(Engine):
                     self.movex += -State.speed
                     self.camera.target.giocatore_animato=self.animato['left_run']
             self.direzione_avatar='left'
-        elif key==pygame.K_z:
-            #print "z"
-            for k,beast in self.lista_beast.iteritems():
-                beast.dialogosemp.incrementa_idx_mess()
+        elif key==pygame.K_l:
+            if self.tipofreccia=='l':
+                self.tipofreccia='f'
+            else:
+                self.tipofreccia='l'
         
         elif key == pygame.K_F4:
             #if not self.dialogo_btn:
@@ -893,7 +900,8 @@ class App_gum(Engine):
             for k,beast in self.lista_beast.iteritems():
                 beast.dialogosemp.dialogo_btn=self.dialogo_btn"""
         if button==1:
-            self.freccia=Proiettile(self,pos)
+            tipo=self.tipofreccia
+            self.freccia=Proiettile(self,pos,tipo=tipo)
             self.freccia.mostra()
 
     #------------------------------------------------------------------ 
