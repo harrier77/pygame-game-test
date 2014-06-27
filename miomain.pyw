@@ -10,12 +10,12 @@ import os
 pygame.mixer.pre_init(44100, -16, 2, 2048) # setup mixer to avoid sound lag
 pygame.init()                      #initialize pygame
 
-pygame.mixer.music.load(os.path.join('suoni', 'Open.ogg'))#load music
+pygame.mixer.music.load(os.path.join('suoni', 'lover.mp3'))#load music
 
 #music is already the name of the music object
 #pygame.mixer.music.play(loops=0, start=0.0): return None
 pygame.mixer.music.play(-1) # play endless
 
 #import cProfile
-myengine.miomain(debug=False)
+myengine.miomain(debug=False,hero_ini_pos1=(15*32,94*32))
 #cProfile.run('myengine.miomain(debug=False)','rstats')

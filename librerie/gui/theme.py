@@ -1,5 +1,10 @@
 # theme.py
-
+"""import os
+dnames = ['default']
+dnames.append("..\\librerie\\data")
+print os.path.dirname(os.path.abspath('..\\'))+"\\librerie\\data"
+print dnames
+exit()"""
 """
 """
 import os, re
@@ -65,20 +70,20 @@ class Theme:
         
         #if the package isn't installed and people are just
         #trying out the scripts or examples
-        dnames.append(os.path.join(os.path.dirname(__file__),"..","..","data","themes",name))
+        #dnames.append(os.path.join(os.path.dirname(__file__),"..","..","data","themes",name))
         
         #if the package is installed, and the package is installed
         #in /usr/lib/python2.3/site-packages/pgu/
         #or c:\python23\lib\site-packages\pgu\
         #the data is in ... lib/../share/ ...
-        dnames.append("D:\\the_assassins_land_of_fire\\new-trunk\\librerie\\data\\default")
+        dnames.append(os.path.dirname(os.path.abspath('.\\new-trunk'))+"\\librerie\\data\\default")
+
         #dnames.append(os.path.join(os.path.dirname(__file__),"..","..","..","..","share","pgu","themes",name))
         #dnames.append(os.path.join(os.path.dirname(__file__),"..","..","..","..","..","share","pgu","themes",name))
         #dnames.append(os.path.join(os.path.dirname(__file__),"..","..","share","pgu","themes",name)) 
         for dname in dnames:
-            #print dname
             if os.path.isdir(dname): break
-        #exit()
+
         if not os.path.isdir(dname): 
             raise Exception('could not find theme '+name)
 

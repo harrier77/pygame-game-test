@@ -265,7 +265,7 @@ class AnimatoSegue(MovingBeast):
         self.listap=self.passi(pos_partenza,pos_da_raggiungere)  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
         self.direzione=self.calcola_direzione(pos_partenza,pos_da_raggiungere) #calcola la direzione della destinazione da raggiungere
 
-    
+    #----------------------------------------
     def controlla_se_preso(self):
         if not self.suonato:
             hits=self.rect.colliderect(self.motore.avatar.hitbox)
@@ -273,7 +273,7 @@ class AnimatoSegue(MovingBeast):
                 self.motore.mag.suono.play()
                 self.segui=True
                 dict_prop={'nome':self.id}
-                self.motore.raccolti.append((dict_prop,self.sprite_fotogrammanew))
+                self.motore.mag.seguito.append((dict_prop,self.sprite_fotogrammanew))
 
     #----------------------------------------
     def muovi_animato(self):

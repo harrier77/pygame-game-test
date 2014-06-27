@@ -1,7 +1,5 @@
 # coding: utf-8
 import os
-
-
 from os.path import relpath
 import sys
 import __builtin__
@@ -18,7 +16,6 @@ from gummworld2 import context, data, model, geometry, toolkit
 from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim,gui
 from miovardump import miovar_dump
-
 from moving_beast import calcola_passi,MovingBeast,Dialogosemplice
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
 from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
@@ -29,7 +26,6 @@ from librerie import xmltodict
 import subprocess
 import math
 from math import atan2,pi
-
 DEBUG=False
 try:
     __builtin__.miavar
@@ -39,7 +35,6 @@ except:
     except:
         #print 'cambio dir a '+os.getcwd()
         os.chdir('..\\') 
-
 
 #-------------------------------------------------------------------------------
 class PguApp():
@@ -80,7 +75,7 @@ class PguApp():
                         pygame.display.flip()
                         clock.tick(60)
         pygame.key.set_repeat()
-     #-------------------------------------------------------------------------------   
+    #-------------------------------------------------------------------------------   
     def menu(self):
         self.tabella.tr()
         inventario=gui.Button(value='Inventario')
@@ -88,75 +83,107 @@ class PguApp():
         self.tabella.td(inventario)
         
         self.tabella.tr()
+        inv_animali=gui.Button(value='Animali al seguito')
+        inv_animali.connect(gui.CLICK,self.inventario_animali)
+        self.tabella.td(inv_animali)
+
+        self.tabella.tr()
         tornabtn=gui.Button(value='Torna al gioco')
         tornabtn.connect(gui.CLICK,self.quit)
         self.tabella.td(tornabtn)
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
-
-    def scarica(self,id_cosa_raccolta,i,tab_riga,eti,immagine):
+    #-------------------------------------------------------------------------------
+    def scarica(self,id_cosa_raccolta,i,tab_riga,eti,immagine,idx_img):
         if id_cosa_raccolta in self.motore.lista_beast:
             self.motore.lista_beast[id_cosa_raccolta].segui=False
-            del self.motore.raccolti[i]
+            try:del self.motore.mag.seguito[i]
+            except:
+                print "i="+str(i),self.motore.mag.seguito
+                exit()
         else:
-            del self.motore.raccolti[i]
-        print self.motore.raccolti
+            obj=pygame.sprite.Sprite()
+            obj.image=immagine.value
+            obj.rect=obj.image.get_rect()
+            obj.rect.x=self.motore.avatar.rect.x+16
+            obj.rect.y=self.motore.avatar.rect.y+16
+            obj.img_idx=idx_img
+            self.motore.raccolto_spathash.add(obj)
+            del self.motore.mag.raccolti[i]
         self.tabella.remove(tab_riga)
         self.tabella.remove(eti)
         self.tabella.remove(immagine)
-    
-    def inventario(self):
-        #miovar_dump(self.tabella.resize)
-        self.tabella.clear()
-        self.tabella.tr()
-        etichetta=gui.Label("Inventario oggetti raccolti:")
-
-        
-        self.tabella.td(etichetta,colspan=2)
-        for i,cosa in enumerate(self.motore.raccolti):
+    #-------------------------------------------------------------------------------
+    def loop_inventario(self,lista_oggetti):
+        for i,cosa in lista_oggetti.iteritems():
                 eti=gui.Label(cosa[0]['nome'])
-                #eti.style.border_bottom=1
                 immagine=gui.Image(cosa[1].image)
-                #immagine.style.border_bottom=1
                 self.tabella.tr()
+                #ilab=gui.Label(str(i))
+                #self.tabella.td(ilab)
                 self.tabella.td(eti)
                 self.tabella.td(immagine)
                 font = pygame.font.SysFont("Tahoma", 12)
                 L=gui.Link(value='Scarica',font=font)
-                
-                L.connect(gui.CLICK,self.scarica,cosa[0]['nome'],i,L,eti,immagine)
+                dic=cosa[0]
+                if 'numero' in dic:idx_img=dic['numero'] 
+                else:idx_img=0 
+                L.connect(gui.CLICK,self.scarica,dic['nome'],i,L,eti,immagine,idx_img)
                 self.tabella.td(L)
-                
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*10
-        #print self.tabella
-        #self.tabella.rect.x=0
-        #self.tabella.reupdate()
-        
-
+    #-------------------------------------------------------------------------------       
+    def inventario(self):
+        self.tabella.clear()
+        self.tabella.tr()
+        etichetta=gui.Label("Inventario oggetti raccolti:")
+        self.tabella.td(etichetta,colspan=2)
+        self.loop_inventario(self.motore.mag.raccolti)
+    #------------------------------------------------------------------------------- 
+    def inventario_animali(self):
+        self.tabella.clear()
+        self.tabella.tr()
+        etichetta=gui.Label("Animali al seguito:")
+        self.tabella.td(etichetta,colspan=2)
+        self.loop_inventario(self.motore.mag.seguito)
     #-------------------------------------------------------------------------------
     def quit(self):
         #print 'quit'
         self.mioloop=False
-#-------------------------------------------------------------------------------
+#EofCLass-------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------
+class AutoDict(dict):
+    def __init__(self):
+        dict.__init__(self)
+        self.id=0
+    def append(self,item):
+        self.id=self.id+1
+        self[self.id]=item
+#EofClass
 
 #-------------------------------------------------------------------------------
 class Magazzino(model.Object):
     def __init__(self,motore):
         self.motore=motore
-        square=pygame.image.load('.\\immagini\\square1.png').convert_alpha()
-        self.background_magazzino =pygame.transform.scale(square,(State.screen.size[0]-1,100))
-        self.backvuoto=self.background_magazzino.copy()
+        from collections import defaultdict
+        self.raccolti=AutoDict()
+        self.seguito=AutoDict()
+        #square=pygame.image.load('.\\immagini\\square1.png').convert_alpha()
+        #self.background_magazzino =pygame.transform.scale(square,(State.screen.size[0]-1,100))
+        #self.backvuoto=self.background_magazzino.copy()
         self.suono=pygame.mixer.Sound('suoni/message.wav')
-    def aggiungi_magazzino(self):
-        x=10
-        #if not self.motore.dialogo_btn:
-        for obj in self.motore.raccolti:
-            larg=obj.image.get_width()
-            self.background_magazzino.blit(obj.image,(x,15))
-            State.screen.blit(self.background_magazzino,(5,550))
-            x=x+larg
+    #-------------------------------------------------------        
+    def is_raccolto_collide(self):
+        newsprite=self.motore.avatar.sprite
+        hits=pygame.sprite.spritecollide(newsprite, self.motore.raccolto_spathash.objects,False)
+        if hits:
+            for obj in hits:
+                prop_ogg= self.motore.dict_gid_to_properties[obj.img_idx]
+                #self.raccolti[obj.img_idx].append
+                self.raccolti.append((prop_ogg,obj))
+                self.motore.raccolto_spathash.remove(obj)
+                self.suono.play()
 #-------------------------------------------------------------------------------
 
 
@@ -339,8 +366,7 @@ class Miohero(model.Object):
 #-------------------------------------------------------------------------------
 class App_gum(Engine):
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
-                            coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=(21*32,28*32),dormi=True,\
-                            discorso_iniziale=None):
+                            coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True):
         self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
         self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito.wav')
         self.nuova_mappa_caricare=True
@@ -350,7 +376,7 @@ class App_gum(Engine):
         self.lista_beast=[]
         self.lista_beast={}
         self.godebug=False
-        self.raccolti=[]
+        
         #dialogo_btn=False
         self.beast_sprite_group=pygame.sprite.Group()
         #necessario per resettare la condizione messa dalla libreria PGU
@@ -361,6 +387,8 @@ class App_gum(Engine):
         os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)    
         
         resolution = Vec2d(resolution)
+        #dir=".\\mappe\\"
+        #mappa='mini.tmx'
         self.mappa_dirfile=dir+mappa
         
         self.tiled_map = TiledMap(dir+mappa)
@@ -382,6 +410,7 @@ class App_gum(Engine):
                         #print tile
                         tile.properties['parent_tileset_name']=tileset.name
                         gid=int(tileset.firstgid)+int(tile.id)
+                        tile.properties['numero']=gid
                         self.dict_gid_to_properties[gid]=tile.properties
         #print self.dict_gid_to_properties
         #exit()
@@ -421,10 +450,10 @@ class App_gum(Engine):
             animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto",'og_rect':O.rect}
             for p in O.properties:
                 animato[p]=O.properties[p]
-                
-            if O.name=="Inizio" or O.name=="inizio":
-                hero_ini_pos= O.rect.x,O.rect.y
-                self.avatar.position=hero_ini_pos
+            if hero_ini_pos==(0,0):
+                if O.name=="Inizio" or O.name=="inizio":
+                    hero_ini_pos= O.rect.x,O.rect.y
+                    self.avatar.position=hero_ini_pos
                 
             if O.type=="warp":
                 self.warps.append(O)
@@ -481,7 +510,7 @@ class App_gum(Engine):
                 beast.motore=self
                 self.lista_beast[beast.id]=beast
                 self.avatar_group.add(beast)
-
+        
         #miovar_dump(self.eventi.sprites()[0].rect)
         #exit()
         ## Insert avatar into the Fringe layer.
@@ -523,6 +552,7 @@ class App_gum(Engine):
         #self.dialogo_btn=False
         #self.crea_magazzino()
         self.mag=Magazzino(self)
+        
         self.app_salvata=None
         self.blockedkeys=False
         self.tipofreccia='f'
@@ -532,9 +562,8 @@ class App_gum(Engine):
         #if discorso_iniziale:
             #self.dialogogioco=Dialogo_gioco(self,lista_messaggi=discorso_iniziale)
             #self.dialogogioco.dialogo_show=True
-    #------------------------------------------------------------------ 
+    #EofInit------------------------------------------------------------------ 
     
-  
     #------------------------------------------------------------------ 
     def update(self, dt):
         if self.blockedkeys:
@@ -555,21 +584,18 @@ class App_gum(Engine):
                     self.move_to = State.camera.screen_to_world((wx,wy))
                 self.is_warp()
                 #self.is_event_collide()
-                self.is_raccolto_collide()
+                self.mag.is_raccolto_collide()
         self.update_camera_position()
         State.camera.update()
         ## Set render's rect.
         self.renderer.set_rect(center=State.camera.rect.center)
-
     #------------------------------------------------------------------                      
-    
     @property
     def mio_move_to(self):
         if self.cammina:
             return self.move_to
         else:
             return None
-    
     #------------------------------------------------------------------    
     def update_camera_position(self):
         """update the camera's position if any movement keys are held down
@@ -596,8 +622,6 @@ class App_gum(Engine):
         rect = self.avatar.hitbox
         pygame.draw.rect(camera.surface, Color('red'), rect.move(-cx,-cy))
         pygame.draw.polygon(camera.surface, Color('white'), self.speed_box.corners, 1)
-        
-    
     #------------------------------------------------------------------ 
     def draw(self, interp):
         State.screen.clear()
@@ -657,7 +681,7 @@ class App_gum(Engine):
                             pass
     #---------------------------------------------------
     def warp_del_seguito(self):
-        for i in self.raccolti:
+        for k,i in self.mag.seguito.iteritems():
             id_raccolto=i[0]['nome']
             if id_raccolto in self.lista_beast: 
                 if self.direzione_avatar=='front':
@@ -673,8 +697,7 @@ class App_gum(Engine):
                     incy=+42
                 self.lista_beast[id_raccolto].x=self.avatar.hitbox.bottomleft[0]+incx
                 self.lista_beast[id_raccolto].y=self.avatar.hitbox.bottomleft[1]+incy
-        
-    
+    #------------------------------------------------------
     def is_warp(self):
         dummy = self.avatar
         newhitbox=dummy.hitbox.copy()
@@ -709,7 +732,6 @@ class App_gum(Engine):
                 else:
                         self.nuova_mappa_caricare=True
                         self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)
-
     #------------------------------------------------------
     def is_walkable2(self):
         if self.ignora_collisioni:
@@ -732,19 +754,15 @@ class App_gum(Engine):
         else:
                 is_walkable=False
         return is_walkable       
-   
-    
-    #-------------------------------------------------------        
-    def is_raccolto_collide(self):
-        newsprite=self.avatar.sprite
-        hits=pygame.sprite.spritecollide(newsprite, self.raccolto_spathash.objects,False)
-        if hits:
-            for obj in hits:
-                prop_ogg= self.dict_gid_to_properties[obj.img_idx]
-                self.raccolti.append((prop_ogg,obj))
-                self.raccolto_spathash.remove(obj)
-                self.mag.suono.play()
-    
+    #------------------------------------------------------------------ 
+    def toggle_layer(self, i):
+        """toggle visibility of layer i"""
+        try:
+            layer = self.all_groups[i]
+            layer.visible = not layer.visible
+            self.renderer.clear()
+        except:
+            pass
     #-------------------------------------------------------
     @property
     def dialogo_btn(self):
@@ -755,7 +773,6 @@ class App_gum(Engine):
         self._dialogo_btn=val
     #-------------------------------------------------------    
     
-
     #------------------------------------------------------
     def is_talking2(self,beast):
             #hits=self.avatar.rect.colliderect(beast.talk_box)
@@ -765,23 +782,6 @@ class App_gum(Engine):
                 #pygame.draw.rect(self.camera.surface, Color('red'), beast.talk_box.move(-cx,-cy))
                 #pygame.draw.rect(self.camera.surface, Color('red'), beast.beast_hit_box.move(-cx,-cy))
                 pygame.draw.rect(self.camera.surface, Color('red'), beast.sprite_fotogramma.rect.move(-cx,-cy))
-            """if beast.dialogosemp.dialogo_btn:
-                if hits:
-                    #beast.set_dialogo_btn(True)
-                    beast.dialogosemp.is_near=True
-                    #beast.dialogosemp.sequenza_messaggi_new()
-                    #beast.staifermo=True
-                    beast.fermato=True
-                    if hasattr(beast.dialogosemp,'sequenza_messaggi_noth'):
-                        beast.dialogosemp.sequenza_messaggi_noth()
-                else:
-                    beast.dialogosemp.is_near=False
-                    #beast.set_dialogo_btn(False)
-                    beast.dialogosemp.dialogo_btn=False
-                    beast.dialogosemp.open=False
-                    beast.dialogosemp.idx_mess=0
-                    beast.fermato=False"""
-
     #------------------------------------------------------------------
     def verifica_residuale_tasti_premuti(self,mio_keydown):
         if not self.blockedkeys:
@@ -804,7 +804,6 @@ class App_gum(Engine):
                 self.camera.target.giocatore_animato=self.animato['back_walk']
                 self.cammina=True
                 self.movey += -State.speed
-
     #------------------------------------------------------------------ 
     def on_key_down(self, unicode, key, mod):
         #print "on_key_down"+str(self.blockedkeys)
@@ -923,15 +922,7 @@ class App_gum(Engine):
             self.avatar.standing_scelta=self.avatar.left_standing
         self.verifica_residuale_tasti_premuti(key)
                 
-    #------------------------------------------------------------------ 
-    def toggle_layer(self, i):
-        """toggle visibility of layer i"""
-        try:
-            layer = self.all_groups[i]
-            layer.visible = not layer.visible
-            self.renderer.clear()
-        except:
-            pass
+
     
     #------------------------------------------------------------------ 
     def on_quit(self):
@@ -946,8 +937,8 @@ class App_gum(Engine):
     #----------------------------------------------------------------------
 #Eofclass#-----------------------------------------------------------------------------------			
 
-def miomain(debug=True):
-    oggetto=App_gum(resolution=(800,600),miodebug=debug)
+def miomain(debug=True,hero_ini_pos1=(0,0)):
+    oggetto=App_gum(resolution=(800,600),miodebug=debug,hero_ini_pos=hero_ini_pos1)
     icon=pygame.image.load(".\immagini\\icona2.gif")
     pygame.display.set_icon(icon)
     gummworld2.run(oggetto)
@@ -958,6 +949,6 @@ if __name__ == '__main__':
 
 
     
-    miomain(debug=DEBUG)
+    miomain(debug=DEBUG,hero_ini_pos1=(0,0))
         
      
