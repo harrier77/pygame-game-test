@@ -808,7 +808,6 @@ class App_gum(Engine):
                 self.movey += -State.speed
     #------------------------------------------------------------------ 
     def on_key_down(self, unicode, key, mod):
-        #print "on_key_down"+str(self.blockedkeys)
         if not self.blockedkeys:
             self.on_key_down_incondizionato(unicode, key, mod)
 
@@ -909,8 +908,11 @@ class App_gum(Engine):
     def on_mouse_button_up(self, pos, button):
             self.mouse_down = False
 
+    def on_key_up(self,key,mod):
+        if not self.blockedkeys:
+            self.on_key_up_incondizionato(key, mod)
     #------------------------------------------------------------------ 
-    def on_key_up(self, key, mod):
+    def on_key_up_incondizionato(self, key, mod):
         self.cammina=False
         self.movey =0
         self.movex =0

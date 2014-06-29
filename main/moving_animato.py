@@ -583,6 +583,7 @@ class MessaggioDaEvento(AnimatoParlanteFermo):
     def is_persona_collide(self):
         #chiamato da self.muovi_animato
         hits=self.evento_hit_box.colliderect(self.motore.avatar.sprite.rect)
+        #print hits
         if hits:
             self.dialogosemp.dialogo_show=True
         #il dialogo viene chiuso in scrivi_frase quando trova finito_dialogo messo a True da incrementa_idx_mess

@@ -49,6 +49,9 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="1353" name="segnaposti_oggetti" tilewidth="32" tileheight="32">
+  <image source="../graphics/tiles/segnaposti_oggetti.png" width="96" height="64"/>
+ </tileset>
  <layer name="Ground1" width="29" height="95">
   <data>
    <tile gid="249"/>
@@ -16611,9 +16614,6 @@
     <property name="dest_tile_y" value="92"/>
    </properties>
   </object>
-  <object name="Inizio" x="455" y="3009" width="28" height="29">
-   <ellipse/>
-  </object>
   <object name="priest" type="animato" x="227" y="582">
    <properties>
     <property name="attendi_evento" value="True"/>
@@ -16639,15 +16639,6 @@
     <property name="sottotipo" value="semplice"/>
    </properties>
    <polyline points="0,0 162,0"/>
-  </object>
-  <object name="femvil" type="animato" x="182" y="394">
-   <properties>
-    <property name="durata_pausa" value="1000"/>
-    <property name="id" value="aio2"/>
-    <property name="orientamento" value="front"/>
-    <property name="sottotipo" value="parlanteconevento"/>
-   </properties>
-   <polyline points="0,0 119,0"/>
   </object>
   <object name="eventoparla" type="evento" x="75" y="358" width="297" height="111">
    <properties>
@@ -16803,5 +16794,14 @@
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
+  <object name="femvil" type="animato" gid="1353" x="188" y="419">
+   <properties>
+    <property name="durata_pausa" value="1000"/>
+    <property name="id" value="aio2"/>
+    <property name="orientamento" value="front"/>
+    <property name="sottotipo" value="parlanteconevento"/>
+   </properties>
+  </object>
+  <object name="Inizio" gid="1354" x="464" y="456"/>
  </objectgroup>
 </map>
