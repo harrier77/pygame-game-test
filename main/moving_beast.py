@@ -342,7 +342,7 @@ class MovingBeast(model.Object):
         #exclpng=pygame.image.load('immagini/exclam1.png').convert_alpha()
         #self.exclamation=pygame.transform.scale(exclpng,(50,38))
         #self.exclamation=exclpng
-        self.x=animato['pos'][0]
+        self.x=animato['pos'][0]+32
         self.y=animato['pos'][1]
         position=animato['pos']
         self.posizione_iniziale_animato=position

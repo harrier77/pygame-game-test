@@ -1,0 +1,11 @@
+#certi eventi vengono percepiti solo una volta in tutto il gioco e altri si resettano quando torni
+#gli oggetti spariscono
+#quando parli con uno si gira verso di te
+#certi animali si prendono con il lazo e altri se ci vai adosso
+#tutti hanno la vita
+#puoi sparare freccie una volta ogni 2 secondi
+#quando muoino gli animali aggiustare animazioni
+#quelli che ti seguono non devono essere sovrapposti
+#agiustare freccie lazo
+#quando parli non puoi girarti
+#agiustare un po tutto

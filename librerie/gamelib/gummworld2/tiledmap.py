@@ -180,6 +180,7 @@ def _load_tiled_tmx_map(tmx_map, gummworld_map, load_invisible=True):
                 sprite.image_source = obj.image_source
                 sprite.name = obj.name
                 sprite.properties = obj.properties
+                if hasattr(obj,'gid'): sprite.gid=obj.gid
                 gummworld_layer.add(sprite)
         else:
             for ypos in xrange(0, layer.height):

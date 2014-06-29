@@ -448,7 +448,13 @@ class App_gum(Engine):
         #Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         Engine.__init__(self, caption='LandOfFire', resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         self.State=State
-        for O in self.prima_lista_ogg:
+        for index,O in enumerate(self.prima_lista_ogg):
+            if O.name==None:
+                gid=int(O.gid)
+                O.name=self.dict_gid_to_properties[gid]['Name']
+                O.type='animato'
+                O.properties['id']=O.name+str(index)
+                O.properties['sottotipo']='parlantefermo'
             animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto",'og_rect':O.rect}
             for p in O.properties:
                 animato[p]=O.properties[p]
@@ -456,7 +462,7 @@ class App_gum(Engine):
                 if O.name=="Inizio" or O.name=="inizio":
                     hero_ini_pos= O.rect.x,O.rect.y
                     self.avatar.position=hero_ini_pos
-                
+
             if O.type=="warp":
                 self.warps.append(O)
             
@@ -477,7 +483,8 @@ class App_gum(Engine):
                         #if beast.id in self.dic_storia:
                             #beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
                     beast.motore=self
-                        
+            #if O.type==None:
+                #print O.name, O.properties
             if O.type=="animato":
                 #animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
                 #for p in O.properties:

@@ -51,6 +51,11 @@
  </tileset>
  <tileset firstgid="1353" name="segnaposti_oggetti" tilewidth="32" tileheight="32">
   <image source="../graphics/tiles/segnaposti_oggetti.png" width="96" height="64"/>
+  <tile id="0">
+   <properties>
+    <property name="Name" value="femvil"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="Ground1" width="29" height="95">
   <data>
@@ -16744,14 +16749,6 @@
    </properties>
    <polyline points="-51,26 -164,25"/>
   </object>
-  <object name="wolf" type="animato" x="610" y="2987">
-   <properties>
-    <property name="durata_pausa" value="10"/>
-    <property name="id" value="Wolf"/>
-    <property name="sottotipo" value="animatosegue"/>
-   </properties>
-   <polyline points="-169,-28 -157,-23"/>
-  </object>
   <object name="AllaHall" type="warp" x="384" y="641" width="34" height="23">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
@@ -16794,7 +16791,7 @@
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
-  <object name="femvil" type="animato" gid="1353" x="188" y="419">
+  <object name="femvil" type="animato" gid="1353" x="118" y="380">
    <properties>
     <property name="durata_pausa" value="1000"/>
     <property name="id" value="aio2"/>
@@ -16802,6 +16799,17 @@
     <property name="sottotipo" value="parlanteconevento"/>
    </properties>
   </object>
-  <object name="Inizio" gid="1354" x="464" y="456"/>
+  <object name="Inizio" gid="1354" x="482" y="3019"/>
+  <object name="wolf" type="animato" gid="1355" x="418" y="3007">
+   <properties>
+    <property name="id" value="Wolf"/>
+    <property name="sottotipo" value="animatosegue"/>
+   </properties>
+  </object>
+  <object gid="1353" x="142" y="2272">
+   <properties>
+    <property name="sottotipo" value="semplice"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
