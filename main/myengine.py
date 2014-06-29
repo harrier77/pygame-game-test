@@ -3,6 +3,7 @@ import os
 from os.path import relpath
 import sys
 import __builtin__
+
 import xml
 from xml import dom
 from xml.dom import minidom
@@ -444,7 +445,8 @@ class App_gum(Engine):
         #self.lista_beast=[]
         self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
         self.direzione_avatar='front'
-        Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
+        #Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
+        Engine.__init__(self, caption='LandOfFire', resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         self.State=State
         for O in self.prima_lista_ogg:
             animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto",'og_rect':O.rect}

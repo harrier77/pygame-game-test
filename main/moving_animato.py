@@ -349,6 +349,19 @@ class AnimatoAttacca(AnimatoSemplice):
             self.fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
         elif direzione=='NE':
             self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
+    
+    def riduci_lista(self,lista):
+        newlista=lista[1::2] 
+        return newlista
+    #-------------------------------------------------------------------------
+    def passi(self,or_pos=(300,200),target_pos=(200,200)):
+        distanza=int(geometry.distance(or_pos,target_pos))
+        lista_posizioni=[]
+        for progress_distance in range(1,distanza,1):  
+                p= geometry.step_toward_point(or_pos, target_pos, progress_distance)
+                lista_posizioni.append(p)
+        return self.riduci_lista(lista_posizioni)
+    
     #-------------------------------------------------------------------------
     def aggiorna_pos_da_seguire(self):
         pos_partenza=self.x,self.y
