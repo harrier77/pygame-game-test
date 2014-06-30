@@ -37,6 +37,27 @@ except:
         #print 'cambio dir a '+os.getcwd()
         os.chdir('..\\') 
 
+class DialogoAvvisi(gui.Dialog):
+    def __init__(self,**params):
+        title = gui.Label("Avviso")
+        doc = gui.Document(width=400,height=200)  
+        gui.Dialog.__init__(self,title,doc)
+        self.init_app()
+    def init_app(self):
+        area=pygame.Rect(200,200,600,400)
+        app = gui.App()
+        self.open()
+        app.init(screen=State.screen.surface,widget=self,area=area)
+        app.paint()
+        pygame.display.flip()
+        while 1:
+            event = pygame.event.wait()
+            if event.type == MOUSEBUTTONDOWN:
+                break
+        
+##
+
+
 #-------------------------------------------------------------------------------
 class PguApp():
     def __init__(self,motore_genitore,inizio='menu'):
@@ -893,24 +914,13 @@ class App_gum(Engine):
                 self.tipofreccia='l'
         
         elif key == pygame.K_F4:
-            #if not self.dialogo_btn:
-                #self.dialogo_btn=True
-            #else:
-                #self.dialogo_btn=False
-                
-            pass
-                
-            #for k,beast in self.lista_beast.iteritems():
-                #beast.dialogosemp.dialogo_btn=self.dialogo_btn
-                #beast.dialogosemp.incrementa_idx_mess()
-            #beast.dialogosemp.suono.play()
-        
+            print 'f4'
+            dialog = DialogoAvvisi()
         elif key == pygame.K_F5:
             if not self.godebug:
                 self.godebug=True
             else:
                 self.godebug=False
-        
         elif key == pygame.K_F6:
             #self.wx.testo.SetLabel(label=str(self.avatar.hitbox))
             self.wx.Show(True) #mostra la finestra wxpython 
