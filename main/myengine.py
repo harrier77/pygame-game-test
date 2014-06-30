@@ -46,6 +46,8 @@ class PguApp():
         self.app.connect(gui.QUIT,self.app.quit,None)
         self.tabella = gui.Table(width=200,height=300,valign=-1,y=50)
         self.tabella.style.margin_top=150
+        selezionatoimg=pygame.image.load('.\\immagini\\selezionato.png').convert_alpha()
+        self.selezionatoimg=pygame.transform.scale(selezionatoimg,(28,28))
         #print self.tabella.style.margin_top
         if inizio=="inventario":
             self.inventario()
@@ -62,14 +64,14 @@ class PguApp():
                 coda_eventi=pygame.event.get()
                 for event in coda_eventi:
                         if event.type == pygame.QUIT:
-                                self.mioloop = False
+                                self.quit()
                         elif event.type == pygame.USEREVENT:
                                 continue
                         elif event.type == pygame.KEYDOWN:
                                 if event.key == pygame.K_e:
-                                        self.mioloop = False
+                                        self.quit()
                                 if event.key == pygame.K_ESCAPE:
-                                        self.mioloop = False
+                                        self.quit()
                                         
                         self.app.event(event)
                         self.app.paint()
@@ -95,7 +97,7 @@ class PguApp():
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
     #-------------------------------------------------------------------------------
-    def scarica(self,id_cosa_raccolta,i,tab_riga,eti,immagine,idx_img):
+    def scarica(self,id_cosa_raccolta,i,tab_riga,eti,immagine,idx_img,sel):
         if id_cosa_raccolta in self.motore.lista_beast:
             self.motore.lista_beast[id_cosa_raccolta].segui=False
             try:del self.motore.mag.seguito[i]
@@ -114,23 +116,31 @@ class PguApp():
         self.tabella.remove(tab_riga)
         self.tabella.remove(eti)
         self.tabella.remove(immagine)
+        self.tabella.remove(sel)
     #-------------------------------------------------------------------------------
     def loop_inventario(self,lista_oggetti):
+        sel_val=''
+        for s in self.motore.mag.selezionabili:
+            if self.motore.mag.selezionabili[s] ==True:sel_val=s
+        
+        self.g = gui.Group(name='armi',value=sel_val)
+        unchainimg=pygame.image.load('.\\immagini\\unchain.png').convert_alpha()
+        unchainimg=pygame.transform.scale(unchainimg,(20,20))
+        iconunchain=gui.Image(unchainimg)
         for i,cosa in lista_oggetti.iteritems():
                 eti=gui.Label(cosa[0]['nome'])
                 immagine=gui.Image(cosa[1].image)
                 self.tabella.tr()
-                #ilab=gui.Label(str(i))
-                #self.tabella.td(ilab)
                 self.tabella.td(eti)
                 self.tabella.td(immagine)
-                font = pygame.font.SysFont("Tahoma", 12)
-                L=gui.Link(value='Scarica',font=font)
+                L=gui.Button(iconunchain)
                 dic=cosa[0]
                 if 'numero' in dic:idx_img=dic['numero'] 
                 else:idx_img=0 
-                L.connect(gui.CLICK,self.scarica,dic['nome'],i,L,eti,immagine,idx_img)
+                sel=gui.Radio(self.g,value=dic['nome'])
+                L.connect(gui.CLICK,self.scarica,dic['nome'],i,L,eti,immagine,idx_img,sel)
                 self.tabella.td(L)
+                self.tabella.td(sel)
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*10
     #-------------------------------------------------------------------------------       
@@ -149,7 +159,9 @@ class PguApp():
         self.loop_inventario(self.motore.mag.seguito)
     #-------------------------------------------------------------------------------
     def quit(self):
-        #print 'quit'
+        for s in self.motore.mag.selezionabili:
+            self.motore.mag.selezionabili[s]=False
+        self.motore.mag.selezionabili[self.g.value]=True
         self.mioloop=False
 #EofCLass-------------------------------------------------------------------------------
 
@@ -170,6 +182,7 @@ class Magazzino(model.Object):
         from collections import defaultdict
         self.raccolti=AutoDict()
         self.seguito=AutoDict()
+        self.selezionabili=dict()
         #square=pygame.image.load('.\\immagini\\square1.png').convert_alpha()
         #self.background_magazzino =pygame.transform.scale(square,(State.screen.size[0]-1,100))
         #self.backvuoto=self.background_magazzino.copy()
@@ -183,8 +196,11 @@ class Magazzino(model.Object):
                 prop_ogg= self.motore.dict_gid_to_properties[obj.img_idx]
                 #self.raccolti[obj.img_idx].append
                 self.raccolti.append((prop_ogg,obj))
+                nomestrumento=prop_ogg['nome']
+                self.selezionabili[nomestrumento]=False
                 self.motore.raccolto_spathash.remove(obj)
                 self.suono.play()
+        #self.selezionabili['arco']=True
 #-------------------------------------------------------------------------------
 
 
@@ -192,17 +208,26 @@ class Magazzino(model.Object):
 class Proiettile(model.Object):
     
     #------------------------------------
-    def __init__(self,motore,mouse_position,tipo='f'):
+    def __init__(self,motore,mouse_position):
         self.freccia1=pygame.image.load('immagini/frnera.png')
         lasso=pygame.image.load('immagini/lasso.png')
         self.lasso=pygame.transform.scale(lasso,(64,15))
-        if tipo=='f':self.dalanciare=self.freccia1
-        elif tipo=='l':self.dalanciare=self.lasso
-        else: self.dalanciare=self.freccia1
+        
         #freccia=pygame.transform.scale(freccia,(72,72))
         
         pygame.mixer.init()
         self.motore=motore
+        #if tipo=='f':
+        #    self.dalanciare=self.freccia1
+        #elif tipo=='l':
+        #    self.dalanciare=self.lasso
+        #else: self.dalanciare=self.freccia1
+        tipo=self.tipo_proiettile
+        if tipo=='arco':self.dalanciare=self.freccia1
+        elif tipo=='lasso':self.dalanciare=self.lasso
+        else: 
+            print "seleziona un'arma"
+            self.dalanciare=pygame.Surface((1,1),pygame.SRCALPHA, 32)
         self.rect=self.image.get_rect()
 
         self.rect.x=self.motore.avatar.rect.x-self.dalanciare.get_width()/2
@@ -222,6 +247,13 @@ class Proiettile(model.Object):
         self.sprite.rect=self.rect
         self.colpito=False
 
+    
+    @property
+    def tipo_proiettile(self):
+        for arma,selettore in self.motore.mag.selezionabili.iteritems():
+            if selettore:
+                return arma
+    
     #------------------------------------
     def mostra(self):
         self.motore.avatar_group.add(self)
@@ -270,6 +302,8 @@ class Proiettile(model.Object):
     def image(self):
         #self.freccia=pygame.transform.rotate(self.freccia, 360-self.arcotangente*57.29)
         return self.dalanciare
+        
+
 #-------------------------------------------------------------------------------#end of class
 
 #-------------------------------------------------------------------------------
@@ -907,9 +941,9 @@ class App_gum(Engine):
             for k,beast in self.lista_beast.iteritems():
                 beast.dialogosemp.dialogo_btn=self.dialogo_btn"""
         if button==1:
-            tipo=self.tipofreccia
-            self.freccia=Proiettile(self,pos,tipo=tipo)
-            self.freccia.mostra()
+            self.freccia=Proiettile(self,pos)
+            if self.freccia:
+                self.freccia.mostra()
 
     #------------------------------------------------------------------ 
     def on_mouse_button_up(self, pos, button):
@@ -918,6 +952,8 @@ class App_gum(Engine):
     def on_key_up(self,key,mod):
         if not self.blockedkeys:
             self.on_key_up_incondizionato(key, mod)
+        else:
+            self.avatar.standing_scelta=self.avatar.front_standing
     #------------------------------------------------------------------ 
     def on_key_up_incondizionato(self, key, mod):
         self.cammina=False

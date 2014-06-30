@@ -15897,7 +15897,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="580"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -16799,14 +16799,14 @@
     <property name="sottotipo" value="parlanteconevento"/>
    </properties>
   </object>
-  <object name="Inizio" gid="1354" x="482" y="3019"/>
+  <object name="Inizio" gid="1354" x="478" y="2332"/>
   <object name="wolf" type="animato" gid="1355" x="418" y="3007">
    <properties>
     <property name="id" value="Wolf"/>
     <property name="sottotipo" value="animatosegue"/>
    </properties>
   </object>
-  <object gid="1353" x="142" y="2272">
+  <object gid="1353" x="150" y="2272">
    <properties>
     <property name="sottotipo" value="semplice"/>
    </properties>
