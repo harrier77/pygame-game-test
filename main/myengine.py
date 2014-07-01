@@ -27,6 +27,7 @@ from librerie import xmltodict
 import subprocess
 import math
 from math import atan2,pi
+import time
 DEBUG=False
 try:
     __builtin__.miavar
@@ -481,8 +482,8 @@ class App_gum(Engine):
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                             coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True):
         self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
-        self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito.wav')
-        self.nuova_mappa_caricare=True
+        self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito2.wav')
+        self.suono_cilecca=pygame.mixer.Sound('suoni/cilecca.wav')
         self.fringe_i=1
         xml = open('animazioni\\prova.xml', 'r').read()
         self.dic_storia=xmltodict.parse(xml)['storia']
@@ -1003,13 +1004,24 @@ class App_gum(Engine):
         elif key == K_ESCAPE: 
                 context.pop()
                 
-
+    @property
+    def intervallo_mouse(self):
+        if not hasattr(self,'mousenow'): return True
+        tnow=time.time()
+        if tnow>self.mousenow+2:
+            self.suono_noncolpito.play()
+            return True
+        else: 
+            self.suono_cilecca.play()
+            return False
     #------------------------------------------------------------------ 
     def on_mouse_button_down(self, pos, button):                
         if button==1:
-            self.freccia=Proiettile(self,pos)
-            if self.freccia:
-                self.freccia.mostra()
+            if self.intervallo_mouse:
+                self.mousenow=time.time()
+                self.freccia=Proiettile(self,pos)
+                if self.freccia:
+                    self.freccia.mostra()
 
     #------------------------------------------------------------------ 
     def on_mouse_button_up(self, pos, button):
