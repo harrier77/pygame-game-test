@@ -109,6 +109,7 @@ class AnimatoCambiaTipo(AnimatoSemplice):
         newbeast=AnimatoSegue(self.oldanimato)
         newbeast.x=self.x
         newbeast.y=self.y
+        newbeast.segui=True
         newbeast.motore=self.motore
         newbeast.aggiorna_pos_da_seguire()
         self.motore.lista_beast[self.id]=newbeast

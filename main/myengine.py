@@ -39,12 +39,20 @@ except:
 
 class DialogoAvvisi(gui.Dialog):
     def __init__(self,**params):
-        title = gui.Label("Avviso")
-        doc = gui.Document(width=400,height=200)  
-        gui.Dialog.__init__(self,title,doc)
+        testo=params['testo']
+        self.scrivi_testo(testo)
         self.init_app()
+    def scrivi_testo(self,testo):
+        title = gui.Label("Avviso")
+        doc = gui.Document(width=200,height=200)
+        gui.Dialog.__init__(self,title,doc)
+        space = title.style.font.size(" ")
+        for word in testo.split(" "): 
+            doc.add(gui.Label(word))
+            doc.space(space)
+        doc.br(space[1])
     def init_app(self):
-        area=pygame.Rect(200,200,600,400)
+        area=pygame.Rect(300,200,400,400)
         app = gui.App()
         self.open()
         app.init(screen=State.screen.surface,widget=self,area=area)
@@ -54,6 +62,7 @@ class DialogoAvvisi(gui.Dialog):
             event = pygame.event.wait()
             if event.type == MOUSEBUTTONDOWN:
                 break
+        pygame.key.set_repeat()
         
 ##
 
@@ -133,7 +142,10 @@ class PguApp():
             obj.rect.y=self.motore.avatar.rect.y+16
             obj.img_idx=idx_img
             self.motore.raccolto_spathash.add(obj)
-            del self.motore.mag.raccolti[i]
+            
+            nomestrumento=self.motore.mag.raccolti[i][0]['nome']
+            self.motore.mag.raccolti.pop(i)
+            self.motore.mag.selezionabili.pop(nomestrumento)
         self.tabella.remove(tab_riga)
         self.tabella.remove(eti)
         self.tabella.remove(immagine)
@@ -182,7 +194,8 @@ class PguApp():
     def quit(self):
         for s in self.motore.mag.selezionabili:
             self.motore.mag.selezionabili[s]=False
-        self.motore.mag.selezionabili[self.g.value]=True
+        if self.g.value in self.motore.mag.selezionabili:
+            self.motore.mag.selezionabili[self.g.value]=True
         self.mioloop=False
 #EofCLass-------------------------------------------------------------------------------
 
@@ -222,6 +235,8 @@ class Magazzino(model.Object):
                 self.motore.raccolto_spathash.remove(obj)
                 self.suono.play()
         #self.selezionabili['arco']=True
+    def delete_selezionabile(self,key):
+        self.selezionabili.pop(key)
 #-------------------------------------------------------------------------------
 
 
@@ -233,40 +248,33 @@ class Proiettile(model.Object):
         self.freccia1=pygame.image.load('immagini/frnera.png')
         lasso=pygame.image.load('immagini/lasso.png')
         self.lasso=pygame.transform.scale(lasso,(64,15))
-        
-        #freccia=pygame.transform.scale(freccia,(72,72))
-        
         pygame.mixer.init()
         self.motore=motore
-        #if tipo=='f':
-        #    self.dalanciare=self.freccia1
-        #elif tipo=='l':
-        #    self.dalanciare=self.lasso
-        #else: self.dalanciare=self.freccia1
         tipo=self.tipo_proiettile
-        if tipo=='arco':self.dalanciare=self.freccia1
-        elif tipo=='lasso':self.dalanciare=self.lasso
+        if tipo=='arco':
+            self.dalanciare=self.freccia1
+        elif tipo=='lasso':
+            self.dalanciare=self.lasso
         else: 
-            print "seleziona un'arma"
-            self.dalanciare=pygame.Surface((1,1),pygame.SRCALPHA, 32)
-        self.rect=self.image.get_rect()
-
-        self.rect.x=self.motore.avatar.rect.x-self.dalanciare.get_width()/2
-        self.rect.y=self.motore.avatar.rect.y-self.dalanciare.get_height()/2
-        pos= self.motore.camera.screen_to_world(mouse_position)
-        self.mouse_position=pos
-        dify= (pos[1]-self.rect.y) 
-        difx=  (pos[0]-self.rect.x)
-        angolo_rads=math.atan2(dify,difx)
-        #self.coefa=float(dify)/float(difx)
-
-        self.dx=math.cos(angolo_rads)
-        self.dy=math.sin(angolo_rads)
-        self.dalanciare=pygame.transform.rotate(self.dalanciare, 360-angolo_rads*57.29)
-        self.sprite=pygame.sprite.Sprite()
-        self.sprite.image=self.dalanciare
-        self.sprite.rect=self.rect
-        self.colpito=False
+            dialog = DialogoAvvisi(testo="Seleziona un'arma o uno strumento da usare! (tasto E)")
+            #self.dalanciare=pygame.Surface((1,1),pygame.SRCALPHA, 32)
+        if hasattr(self,'dalanciare'):
+            self.rect=self.image.get_rect()
+            self.rect.x=self.motore.avatar.rect.x-self.dalanciare.get_width()/2
+            self.rect.y=self.motore.avatar.rect.y-self.dalanciare.get_height()/2
+            pos= self.motore.camera.screen_to_world(mouse_position)
+            self.mouse_position=pos
+            dify= (pos[1]-self.rect.y) 
+            difx=  (pos[0]-self.rect.x)
+            angolo_rads=math.atan2(dify,difx)
+            #self.coefa=float(dify)/float(difx)
+            self.dx=math.cos(angolo_rads)
+            self.dy=math.sin(angolo_rads)
+            self.dalanciare=pygame.transform.rotate(self.dalanciare, 360-angolo_rads*57.29)
+            self.sprite=pygame.sprite.Sprite()
+            self.sprite.image=self.dalanciare
+            self.sprite.rect=self.rect
+            self.colpito=False
 
     
     @property
@@ -277,7 +285,8 @@ class Proiettile(model.Object):
     
     #------------------------------------
     def mostra(self):
-        self.motore.avatar_group.add(self)
+        if hasattr(self,'rect'):
+            self.motore.avatar_group.add(self)
     #------------------------------------
     def muovi(self): 
         if not self.colpito:
@@ -354,6 +363,7 @@ class Miohero(model.Object):
         self.herosprite.rect=self.rect
         self.position = map_pos
         self.screen_position = screen_pos
+        
             
     #------------------------------------       
     def crea_giocatore_animato(self):
@@ -396,6 +406,8 @@ class Miohero(model.Object):
             image=self.standing_scelta
             dim_meta= (int(image.get_size()[0]/self.div_scala),int(image.get_size()[1]/self.div_scala))
             image=pygame.transform.scale(image,dim_meta)
+        if hasattr(self.parent,'arma') and not self.parent.cammina:
+            self.parent.arma.draw_arma()
         return image
     #------------------------------------ 
     @property
@@ -418,6 +430,51 @@ class Miohero(model.Object):
         miosprite.image=self.image
         miosprite.rect=self.hitbox
         return miosprite
+
+#-------------------------------------------------------------------------------   
+class Arma(object):
+    def __init__(self,parent):
+        self.parent=parent
+        arma=pygame.image.load('immagini/spada.png').convert()
+        self.arma=pygame.transform.scale(arma,(16,16))
+    
+    @property
+    def arma_img(self):
+        colorkey = self.arma.get_at((0,0))
+        self.arma.set_colorkey(colorkey, RLEACCEL)
+        return self.arma
+    
+    def draw_spada(self):
+        cx,cy=self.parent.State.camera.rect.topleft
+        img=self.arma_img
+        avatar=self.parent.avatar
+        direzione=self.parent.direzione_avatar
+        if not avatar.dormi:
+            x=avatar.rect.x-cx
+            y=avatar.rect.y-cy
+            if direzione=='right':
+                x=avatar.rect.x-cx-3
+                y=avatar.rect.y-cy-9
+            elif direzione=='left':
+                img=pygame.transform.flip(self.arma_img,True,False)
+                y=avatar.rect.y-cy-9
+                x=avatar.rect.x-cx-25
+            elif direzione=='front':
+                y=avatar.rect.y-cy-4
+                x=avatar.rect.x-cx-12
+            elif direzione=='back':
+                img=pygame.transform.rotate(self.arma_img,200)
+                img=pygame.transform.scale(img,(10,10))
+                y=avatar.rect.y-cy+5
+                x=avatar.rect.x-cx
+            #print direzione+str(x)+ str(y)
+            self.parent.screen.blit(img,(x,y))
+    
+    def draw_arma(self):
+        if 'spada' in self.parent.mag.selezionabili:
+            if self.parent.mag.selezionabili['spada']:
+                self.draw_spada()
+                
         
 #-------------------------------------------------------------------------------
 class App_gum(Engine):
@@ -499,6 +556,7 @@ class App_gum(Engine):
         self.catturabili=pygame.sprite.Group()
         #self.lista_beast=[]
         self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
+        
         self.direzione_avatar='front'
         #Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         Engine.__init__(self, caption='LandOfFire', resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
@@ -585,7 +643,10 @@ class App_gum(Engine):
         #self.freccia=Proiettile(self)
  
         State.camera.position=Vec2d(State.camera.position)
- 
+        
+        self.arma=Arma(self)
+        self.avatar.arma_img=self.arma.arma_img
+        
         # Create a speed box for converting mouse position to destination
         # and scroll speed.
         self.speed_box = geometry.Diamond(0,0,4,2)
@@ -915,7 +976,7 @@ class App_gum(Engine):
         
         elif key == pygame.K_F4:
             print 'f4'
-            dialog = DialogoAvvisi()
+            dialog = DialogoAvvisi(testo='pippo F4')
         elif key == pygame.K_F5:
             if not self.godebug:
                 self.godebug=True
@@ -945,11 +1006,6 @@ class App_gum(Engine):
 
     #------------------------------------------------------------------ 
     def on_mouse_button_down(self, pos, button):                
-        """ if button==3:
-            self.mouse_down = True
-            self.dialogo_btn=True
-            for k,beast in self.lista_beast.iteritems():
-                beast.dialogosemp.dialogo_btn=self.dialogo_btn"""
         if button==1:
             self.freccia=Proiettile(self,pos)
             if self.freccia:
