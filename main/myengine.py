@@ -95,15 +95,20 @@ class PguApp():
                 coda_eventi=pygame.event.get()
                 for event in coda_eventi:
                         if event.type == pygame.QUIT:
-                                self.quit()
+                            self.quit()
                         elif event.type == pygame.USEREVENT:
-                                continue
+                            continue
+                        elif event.type == pygame.MOUSEBUTTONDOWN:
+                            if event.button==4:
+                                print 'prossimo'
+                            if event.button==5:
+                                print "precedente"
                         elif event.type == pygame.KEYDOWN:
-                                if event.key == pygame.K_e:
-                                        self.quit()
-                                if event.key == pygame.K_ESCAPE:
-                                        self.quit()
-                                        
+                            if event.key == pygame.K_e:
+                                self.quit()
+                            if event.key == pygame.K_ESCAPE:
+                                self.quit()
+                                    
                         self.app.event(event)
                         self.app.paint()
                         pygame.display.flip()
@@ -181,7 +186,11 @@ class PguApp():
     def inventario(self):
         self.tabella.clear()
         self.tabella.tr()
-        etichetta=gui.Label("Inventario oggetti raccolti:")
+        if len(self.motore.mag.raccolti)==0:
+            etichetta=gui.Label("Avvicinati a qualcosa per raccoglierlo")
+        else:
+            etichetta=gui.Label("Inventario oggetti raccolti:")
+        
         self.tabella.td(etichetta,colspan=2)
         self.loop_inventario(self.motore.mag.raccolti)
     #------------------------------------------------------------------------------- 
@@ -243,7 +252,6 @@ class Magazzino(model.Object):
 
 #-------------------------------------------------------------------------------
 class Proiettile(model.Object):
-    
     #------------------------------------
     def __init__(self,motore,mouse_position):
         self.freccia1=pygame.image.load('immagini/frnera.png')
@@ -252,38 +260,34 @@ class Proiettile(model.Object):
         pygame.mixer.init()
         self.motore=motore
         tipo=self.tipo_proiettile
-        if tipo=='arco':
-            self.dalanciare=self.freccia1
-        elif tipo=='lasso':
-            self.dalanciare=self.lasso
-        else: 
-            dialog = DialogoAvvisi(testo="Seleziona un'arma o uno strumento da usare! (tasto E)")
-            #self.dalanciare=pygame.Surface((1,1),pygame.SRCALPHA, 32)
+        if tipo=='arco':  self.dalanciare=self.freccia1
+        elif tipo=='lasso': self.dalanciare=self.lasso
         if hasattr(self,'dalanciare'):
-            self.rect=self.image.get_rect()
-            self.rect.x=self.motore.avatar.rect.x-self.dalanciare.get_width()/2
-            self.rect.y=self.motore.avatar.rect.y-self.dalanciare.get_height()/2
-            pos= self.motore.camera.screen_to_world(mouse_position)
-            self.mouse_position=pos
-            dify= (pos[1]-self.rect.y) 
-            difx=  (pos[0]-self.rect.x)
-            angolo_rads=math.atan2(dify,difx)
-            #self.coefa=float(dify)/float(difx)
-            self.dx=math.cos(angolo_rads)
-            self.dy=math.sin(angolo_rads)
-            self.dalanciare=pygame.transform.rotate(self.dalanciare, 360-angolo_rads*57.29)
-            self.sprite=pygame.sprite.Sprite()
-            self.sprite.image=self.dalanciare
-            self.sprite.rect=self.rect
-            self.colpito=False
-
-    
+            self.orienta_proiettile(mouse_position)
+     #------------------------------------
+    def orienta_proiettile(self,mouse_position):
+        self.rect=self.image.get_rect()
+        self.rect.x=self.motore.avatar.rect.x-self.dalanciare.get_width()/2
+        self.rect.y=self.motore.avatar.rect.y-self.dalanciare.get_height()/2
+        pos= self.motore.camera.screen_to_world(mouse_position)
+        self.mouse_position=pos
+        dify= (pos[1]-self.rect.y) 
+        difx=  (pos[0]-self.rect.x)
+        angolo_rads=math.atan2(dify,difx)
+        #self.coefa=float(dify)/float(difx)
+        self.dx=math.cos(angolo_rads)
+        self.dy=math.sin(angolo_rads)
+        self.dalanciare=pygame.transform.rotate(self.dalanciare, 360-angolo_rads*57.29)
+        self.sprite=pygame.sprite.Sprite()
+        self.sprite.image=self.dalanciare
+        self.sprite.rect=self.rect
+        self.colpito=False
+    #------------------------------------
     @property
     def tipo_proiettile(self):
         for arma,selettore in self.motore.mag.selezionabili.iteritems():
             if selettore:
                 return arma
-    
     #------------------------------------
     def mostra(self):
         if hasattr(self,'rect'):
@@ -291,21 +295,12 @@ class Proiettile(model.Object):
     #------------------------------------
     def muovi(self): 
         if not self.colpito:
-            """if len(self.lista_pos)>0: 
-                pos=self.lista_pos.pop(0)
-                self.rect.x,self.rect.y=pos
-            p=geometry.step_toward_point((self.rect.x,self.rect.y), self.mouse_position, 10)
-            self.rect.x=p[0]
-            self.rect.y=p[1]
-            print p"""
             #con trigonometria
             self.rect.x=self.rect.x+self.dx*10
             self.rect.y=self.rect.y+self.dy*10
             hits= pygame.sprite.spritecollide(self.sprite,self.motore.beast_sprite_group, False)
-            
             if hits:
                 ogg_colpito=self.motore.lista_beast[hits[0].id]
-                
                 if ogg_colpito.id<>'Wolf':
                     #if hasattr(ogg_colpito,'miocingdying'):
                     if hasattr(ogg_colpito,'evento_colpito'):
@@ -327,15 +322,40 @@ class Proiettile(model.Object):
             #con coefficiente angolare
             #self.rect.x=self.rect.x+4
             #self.rect.y=self.rect.y+4*self.coefa
-        
+
     #------------------------------------
     @property
     def image(self):
         #self.freccia=pygame.transform.rotate(self.freccia, 360-self.arcotangente*57.29)
         return self.dalanciare
-        
-
 #-------------------------------------------------------------------------------#end of class
+
+class UtensileSpada(object):
+    def __init__(self,motore,mouse_position):
+        #Proiettile.__init__(self,motore,mouse_position)
+        pygame.mixer.init()
+        self.motore=motore
+        self.check_corpo_a_corpo()
+    #------------------------------------
+    def check_corpo_a_corpo(self):
+        hits= pygame.sprite.spritecollide(self.motore.avatar.sprite,self.motore.beast_sprite_group, False)
+        if hits:
+            ogg_colpito=self.motore.lista_beast[hits[0].id]
+            if hasattr(ogg_colpito,'evento_colpito'):
+                ogg_colpito.evento_colpito()
+            self.colpito=True
+    #------------------------------------
+    def muovi(self): 
+        pass
+    #------------------------------------
+    def mostra(self):
+        pass
+    #------------------------------------
+    @property
+    def image(self):
+        pass
+#-------------------------------------------------------------------------------#end of class
+
 
 #-------------------------------------------------------------------------------
 class Miohero(model.Object):
@@ -1003,7 +1023,7 @@ class App_gum(Engine):
                     self.toggle_layer(key - K_0)                    
         elif key == K_ESCAPE: 
                 context.pop()
-                
+    #------------------------------------------------------------------ 
     @property
     def intervallo_mouse(self):
         if not hasattr(self,'mousenow'): return True
@@ -1019,9 +1039,19 @@ class App_gum(Engine):
         if button==1:
             if self.intervallo_mouse:
                 self.mousenow=time.time()
-                self.freccia=Proiettile(self,pos)
-                if self.freccia:
-                    self.freccia.mostra()
+                if 'arco' in self.mag.selezionabili:
+                    if self.mag.selezionabili['arco']:
+                        utensile=Proiettile(self,pos)
+                if 'lasso' in self.mag.selezionabili:
+                    if self.mag.selezionabili['lasso']:
+                        utensile=Proiettile(self,pos)
+                if 'spada' in self.mag.selezionabili:
+                    if self.mag.selezionabili['spada']:
+                        utensile=UtensileSpada(self,pos)
+                if 'utensile' in locals():
+                    utensile.mostra()
+                else:
+                    dialog = DialogoAvvisi(testo="Seleziona un'arma o uno strumento da usare! (tasto E)")
 
     #------------------------------------------------------------------ 
     def on_mouse_button_up(self, pos, button):
@@ -1055,6 +1085,7 @@ class App_gum(Engine):
         context.pop()
     
     def mio_riprendi(self):
+
         context.push(self.app_salvata)
         while context.top():
             State.clock.tick()

@@ -27,9 +27,26 @@ class AnimatoSemplice(MovingBeast):
     def draw_fotogramma(self):
         self.disegna_linea_salute()
         return True
-    
+    #----------------------------------------
+
+    @property
+    def corpo_a_corpo(self):
+        hits= pygame.sprite.spritecollide(self.motore.avatar.sprite,self.motore.beast_sprite_group, False)
+        if hits:
+            ogg_colpito=self.motore.lista_beast[hits[0].id]
+            print ogg_colpito.id
+            return True
+        else:
+            return False
+    #----------------------------------------
     def evento_colpito(self):
-        self.fallo_morire()
+        if 'arco' in self.motore.mag.selezionabili:
+            if self.motore.mag.selezionabili['arco']==True:
+                if not self.corpo_a_corpo:
+                    self.fallo_morire()
+        if 'spada' in self.motore.mag.selezionabili:
+            if self.motore.mag.selezionabili['spada']==True:
+                self.fallo_morire()
     #-------------------------------------------------------------------------
     def fallo_morire(self):
         if hasattr(self, 'miocingdying'):
@@ -74,12 +91,14 @@ class AnimatoSemplice(MovingBeast):
         #sezione che effettivamente muove l'animazione, ma solo se non èin pausa o non è fermata
         if self.is_walking and not self.fermato and not self.is_persona_collide: 
             self.scegli_fotogramma_animazione(self.miocing,self.direzione)
-            
+        elif self.is_persona_collide and self.morto:
+            self.scegli_fotogramma_animazione(self.miocing,self.direzione)
         else:
-            if (self.direzione=='right') or (self.direzione=='SE') or (self.direzione=='NE'): 
-                self.fotogramma=self.miocing.animObjs['right_stand'].ritorna_fotogramma()
-            elif (self.direzione=='left') or (self.direzione=='SW') or (self.direzione=='NW'): 
-                self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
+            if not self.morto:
+                if (self.direzione=='right') or (self.direzione=='SE') or (self.direzione=='NE'): 
+                    self.fotogramma=self.miocing.animObjs['right_stand'].ritorna_fotogramma()
+                elif (self.direzione=='left') or (self.direzione=='SW') or (self.direzione=='NW'): 
+                    self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
             
         if (self.lanciato==False) and (self.is_walking==False) and (self.staifermo==False):
                 self.mio_timer_pausa() #lancia il timer che conta i secondi della pausa passati come parametro a MovingBeast()
@@ -110,11 +129,14 @@ class AnimatoCambiaTipo(AnimatoSemplice):
         newbeast.x=self.x
         newbeast.y=self.y
         newbeast.segui=True
+        self.motore.mag.suono.play()
         newbeast.motore=self.motore
         newbeast.aggiorna_pos_da_seguire()
         self.motore.lista_beast[self.id]=newbeast
         self.motore.avatar_group.add(newbeast)
         self.motore.avatar_group.objects.remove(self)
+        dict_prop={'nome':self.id}
+        self.motore.mag.seguito.append((dict_prop,self.sprite_fotogrammanew))
 #------------------------------------------------------------
 #fine della Classe
 

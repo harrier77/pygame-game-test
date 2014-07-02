@@ -6,12 +6,13 @@ __builtin__.miodebug=False
 from main import myengine
 import pygame
 from pygame.locals import *
-import miovar_dump
-from miovar_dump import miovar_dump
+import librerie
+from librerie import miovardump
+
 import sys; sys.path.insert(0, "D:\\the_assassins_land_of_fire\\new-trunk\\librerie")
 import gui
 import os
-from miovar_dump import *
+
 
 class Quit(gui.Button):
     def __init__(self,**params):
@@ -37,6 +38,8 @@ class Lancia(gui.Button):
             self.inizializzato=True
             self.genitore.app_gioco=oggetto
         else:
+            print self.genitore.app_gioco
+            save(self.genitore.app_gioco)
             self.genitore.app_gioco.mio_riprendi()
         self.pgu.repaint()
 
@@ -94,12 +97,15 @@ class MioMenu():
         tabella.td(settaggi)
         
         tabella.tr()
-        punteggio=gui.Button(value='Punteggio')
-        tabella.td(punteggio)
+        saveb=gui.Button(value='Save')
+        self.app_gioco="vuoto"
+        saveb.connect(gui.CLICK,save,self.app_gioco)
+        tabella.td(saveb)
         
         tabella.tr()
-        inventario=gui.Button(value='Inventario')
-        tabella.td(inventario)
+        restoreb=gui.Button(value='Restore')
+        tabella.td(restoreb)
+        restoreb.connect(gui.CLICK,restore)
         
         tabella.tr()
         e = Quit(miomenu=self)
@@ -124,5 +130,35 @@ class MioMenu():
                         self.app.event(event)
                         self.app.loop()
                         clock.tick(60)
+
+import pickle
+def save(mio_ogg):
+    """data1 = {'a': [1, 2.0, 3, 4+6j],
+             'b': ('string', u'Unicode string'),
+             'c': None}
+
+    selfref_list = [1, 2, 3]
+    selfref_list.append(selfref_list)"""
+
+    output = open('data.pkl', 'wb')
+    data1=mio_ogg
+    # Pickle dictionary using protocol 0.
+    pickle.dump(data1, output)
+
+    # Pickle the list using the highest protocol available.
+    #pickle.dump(selfref_list, output, -1)
+
+    output.close()
+
+def restore():
+    pkl_file = open('data.pkl', 'rb')
+
+    data1 = pickle.load(pkl_file)
+    print data1
+
+    data2 = pickle.load(pkl_file)
+    print data2
+
+    pkl_file.close()
 
 o=MioMenu()
