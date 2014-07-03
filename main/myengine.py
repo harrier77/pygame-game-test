@@ -454,18 +454,21 @@ class Miohero(model.Object):
 
 #-------------------------------------------------------------------------------   
 class Arma(object):
-    def __init__(self,parent):
+    def __init__(self,parent,nomeutensile='spada'):
         self.parent=parent
-        arma=pygame.image.load('immagini/spada.png').convert()
-        self.arma=pygame.transform.scale(arma,(16,16))
-    
+        #self.load(nomeutensile)
+
+    #def load(self,nomeutensile):
+    #    arma=pygame.image.load('immagini/'+nomeutensile+'.png').convert()
+    #    self.arma=pygame.transform.scale(arma,(16,16))
+        
     @property
     def arma_img(self):
         colorkey = self.arma.get_at((0,0))
         self.arma.set_colorkey(colorkey, RLEACCEL)
         return self.arma
     
-    def draw_spada(self):
+    def draw(self):
         cx,cy=self.parent.State.camera.rect.topleft
         img=self.arma_img
         avatar=self.parent.avatar
@@ -494,8 +497,17 @@ class Arma(object):
     def draw_arma(self):
         if 'spada' in self.parent.mag.selezionabili:
             if self.parent.mag.selezionabili['spada']:
-                self.draw_spada()
-                
+                arma=pygame.image.load('immagini/spada.png').convert()
+                self.arma=pygame.transform.scale(arma,(16,16))
+                self.draw()
+        if 'piccone' in self.parent.mag.selezionabili:
+            if self.parent.mag.selezionabili['piccone']:
+                arma=pygame.image.load('immagini/piccone.png').convert()
+                self.arma=pygame.transform.scale(arma,(24,24))
+                self.draw()
+            
+#--EofClass---------------------------------------------------------                
+
         
 #-------------------------------------------------------------------------------
 class App_gum(Engine):
@@ -666,7 +678,7 @@ class App_gum(Engine):
         State.camera.position=Vec2d(State.camera.position)
         
         self.arma=Arma(self)
-        self.avatar.arma_img=self.arma.arma_img
+        #self.avatar.arma_img=self.arma.arma_img
         
         # Create a speed box for converting mouse position to destination
         # and scroll speed.

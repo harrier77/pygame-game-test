@@ -1,7 +1,8 @@
 #certi eventi vengono percepiti solo una volta in tutto il gioco e altri si resettano quando torni
 #gli oggetti spariscono anche se si cambia mappa
 #quando parli con uno si gira verso di te
-OK #certi animali si prendono con il lazo e altri se ci vai adosso 
+OK #certi animali si prendono con il lasso e altri se ci vai adosso 
+OK #se tiri frecce ad animali domestici non succede niente, devi usare il lasso
 #tutti hanno la vita
 OK  #puoi sparare frecce una volta ogni 2 secondi 
 OK #quando muoino gli animali aggiustare animazioni 

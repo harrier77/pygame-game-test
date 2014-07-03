@@ -7,11 +7,12 @@ from main import myengine
 import pygame
 from pygame.locals import *
 import librerie
-from librerie import miovardump
-
+import miovar_dump
+from miovar_dump import miovar_dump
 import sys; sys.path.insert(0, "D:\\the_assassins_land_of_fire\\new-trunk\\librerie")
 import gui
 import os
+import pickle
 
 
 class Quit(gui.Button):
@@ -39,9 +40,28 @@ class Lancia(gui.Button):
             self.genitore.app_gioco=oggetto
         else:
             print self.genitore.app_gioco
-            save(self.genitore.app_gioco)
+            #save(self.genitore.app_gioco)
             self.genitore.app_gioco.mio_riprendi()
         self.pgu.repaint()
+
+class Salva(gui.Button):
+    def __init__(self,**params):
+        params['value'] = 'Salva'
+        gui.Button.__init__(self,**params)
+        self.pgu=params['pgu']
+        self.genitore=params['genitore']
+        self.connect(gui.CLICK,self.save,params)
+        self.inizializzato=False
+    def save(self,params):
+        print 'save'
+        print self.pgu
+        data1=self.genitore.app_gioco.State.map
+        miovar_dump(data1)
+        print data1
+        output = open('data.pkl', 'wb')
+        pickle.dump(data1, output)
+        output.close()
+        
 
 class Settaggi(gui.Button):
     def __init__(self,genitore):
@@ -97,9 +117,7 @@ class MioMenu():
         tabella.td(settaggi)
         
         tabella.tr()
-        saveb=gui.Button(value='Save')
-        self.app_gioco="vuoto"
-        saveb.connect(gui.CLICK,save,self.app_gioco)
+        saveb=Salva(pgu=self.app,genitore=self)
         tabella.td(saveb)
         
         tabella.tr()
@@ -131,7 +149,7 @@ class MioMenu():
                         self.app.loop()
                         clock.tick(60)
 
-import pickle
+
 def save(mio_ogg):
     """data1 = {'a': [1, 2.0, 3, 4+6j],
              'b': ('string', u'Unicode string'),

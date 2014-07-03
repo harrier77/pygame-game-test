@@ -31,6 +31,11 @@
     <property name="nome" value="lasso"/>
    </properties>
   </tile>
+  <tile id="4">
+   <properties>
+    <property name="nome" value="piccone"/>
+   </properties>
+  </tile>
   <tile id="5">
    <properties>
     <property name="nome" value="spada"/>
@@ -4549,7 +4554,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="846"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -13079,8 +13084,8 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="2"/>
+   <tile gid="2"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -13108,8 +13113,8 @@
    <tile gid="2"/>
    <tile gid="2"/>
    <tile gid="2"/>
-   <tile gid="2"/>
-   <tile gid="2"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
    <tile gid="2"/>
    <tile gid="2"/>
    <tile gid="2"/>
@@ -15867,8 +15872,8 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="583"/>
+   <tile gid="580"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -15897,7 +15902,7 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="580"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>

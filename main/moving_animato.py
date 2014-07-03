@@ -121,7 +121,9 @@ class AnimatoCambiaTipo(AnimatoSemplice):
         AnimatoSemplice.__init__(self,animato)
     #---------------------------------------------------
     def evento_colpito(self):
-        self.cambialo()
+        if 'lasso' in self.motore.mag.selezionabili:
+            if self.motore.mag.selezionabili['lasso']:
+                self.cambialo()
     #----------------------------------------------------
     def cambialo(self):
         print "cambialo"
