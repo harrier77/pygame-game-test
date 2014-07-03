@@ -299,12 +299,31 @@ class AnimatoSegue(MovingBeast):
                 self.segui=True
                 dict_prop={'nome':self.id}
                 self.motore.mag.seguito.append((dict_prop,self.sprite_fotogrammanew))
-
+    #----------------------------------------
+    @property
+    def collisione_con_altri(self):
+        if len(self.listap)>0: 
+            pos= self.listap.pop(0)
+            is_walkable=True
+            newhitbox=self.rect.copy()
+            newhitbox.x=pos[0]
+            hits=self.motore.avatar_group.objects.intersect_objects(newhitbox)
+            if not hits: is_walkable=True
+            else: is_walkable=False
+            newhitbox.y=pos[1]
+            hits=self.motore.avatar_group.objects.intersect_objects(newhitbox)
+            if not hits:is_walkable=True
+            else: is_walkable=False
+            return is_walkable
+        else:
+            return True
     #----------------------------------------
     def muovi_animato(self):
         self.controlla_se_preso()
         if self.segui : self.aggiorna_pos_da_seguire()
         #sezione che effettivamente muove l'animazione, ma solo se la lista delle posizioni da seguire non è vuota
+        #print self.collisione_con_altri
+        #if self.collisione_con_altri:
         if self.is_p_in_listap: 
             self.scegli_fotogramma_animazione(self.miocing,self.direzione)
         else:

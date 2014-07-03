@@ -1,12 +1,17 @@
-#certi eventi vengono percepiti solo una volta in tutto il gioco e altri si resettano quando torni
-#gli oggetti spariscono anche se si cambia mappa
+serve il salvataggio:
+    #certi eventi vengono percepiti solo una volta in tutto il gioco e altri si resettano quando torni
+    #gli oggetti spariscono anche se si cambia mappa
+
 #quando parli con uno si gira verso di te
+
 OK #certi animali si prendono con il lasso e altri se ci vai adosso 
 OK #se tiri frecce ad animali domestici non succede niente, devi usare il lasso
-#tutti hanno la vita
+OK #tutti hanno la vita (sempre, se c'è l'animazione "muore")
 OK  #puoi sparare frecce una volta ogni 2 secondi 
 OK #quando muoino gli animali aggiustare animazioni 
-#quelli che ti seguono non devono essere sovrapposti
+QUASI FATTO #quelli che ti seguono non devono essere sovrapposti
 OK #aggiustare frecce lazo  (fatto selettore)
 OK #quando parli non puoi girarti 
+
+
 #aggiustare un po tutto
