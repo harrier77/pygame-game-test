@@ -1,5 +1,18 @@
 import pygame
 import math
+from miovardump import miovar_dump
+from gummworld2 import geometry
+
+#funzioni statiche, no classi
+def primo_sprite_in_collisione(tiled_map,rect):
+    #print rect
+    return tiled_map.get_layers(0)[0].objects.intersect_objects(rect)[0]
+    
+def prima_cella_in_collisione(tiled_map,rect):
+    #print rect
+    return tiled_map.get_layers(0)[0].objects.intersect_indices(rect)[0]
+
+
 #-------------------------------------------------------------------------------
 class Proiettile(object):
     #------------------------------------
@@ -106,24 +119,48 @@ class UtensileSpada(object):
         pass
 #-------------------------------------------------------------------------------#end of class
 
-class UtensilePiccone(object):
+class UtensilePiccone(Proiettile):
     def __init__(self,motore,mouse_position):
         pygame.mixer.init()
         self.motore=motore
-        self.check_collision()
-    #------------------------------------
-    def check_collision(self):
-        hits= pygame.sprite.spritecollide(self.motore.avatar.sprite,self.motore.collision_group, False)
-        if hits:
-            print hits
+        self.dalanciare=pygame.image.load('immagini/piccone.png')
+        pygame.mixer.init()
+        self.motore=motore
+        self.orienta_proiettile(mouse_position)
+        partenza_pos_mappa=(self.motore.avatar.rect.x,self.motore.avatar.rect.y)
+        cx,cy = self.motore.camera.rect.topleft
+        partenza_pos_schermo=(self.motore.avatar.rect.x-cx,self.motore.avatar.rect.y-cy)
+        self.distanza=int(geometry.distance(partenza_pos_schermo,mouse_position))
+   
     #------------------------------------
     def muovi(self): 
-        pass
+        if self.distanza<64:
+            if not self.colpito:
+                #con trigonometria
+                self.rect.x=self.rect.x+self.dx*10
+                self.rect.y=self.rect.y+self.dy*10
+                hits= pygame.sprite.spritecollide(self.sprite,self.motore.collision_group, False)
+                if hits:
+                    self.motore.suono_colpito.play()
+                    self.motore.avatar_group.objects.remove(self) #rimuovi il piccone in movimento
+                    ostacolo_da_rimuovere=hits[0] #individua la collisione
+                    self.motore.collision_group.objects.remove(ostacolo_da_rimuovere) #rimuovi la collisione
+                    #hits1= self.motore.ground_group.objects.intersect_objects(herobox) #individua lo sprite del terreno dove sta l'avatar
+                    #hits1= pygame.sprite.spritecollide(self.motore.avatar.sprite,self.motore.ground_group, False)
+                    hits1=primo_sprite_in_collisione(self.motore.tiled_map,self.motore.avatar.hitbox)
+                    if hits1:
+                        sprite_tile_terreno=hits1
+                        nuovosprite=pygame.sprite.Sprite()
+                        nuovosprite.image=sprite_tile_terreno.image
+                        #print sprite_tile_terreno.rect
+                        nuovosprite.rect=ostacolo_da_rimuovere.rect
+                        self.motore.ground_spathash.add(nuovosprite)
+                        self.motore.renderer.set_dirty(nuovosprite.rect)
     #------------------------------------
     def mostra(self):
-        pass
-    #------------------------------------
-    @property
-    def image(self):
-        pass
+        if self.distanza<32:
+            if hasattr(self,'rect'):
+                self.motore.avatar_group.add(self)
+                
+                
 #-------------------------------------------------------------------------------#end of class

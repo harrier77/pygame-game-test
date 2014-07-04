@@ -404,7 +404,7 @@ class Arma(object):
 
         
 #-------------------------------------------------------------------------------
-class App_gum(Engine):
+class Motore(Engine):
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
                             coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True):
         self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
@@ -434,6 +434,9 @@ class App_gum(Engine):
         self.tiled_map = TiledMap(dir+mappa)
 
         for mylayer in self.tiled_map.layers:
+                if mylayer.name=="Ground1":
+                        self.ground_group_i= mylayer.layeri
+                        self.ground_spathash=mylayer.objects
                 if mylayer.name=="Collision":
                         self.collision_group_i= mylayer.layeri
                 if mylayer.name=="Fringe":
@@ -468,6 +471,7 @@ class App_gum(Engine):
         ## Save special layers.
         self.all_groups = self.tiled_map.layers[:]
         self.avatar_group = self.tiled_map.layers[self.fringe_i]
+        self.ground_group= self.tiled_map.layers[self.ground_group_i]
         self.over_group=self.tiled_map.layers[self.over_i]
         self.collision_group = self.tiled_map.layers[self.collision_group_i]
         num_layers=len(self.all_groups)-1
@@ -727,7 +731,9 @@ class App_gum(Engine):
                         elif isinstance(s,Proiettile):
                             s.muovi()
                             blit(s.image, s.rect.move(-cx,-cy))
-                            pass
+                        elif isinstance(s,UtensilePiccone):
+                            s.muovi()
+                            blit(s.image, s.rect.move(-cx,-cy))
                         else:
                             blit(s.image, s.rect.move(-cx,-cy))
                             pass
@@ -1003,7 +1009,7 @@ class App_gum(Engine):
 #Eofclass#-----------------------------------------------------------------------------------			
 
 def miomain(debug=True,hero_ini_pos1=(0,0)):
-    oggetto=App_gum(resolution=(800,600),miodebug=debug,hero_ini_pos=hero_ini_pos1)
+    oggetto=Motore(resolution=(800,600),miodebug=debug,hero_ini_pos=hero_ini_pos1)
     icon=pygame.image.load(".\immagini\\icona2.gif")
     pygame.display.set_icon(icon)
     gummworld2.run(oggetto)

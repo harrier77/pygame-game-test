@@ -8,6 +8,8 @@ from gummworld2 import geometry,model,data
 import copy
 
 
+    
+    
 #---------------------------------------
 #Animazione di unità che non parla e non affronta il personaggio avatar
 #limitandosi a camminare avanti e indietro secondo il percorso della proprietà points

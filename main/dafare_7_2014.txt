@@ -13,5 +13,8 @@ QUASI FATTO #quelli che ti seguono non devono essere sovrapposti
 OK #aggiustare frecce lazo  (fatto selettore)
 OK #quando parli non puoi girarti 
 
+#FATTO piccone che scava rimuovendo le collisioni
 
 #aggiustare un po tutto
+
+#selettore come quadrato al centro in basso
