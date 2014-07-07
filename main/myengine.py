@@ -66,8 +66,92 @@ class DialogoAvvisi(gui.Dialog):
                 break
         pygame.key.set_repeat()
         
-##
+#EofClass----------------
 
+class Selettore(gui.Dialog):
+    def __init__(self,**params):
+        motore=params['motore']
+        sprite_selez=self.individua_selezionato(motore.mag.selezionabili,motore.mag.raccolti)
+        self.immagine=gui.Image(sprite_selez.image)
+        self.dic_selezionabili=motore.mag.selezionabili
+        self.dic_raccolti=motore.mag.raccolti
+        w=50
+        h=60
+        posx=(800-w)/2
+        posy=600-h
+        self.doc = gui.Document(width=w,height=h,valign=-1,align=0)
+        self.doc.add(self.immagine,align=-1)
+        titlewidg = gui.Label("Sel")
+        gui.Dialog.__init__(self,titlewidg,self.doc,valign=-1,align=-1)
+        area=pygame.Rect(posx,posy,w,h)
+        self.app = gui.App()
+        self.open()
+        self.app.init(screen=State.screen.surface,widget=self,area=area)
+        self.app.paint()
+        pygame.display.flip()
+        self.ciclo()
+    #-----------------------------
+    def individua_selezionato(self,lista,dic_raccolti):
+        selezionato=None
+        sprite_selez=None
+        for nome,condizione in lista.iteritems():
+            if condizione:
+                selezionato=nome
+                self.selez=nome
+        if selezionato is not None:
+            for key,record in dic_raccolti.iteritems():
+                if record[0]['nome']==selezionato:
+                    sprite_selez=record[1]
+        return sprite_selez
+    #------------------------------
+    def cambia_selez(self):
+        for k,condizione in self.dic_selezionabili.iteritems():
+            if condizione:
+                self.dic_selezionabili[k]=False
+                next=self.dic_next[k]
+                if next is None:
+                    next=self.dic_selezionabili.keys()[0]
+                self.dic_selezionabili[next]=True
+                break
+        sprite_selez=self.individua_selezionato(self.dic_selezionabili,self.dic_raccolti)
+        self.doc.remove(self.immagine)
+        self.immagine=gui.Image(sprite_selez.image)
+        self.doc.add(self.immagine,align=-1)
+        self.app.paint()
+        pygame.display.flip()
+    #--------------------------------------------------
+    def neighborhood(self,iterable):
+        iterator = iter(iterable)
+        prev = None
+        item = iterator.next()  # throws StopIteration if empty.
+        for next in iterator:
+            yield (prev,item,next)
+            prev = item
+            item = next
+        yield (prev,item,None)
+    #----------------------------------
+    @property
+    def dic_next(self):
+        mydic_next=dict()
+        for lista_vicini in self.neighborhood(self.dic_selezionabili):
+            next=lista_vicini[2]
+            item=lista_vicini[1]
+            mydic_next[item]=next
+        return mydic_next
+    #----------------------------
+    def ciclo(self):
+        while 1:
+            event = pygame.event.wait()
+            if event.type == MOUSEBUTTONDOWN:
+                break
+            if event.type == KEYDOWN:
+                if event.key == K_h:
+                    break
+                if event.key==K_RIGHT:
+                    self.cambia_selez()
+                    
+        pygame.key.set_repeat()
+#EofClass----------------    
 
 #-------------------------------------------------------------------------------
 class PguApp():
@@ -906,7 +990,9 @@ class Motore(Engine):
                 self.tipofreccia='f'
             else:
                 self.tipofreccia='l'
-        
+        elif key==pygame.K_h:
+            print "h"
+            selettore=Selettore(motore=self)
         elif key == pygame.K_F4:
             print 'f4'
             dialog = DialogoAvvisi(testo='pippo F4')
