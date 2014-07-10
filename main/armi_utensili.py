@@ -107,6 +107,8 @@ class UtensileSpada(object):
             if hasattr(ogg_colpito,'evento_colpito'):
                 ogg_colpito.evento_colpito()
             self.colpito=True
+            if self.motore.lista_beast[hits[0].id].sottotipo=='attaccante':
+                self.motore.lista_beast[hits[0].id].vaiattacca=True
     #------------------------------------
     def muovi(self): 
         pass

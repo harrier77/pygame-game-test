@@ -318,13 +318,6 @@
    </properties>
    <polyline points="-63,76 -209,213 -900,273 -1137,341 -1141,752 -1136,1357 -915,1472 -635,1392 -64,1329 725,1361 1333,1469 2021,1441 2069,851 2035,275 1644,104 1699,-160 1305,-295"/>
   </object>
-  <object x="3747" y="2591" width="843" height="44"/>
-  <object x="3959" y="2437">
-   <polyline points="0,0 501,0"/>
-  </object>
-  <object x="3855" y="4151">
-   <polyline points="0,0 11,-3"/>
-  </object>
   <object name="jaguar" type="animato" x="2753" y="3040">
    <properties>
     <property name="id" value="jag1"/>

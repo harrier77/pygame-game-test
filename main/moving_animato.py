@@ -93,7 +93,7 @@ class AnimatoSemplice(MovingBeast):
         #sezione che effettivamente muove l'animazione, ma solo se non èin pausa o non è fermata
         if self.is_walking and not self.fermato and not self.is_persona_collide: 
             self.scegli_fotogramma_animazione(self.miocing,self.direzione)
-        elif self.is_persona_collide and self.morto:
+        elif self.is_persona_collide and not self.morto:
             self.scegli_fotogramma_animazione(self.miocing,self.direzione)
         else:
             if not self.morto:
@@ -101,6 +101,7 @@ class AnimatoSemplice(MovingBeast):
                     self.fotogramma=self.miocing.animObjs['right_stand'].ritorna_fotogramma()
                 elif (self.direzione=='left') or (self.direzione=='SW') or (self.direzione=='NW'): 
                     self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
+            else: self.scegli_fotogramma_animazione(self.miocing,self.direzione)
             
         if (self.lanciato==False) and (self.is_walking==False) and (self.staifermo==False):
                 self.mio_timer_pausa() #lancia il timer che conta i secondi della pausa passati come parametro a MovingBeast()
@@ -438,6 +439,8 @@ class AnimatoAttacca(AnimatoSemplice):
         if self.vaiattacca:
             self.aggiorna_pos_da_seguire()
         #self.miocing.moveConductor.play()
+        if self.morto:
+            self.miocing=self.miocingdying
         self.scegli_fotogramma_con_fermo_animato(self.miocing,self.direzione)
         return self.fotogramma
 #EofClass---------------------------------------------------

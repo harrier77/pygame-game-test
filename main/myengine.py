@@ -16,6 +16,7 @@ import gummworld2
 from gummworld2 import context, data, model, geometry, toolkit
 from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim,gui
+
 from miovardump import miovar_dump
 from moving_beast import calcola_passi,MovingBeast,Dialogosemplice
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
@@ -68,28 +69,50 @@ class DialogoAvvisi(gui.Dialog):
         
 #EofClass----------------
 
-class Selettore(gui.Dialog):
+class Selettore(gui.Container):
     def __init__(self,**params):
         motore=params['motore']
-        sprite_selez=self.individua_selezionato(motore.mag.selezionabili,motore.mag.raccolti)
+        if motore.mag.selezionabili:
+            if not True in motore.mag.selezionabili.values():
+                firstkey=motore.mag.selezionabili.iterkeys().next()
+                motore.mag.selezionabili[firstkey]=True
+            sprite_selez=self.individua_selezionato(motore.mag.selezionabili,motore.mag.raccolti)
+        else:
+            return
+        
+        if sprite_selez==None:
+            dialog = DialogoAvvisi(testo="Seleziona un'arma o uno strumento da usare! (tasto E)")
+            return
         self.immagine=gui.Image(sprite_selez.image)
         self.dic_selezionabili=motore.mag.selezionabili
         self.dic_raccolti=motore.mag.raccolti
-        w=50
-        h=60
+        w=40
+        h=40
         posx=(800-w)/2
         posy=600-h
         self.doc = gui.Document(width=w,height=h,valign=-1,align=0)
         self.doc.add(self.immagine,align=-1)
         titlewidg = gui.Label("Sel")
-        gui.Dialog.__init__(self,titlewidg,self.doc,valign=-1,align=-1)
+        #gui.Dialog.__init__(self,titlewidg,self.doc,valign=-1,align=-1)
+        self.my_dialog_init(titlewidg,self.doc)
         area=pygame.Rect(posx,posy,w,h)
         self.app = gui.App()
+        
         self.open()
         self.app.init(screen=State.screen.surface,widget=self,area=area)
         self.app.paint()
         pygame.display.flip()
+        #miovar_dump(self.app.theme)
         self.ciclo()
+    #-----------------------------
+    def my_dialog_init(self,title,main,**params):
+        params.setdefault('cls','selettore')
+        #gui.Table.__init__(self,**params)
+        #self.tr()
+        #self.td(main,colspan=2,cls=self.cls+".main")
+        gui.Container.__init__(self,**params)
+        self.add(main,0,0)
+        
     #-----------------------------
     def individua_selezionato(self,lista,dic_raccolti):
         selezionato=None
@@ -101,17 +124,20 @@ class Selettore(gui.Dialog):
         if selezionato is not None:
             for key,record in dic_raccolti.iteritems():
                 if record[0]['nome']==selezionato:
-                    sprite_selez=record[1]
+                    sprite_selez=record[1]          
         return sprite_selez
     #------------------------------
-    def cambia_selez(self):
+    def cambia_selez(self,verso='next'):
         for k,condizione in self.dic_selezionabili.iteritems():
             if condizione:
                 self.dic_selezionabili[k]=False
-                next=self.dic_next[k]
-                if next is None:
-                    next=self.dic_selezionabili.keys()[0]
-                self.dic_selezionabili[next]=True
+                if verso=='next':
+                    scelto=self.dic_next[1][k]
+                elif verso=='prev':
+                    scelto=self.dic_next[0][k]
+                if scelto is None:
+                    scelto=self.dic_selezionabili.keys()[0]
+                self.dic_selezionabili[scelto]=True
                 break
         sprite_selez=self.individua_selezionato(self.dic_selezionabili,self.dic_raccolti)
         self.doc.remove(self.immagine)
@@ -133,22 +159,30 @@ class Selettore(gui.Dialog):
     @property
     def dic_next(self):
         mydic_next=dict()
+        mydic_prev=dict()
         for lista_vicini in self.neighborhood(self.dic_selezionabili):
+            previous=lista_vicini[0]
             next=lista_vicini[2]
             item=lista_vicini[1]
+            mydic_prev[item]=previous
             mydic_next[item]=next
-        return mydic_next
+        return (mydic_prev,mydic_next)
     #----------------------------
     def ciclo(self):
         while 1:
             event = pygame.event.wait()
             if event.type == MOUSEBUTTONDOWN:
-                break
+                if event.button==4 or event.button==5:
+                    self.cambia_selez()
+                else:
+                    break
             if event.type == KEYDOWN:
-                if event.key == K_h:
+                if event.key == K_h or event.key ==K_ESCAPE:
                     break
                 if event.key==K_RIGHT:
-                    self.cambia_selez()
+                    self.cambia_selez(verso='next')
+                if event.key==K_LEFT:
+                    self.cambia_selez(verso='prev')
                     
         pygame.key.set_repeat()
 #EofClass----------------    
@@ -501,22 +535,47 @@ class Motore(Engine):
         self.lista_beast={}
         self.godebug=False
         
-        #dialogo_btn=False
-        self.beast_sprite_group=pygame.sprite.Group()
         #necessario per resettare la condizione messa dalla libreria PGU
         pygame.key.set_repeat()
         x = 20
         y = 80
+        self.cammina=False   
+        self.corsa=False
         #import os
         os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)    
-        
         resolution = Vec2d(resolution)
-        #dir=".\\mappe\\"
-        #mappa='mini.tmx'
-        self.mappa_dirfile=dir+mappa
-        
-        self.tiled_map = TiledMap(dir+mappa)
+        self.mag=Magazzino(self)
+        self.app_salvata=None
+        self.blockedkeys=False
+        self.tipofreccia='f'
+        #con questa proprietà le collisioni vengono ignorate
+        self.ignora_collisioni=ign_coll
+        State.speed = 10
+        self.movex=0
+        self.movey=0
+        # Mouse and movement state. move_to is in world coordinates.
+        self.move_to = None
+        self.speed = None
+        self.target_moved = (0,0)
+        self.mouse_down = False
+        self.grid_cache = {}
+        self.label_cache = {}
+        self.dict_gid_to_properties={}
+        self.arma=Arma(self)
+        self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
+        self.direzione_avatar='front'
+        self.imm_fermo=self.avatar.sit_standing
+        dir_mappa=dir+mappa
+        self.init_mappa(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
 
+    #EofInit------------------------------------------------------------------ 
+    
+    def init_mappa(self,dir_mappa='',coll_invis=True,hero_ini_pos=(0,0),resolution=(800,600),dormi=True,miodebug=True):
+        self.warps=[]
+        self.eventi=pygame.sprite.Group()
+        self.beast_sprite_group=pygame.sprite.Group()
+        self.mappa_dirfile=dir_mappa
+        self.tiled_map = TiledMap(dir_mappa)
         for mylayer in self.tiled_map.layers:
                 if mylayer.name=="Ground1":
                         self.ground_group_i= mylayer.layeri
@@ -530,25 +589,19 @@ class Motore(Engine):
                 if mylayer.name=="raccolto": 
                         self.raccolto_layer=mylayer
                         self.raccolto_spathash=mylayer.objects
-
-        self.dict_gid_to_properties={}
         for tileset in self.tiled_map.raw_map.tile_sets:
                 for tile in tileset.tiles:
-                        #print tile
                         tile.properties['parent_tileset_name']=tileset.name
                         gid=int(tileset.firstgid)+int(tile.id)
                         tile.properties['numero']=gid
                         self.dict_gid_to_properties[gid]=tile.properties
-        #print self.dict_gid_to_properties
-        #exit()
-        
+
         #carica in una lista i lvelli degli oggetti 
         self.lista_oggetti=list()
         myappend=self.lista_oggetti.append
         for L in self.tiled_map.layers: 
                 if L.is_object_group :
                         myappend(L)
-        #fine
         #l'attr lista_oggetti in realtà è una lista dei layer con oggetti, che spesso è uno solo
         self.prima_lista_ogg=self.lista_oggetti[0].objects.objects
 
@@ -564,18 +617,13 @@ class Motore(Engine):
         self.collision_group.visible = not coll_invis
         ## Remove above-ground layers so we can give map to the renderer.
         del self.tiled_map.layers[1:]
-        self.cammina=False   
         dict_animati={}
-        self.warps=[]
-        self.eventi=pygame.sprite.Group()
         self.catturabili=pygame.sprite.Group()
-        #self.lista_beast=[]
-        self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
-        
-        self.direzione_avatar='front'
-        #Engine.__init__(self, caption='Tiled Map with Renderer '+mappa, resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
+        #self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
         Engine.__init__(self, caption='LandOfFire', resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         self.State=State
+        print hero_ini_pos
+        self.avatar.position=hero_ini_pos
         for index,O in enumerate(self.prima_lista_ogg):
             if O.name==None:
                 gid=int(O.gid)
@@ -590,10 +638,8 @@ class Motore(Engine):
                 if O.name=="Inizio" or O.name=="inizio":
                     hero_ini_pos= O.rect.x,O.rect.y
                     self.avatar.position=hero_ini_pos
-
             if O.type=="warp":
                 self.warps.append(O)
-            
             if O.type=="evento":
                 self.eventi.add(O)
                 if 'sottotipo' in O.properties:
@@ -608,15 +654,9 @@ class Motore(Engine):
                     if O.properties['sottotipo']=='AttivaAnimato':
                         beast=AttivaAnimato(animato)
                         self.lista_beast[beast.id]=beast
-                        #if beast.id in self.dic_storia:
-                            #beast.dialogosemp.lista_messaggi=self.dic_storia[beast.id]['messaggio']
                     beast.motore=self
-            #if O.type==None:
-                #print O.name, O.properties
+
             if O.type=="animato":
-                #animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto"}
-                #for p in O.properties:
-                    #animato[p]=O.properties[p]
                 dict_animati[animato.get('id')]=animato
                 dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
                 
@@ -648,61 +688,21 @@ class Motore(Engine):
                 self.lista_beast[beast.id]=beast
                 self.avatar_group.add(beast)
         
-        #miovar_dump(self.eventi.sprites()[0].rect)
-        #exit()
         ## Insert avatar into the Fringe layer.
         self.avatar.rect.x=hero_ini_pos[0]
         self.avatar.rect.y=hero_ini_pos[1]
         self.avatar_group.add(self.avatar)
-
-        #self.freccia=Proiettile(self)
- 
         State.camera.position=Vec2d(State.camera.position)
-        
-        self.arma=Arma(self)
-        #self.avatar.arma_img=self.arma.arma_img
-        
+
+        self.animato=self.camera.target.animated_object
         # Create a speed box for converting mouse position to destination
         # and scroll speed.
         self.speed_box = geometry.Diamond(0,0,4,2)
         self.speed_box.center = Vec2d(State.camera.rect.size) // 2
         self.max_speed_box = float(self.speed_box.width) / 2.0
-
-        # Mouse and movement state. move_to is in world coordinates.
-        self.move_to = None
-        self.speed = None
-        self.target_moved = (0,0)
-        self.mouse_down = False
-        self.grid_cache = {}
-        self.label_cache = {}
-        
-        State.speed = 10
-        self.movex=0
-        self.movey=0
-        self.cammina=False
-        self.imm_fermo=self.avatar.sit_standing
-        self.animato=self.camera.target.animated_object
-        
-        #con questa proprietà le collisioni vengono ignorate
-        self.ignora_collisioni=ign_coll
-        self.corsa=False
-
         ## Create the renderer.
         self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
-        #self.dialogo_btn=False
-        #self.crea_magazzino()
-        self.mag=Magazzino(self)
         
-        self.app_salvata=None
-        self.blockedkeys=False
-        self.tipofreccia='f'
-
-        #exit()
-        #discorso_iniziale=None
-        #if discorso_iniziale:
-            #self.dialogogioco=Dialogo_gioco(self,lista_messaggi=discorso_iniziale)
-            #self.dialogogioco.dialogo_show=True
-    #EofInit------------------------------------------------------------------ 
     
     #------------------------------------------------------------------ 
     def update(self, dt):
@@ -873,7 +873,8 @@ class Motore(Engine):
                         self.warp_del_seguito() #verifica se nel passaggio di mappa deve portarsi dietro il cane o altro seguito
                 else:
                         self.nuova_mappa_caricare=True
-                        self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)
+                        #self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)
+                        self.init_mappa(dir_mappa=dir+mappa,hero_ini_pos=(destx,desty),resolution=(800,600),dormi=False,miodebug=False)
     #------------------------------------------------------
     def is_walkable2(self):
         if self.ignora_collisioni:

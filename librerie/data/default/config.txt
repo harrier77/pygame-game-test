@@ -1,4 +1,5 @@
 desktop background pergamena.jpg
+selettore background sfondo_selettore.png
 
 input font Vera.ttf 16 
 input background input.normal.png
