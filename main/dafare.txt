@@ -1,17 +1,17 @@
 #1. FATTO sequenza messaggi comandata dal pulsante destro mouse, al termine si disattiva la finestrella 
 #2. DA FARE messaggi effetto telescrivente
 #3. FATTO messaggi che vengono dati solo ad un certo evento e altri che sono sempre attivi con l'animato
-#4. DA FARE l'animato che parla in certi casi deve continuare il suo percorso una volta sola e uscire di scena
+#4. FATTO l'animato che parla in certi casi deve continuare il suo percorso una volta sola e uscire di scena
 #5. FATTO l'animato che parla se prende l'iniziativa mostra un fumetto col punto esclamativo
 #6. FATTO lancio frecce
-#7. DA FARE collisione frecce
+#7. FATTO collisione frecce
 #8. FATTO livello speciale mappa delle celle con cose raccoglibili con un nome identificativo
 #9. FATTO raccolta cose che vengono mostrate in uno spazio a fondo schermo
 #10. FATTO togliere il punto esclamativo che verrà quando serve
 #11. FATTO quando il dialogo parte da un evento, l'animato si mette davanti al personaggio e inizia a parlare da solo
-#11a.DA FARE mentre sta parlando si deve bloccare il gioco
-#12. DA FARE quando ha finito di parlare deve tornare indietro e uscire dalla porta per sempre
+#11a.FATTO mentre sta parlando si deve bloccare il gioco
+#12. FATTO quando ha finito di parlare deve tornare indietro e uscire dalla porta per sempre
 #13. DA FARE migliorare i tempi di caricamento delle mappe
-#14. DA FARE certi animati devono andare più veloci
+#14. FATTO certi animati devono andare più veloci
 #15. DA FARE gli animati che guardano il califfo quando è finito il discorso diventa lo schermo nero e si mettono ai loro posti
 #16. DA FARE finita la scena del discorso e cambiata la scena, l'amico con la lancia parla di sua iniziativa

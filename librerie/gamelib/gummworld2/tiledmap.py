@@ -216,3 +216,5 @@ def _load_tiled_tmx_map(tmx_map, gummworld_map, load_invisible=True):
                     sprite.img_idx=img_idx
                     #end of hack
                     gummworld_layer.add(sprite)
+    gummworld_map.mio_resource=resource
+    #gummworld_map.indexed_tiles=resource.indexed_tiles

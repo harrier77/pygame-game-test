@@ -9,7 +9,7 @@ from xml import dom
 from xml.dom import minidom
 import pygame
 from pygame.locals import *
-from pygame import sprite
+from pygame import sprite,time
 import paths
 import gummworld2
 #import cProfile, pstats
@@ -30,6 +30,9 @@ from librerie import xmltodict
 import math
 from math import atan2,pi
 import time
+import shelve
+import pickle
+
 DEBUG=False
 try:
     __builtin__.miavar
@@ -231,7 +234,7 @@ class PguApp():
                         self.app.event(event)
                         self.app.paint()
                         pygame.display.flip()
-                        clock.tick(60)
+
         pygame.key.set_repeat()
     #-------------------------------------------------------------------------------   
     def menu(self):
@@ -342,7 +345,6 @@ class AutoDict(dict):
 class Magazzino(model.Object):
     def __init__(self,motore):
         self.motore=motore
-        from collections import defaultdict
         self.raccolti=AutoDict()
         self.seguito=AutoDict()
         self.selezionabili=dict()
@@ -351,22 +353,59 @@ class Magazzino(model.Object):
         #self.backvuoto=self.background_magazzino.copy()
         self.suono=pygame.mixer.Sound('suoni/message.wav')
     #-------------------------------------------------------        
+    def azzera_layer_raccolto(self):
+        rect = pygame.Rect(0,0, self.motore.tiled_map.pixel_width+1, self.motore.tiled_map.pixel_height+1)
+        cell_size = max(self.motore.tiled_map.tile_width, self.motore.tiled_map.tile_height)
+        self.motore.raccolto_spathash.__init__(rect,cell_size) #azzera tutto il laayer delle celle raccoglibili
+    #-------------------------------------------------------            
+    def ricostruisci_layer_raccolto(self,content2D):
+        self.azzera_layer_raccolto()
+        larg_tile=int(self.motore.tiled_map.tile_width)
+        alt_tile=int(self.motore.tiled_map.tile_height)
+        for r,row in enumerate(content2D):
+            for c,cell in enumerate(row):
+                #print r,c," ",cell
+                myobj=pygame.sprite.Sprite()
+                myobj.name=(r,c)
+                myobj.img_idx=long(cell)
+                pixposx=int(r)*larg_tile
+                pixposy=int(c)*alt_tile
+                rect=pygame.Rect(pixposx,pixposy,larg_tile,alt_tile)
+                myobj.rect=rect
+                if myobj.img_idx<>0:
+                    offx,offy,tile_img = self.motore.tiled_map.mio_resource.indexed_tiles[myobj.img_idx]
+                    myobj.image=tile_img
+                    self.motore.raccolto_spathash.add(myobj)
+                    #if myobj.name==(13,69):
+                        #miovar_dump(myobj)
+                        #exit()
+
+    #-------------------------------------------------------
+    def remove_single_tile(self,obj):
+        self.motore.raccolto_spathash.remove(obj)
+        self.motore.matr_layer_raccolto[obj.name[0]][obj.name[1]]=0 #azzera anche il corrispondente contenuto della matrice
+        miovar_dump(obj)
+    
+    #-------------------------------------------------------        
     def is_raccolto_collide(self):
         newsprite=self.motore.avatar.sprite
         hits=pygame.sprite.spritecollide(newsprite, self.motore.raccolto_spathash.objects,False)
         if hits:
             for obj in hits:
                 prop_ogg= self.motore.dict_gid_to_properties[obj.img_idx]
-                #self.raccolti[obj.img_idx].append
+                prop_ogg['mappa']=self.motore.mappa_dirfile
                 self.raccolti.append((prop_ogg,obj))
                 nomestrumento=prop_ogg['nome']
                 self.selezionabili[nomestrumento]=False
-                self.motore.raccolto_spathash.remove(obj)
+                self.remove_single_tile(obj)
+                #self.motore.raccolto_spathash.remove(obj)
+                #self.motore.matr_layer_raccolto[obj.name[0]][obj.name[1]]=0 #azzera anche il corrispondente contenuto della matrice
                 self.suono.play()
-        #self.selezionabili['arco']=True
+    #-------------------------------------------------------        
     def delete_selezionabile(self,key):
         self.selezionabili.pop(key)
 #-------------------------------------------------------------------------------
+
 
 
 #-------------------------------------------------------------------------------
@@ -520,7 +559,38 @@ class Arma(object):
             
 #--EofClass---------------------------------------------------------                
 
-        
+#function
+def filter_dic_for_json(dic):
+    for key,val in dic.iteritems():
+        print key,val
+        print type(val)
+            
+    return dic
+#eofunction
+#function
+def lista_matrice_gids(matrice):
+    #le mattonelle del livello sono contenute in cell_ids che però non si può salvare perché contiene surfaces
+    #cell_ids=self.tiled_map.layers[5].objects.cell_ids
+    #come cancellare una singola cella sul livello 0; inutile perché non ha alcun effetto sulla lista degli sprite
+    #self.tiled_map.raw_map.layers[0].content2D[0][1]=0
+    #print self.tiled_map.raw_map.layers[5].content2D[7][7] #così si estrae il gid della mattonella alla posizione 7,7
+    #print self.tiled_map.mio_resource.indexed_tiles[580][2] #così si può ottenere l'immagine della mattonella con gid 580
+    r=0
+    c=0
+    for riga in matrice:
+        for cella in riga:
+            if cella:
+                sys.stdout.write(" ")
+                sys.stdout.write("("+str(r)+",")
+                sys.stdout.write(str(c)+")->")
+                sys.stdout.write(str(cella)+"\n ")
+            c=c+1
+        c=0
+        r=r+1
+    #exit()
+#eofunction
+
+
 #-------------------------------------------------------------------------------
 class Motore(Engine):
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
@@ -576,6 +646,9 @@ class Motore(Engine):
         self.beast_sprite_group=pygame.sprite.Group()
         self.mappa_dirfile=dir_mappa
         self.tiled_map = TiledMap(dir_mappa)
+        
+        #lista_matrice_gids(self.tiled_map.raw_map.layers[5].content2D)
+        
         for mylayer in self.tiled_map.layers:
                 if mylayer.name=="Ground1":
                         self.ground_group_i= mylayer.layeri
@@ -589,6 +662,7 @@ class Motore(Engine):
                 if mylayer.name=="raccolto": 
                         self.raccolto_layer=mylayer
                         self.raccolto_spathash=mylayer.objects
+                        self.matr_layer_raccolto=self.tiled_map.raw_map.layers[mylayer.layeri].content2D
         for tileset in self.tiled_map.raw_map.tile_sets:
                 for tile in tileset.tiles:
                         tile.properties['parent_tileset_name']=tileset.name
@@ -701,6 +775,11 @@ class Motore(Engine):
         self.speed_box.center = Vec2d(State.camera.rect.size) // 2
         self.max_speed_box = float(self.speed_box.width) / 2.0
         ## Create the renderer.
+        self.mioclock=pygame.time.Clock()
+        self.mioframelimit=50
+        State.clock.max_ups=30
+        State.clock.max_fps=0
+        toolkit.make_hud()
         self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
         
     
@@ -729,6 +808,8 @@ class Motore(Engine):
         State.camera.update()
         ## Set render's rect.
         self.renderer.set_rect(center=State.camera.rect.center)
+        State.hud.update(dt)
+        self.mioclock.tick(self.mioframelimit)
     #------------------------------------------------------------------                      
     @property
     def mio_move_to(self):
@@ -762,6 +843,7 @@ class Motore(Engine):
         rect = self.avatar.hitbox
         pygame.draw.rect(camera.surface, Color('red'), rect.move(-cx,-cy))
         pygame.draw.polygon(camera.surface, Color('white'), self.speed_box.corners, 1)
+        State.hud.draw()
     #------------------------------------------------------------------ 
     def draw(self, interp):
         State.screen.clear()
@@ -781,6 +863,7 @@ class Motore(Engine):
                 #if callable(beast.dialogosemp.scrivi_frase):
                     beast.dialogosemp.scrivi_frase()
         #self.mag.aggiungi_magazzino()
+        
         State.screen.flip()
     #---------------------------------------------------
     def draw_detail(self):
@@ -994,6 +1077,18 @@ class Motore(Engine):
         elif key==pygame.K_h:
             print "h"
             selettore=Selettore(motore=self)
+        elif key == pygame.K_F2:
+            print 'f2'
+            lista_matrice_gids(self.matr_layer_raccolto)
+            itemlist=self.matr_layer_raccolto
+            filename="saved\\raccolti.txt"
+            pickle.dump( itemlist, open(filename,"wb" ) )
+        elif key == pygame.K_F3:
+            print 'f3'
+            filename="saved\\raccolti.txt"
+            nuovamatrice=pickle.load(open( filename, "rb" ))
+            lista_matrice_gids(nuovamatrice)
+            self.mag.ricostruisci_layer_raccolto(nuovamatrice)
         elif key == pygame.K_F4:
             print 'f4'
             dialog = DialogoAvvisi(testo='pippo F4')

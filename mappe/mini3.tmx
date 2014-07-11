@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="3" height="3" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="minimap" value="graphics/minimaps/001-1.png"/>
+  <property name="music" value="Faith.ogg"/>
+  <property name="name" value="Tulimshar"/>
+ </properties>
+ <tileset firstgid="1" name="Desert1" tilewidth="32" tileheight="32">
+  <image source="graphics/tiles/desert1.png" width="512" height="512"/>
+ </tileset>
+ <layer name="Ground" width="3" height="3">
+  <data>
+   <tile gid="1"/>
+   <tile gid="0"/>
+   <tile gid="10"/>
+   <tile gid="43"/>
+   <tile gid="59"/>
+   <tile gid="63"/>
+   <tile gid="60"/>
+   <tile gid="4"/>
+   <tile gid="5"/>
+  </data>
+ </layer>
+</map>
