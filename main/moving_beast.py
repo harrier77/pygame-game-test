@@ -351,8 +351,12 @@ class MovingBeast(model.Object):
             self.lista_destinazioni=self.calcola_points(points,position)
             self.x=self.lista_destinazioni[0][0]
             self.y=self.lista_destinazioni[0][1]
+        elif 'punto_arrivo' in animato:
+            cellxy=eval("("+animato['punto_arrivo']+")")
+            self.lista_destinazioni=self.calcola_points_cella(cellxy,position)
         else:
             self.lista_destinazioni=self.comp_lista_destinazioni(self.x,self.y)
+            
         #self.fotogramma=self.miocing.left_standing
         self.miocing.moveConductor.play()
         self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
@@ -377,6 +381,24 @@ class MovingBeast(model.Object):
             couple=(newx,newy)
             real_points.append(couple)
         return real_points
+        
+    def calcola_points_cella(self,cellxy,position):
+        x0=position[0]+22
+        y0=position[1]+22
+        real_points=[(x0,y0)]
+        x=int(cellxy[0])
+        y=int(cellxy[1])
+        newx=x*32
+        newy=y*32
+        couple=(newx,newy)
+        
+        real_points.append(couple)
+        #print self.id
+        #print position
+        #print couple
+        #print real_points
+        return real_points
+    
     
     #-------------------------------------------------------------------------
     def passi(self,or_pos=(300,200),target_pos=(200,200)):

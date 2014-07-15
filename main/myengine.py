@@ -30,7 +30,6 @@ from librerie import xmltodict
 import math
 from math import atan2,pi
 import time
-import shelve
 import pickle
 
 DEBUG=False
@@ -105,7 +104,7 @@ class Selettore(gui.Container):
         self.app.init(screen=State.screen.surface,widget=self,area=area)
         self.app.paint()
         pygame.display.flip()
-        #miovar_dump(self.app.theme)
+
         self.ciclo()
     #-----------------------------
     def my_dialog_init(self,title,main,**params):
@@ -376,15 +375,12 @@ class Magazzino(model.Object):
                     offx,offy,tile_img = self.motore.tiled_map.mio_resource.indexed_tiles[myobj.img_idx]
                     myobj.image=tile_img
                     self.motore.raccolto_spathash.add(myobj)
-                    #if myobj.name==(13,69):
-                        #miovar_dump(myobj)
-                        #exit()
 
     #-------------------------------------------------------
     def remove_single_tile(self,obj):
         self.motore.raccolto_spathash.remove(obj)
         self.motore.matr_layer_raccolto[obj.name[0]][obj.name[1]]=0 #azzera anche il corrispondente contenuto della matrice
-        miovar_dump(obj)
+
     
     #-------------------------------------------------------        
     def is_raccolto_collide(self):
@@ -593,13 +589,14 @@ def lista_matrice_gids(matrice):
 
 #-------------------------------------------------------------------------------
 class Motore(Engine):
-    def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="casa_gioco.tmx",\
+    def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="betatest.tmx",\
                             coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True):
         self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
         self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito2.wav')
         self.suono_cilecca=pygame.mixer.Sound('suoni/cilecca.wav')
         self.fringe_i=1
-        xml = open('animazioni\\prova.xml', 'r').read()
+        #xml = open('animazioni\\prova.xml', 'r').read()
+        xml = open('animazioni\\beta.xml', 'r').read()
         self.dic_storia=xmltodict.parse(xml)['storia']
         self.lista_beast=[]
         self.lista_beast={}
@@ -645,12 +642,13 @@ class Motore(Engine):
         self.eventi=pygame.sprite.Group()
         self.beast_sprite_group=pygame.sprite.Group()
         self.mappa_dirfile=dir_mappa
+    
         self.tiled_map = TiledMap(dir_mappa)
         
         #lista_matrice_gids(self.tiled_map.raw_map.layers[5].content2D)
         
         for mylayer in self.tiled_map.layers:
-                if mylayer.name=="Ground1":
+                if mylayer.name=="Ground1" or mylayer.name=="Ground":
                         self.ground_group_i= mylayer.layeri
                         self.ground_spathash=mylayer.objects
                 if mylayer.name=="Collision":
@@ -696,15 +694,22 @@ class Motore(Engine):
         #self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
         Engine.__init__(self, caption='LandOfFire', resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         self.State=State
-        print hero_ini_pos
         self.avatar.position=hero_ini_pos
         for index,O in enumerate(self.prima_lista_ogg):
             if O.name==None:
-                gid=int(O.gid)
-                O.name=self.dict_gid_to_properties[gid]['Name']
+                if hasattr(O,'gid'):
+                    gid=int(O.gid)
+                else:
+                    continue
+                
+                if 'Name' in self.dict_gid_to_properties[gid]:
+                    O.name=self.dict_gid_to_properties[gid]['Name']
+                elif 'name' in self.dict_gid_to_properties[gid]: 
+                    O.name=self.dict_gid_to_properties[gid]['name']
+                else:O.name='boar'
                 O.type='animato'
-                O.properties['id']=O.name+str(index)
-                O.properties['sottotipo']='parlantefermo'
+                if not 'id' in O.properties:O.properties['id']=O.name+str(index)
+                if not 'sottotipo' in O.properties:O.properties['sottotipo']='parlantefermo'
             animato={'pos':(O.rect.x,O.rect.y),'dir':str(O.name),'staifermo':False,'orientamento':"vuoto",'og_rect':O.rect}
             for p in O.properties:
                 animato[p]=O.properties[p]
@@ -730,7 +735,7 @@ class Motore(Engine):
                         self.lista_beast[beast.id]=beast
                     beast.motore=self
 
-            if O.type=="animato":
+            if O.type=="animato" :
                 dict_animati[animato.get('id')]=animato
                 dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
                 

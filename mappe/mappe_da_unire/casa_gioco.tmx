@@ -54,14 +54,7 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="1353" name="segnaposti_oggetti" tilewidth="32" tileheight="32">
-  <image source="../graphics/tiles/segnaposti_oggetti.png" width="96" height="64"/>
-  <tile id="0">
-   <properties>
-    <property name="Name" value="femvil"/>
-   </properties>
-  </tile>
- </tileset>
+ <tileset firstgid="1353" source="../tilesets/segnaposti_oggetti.tsx"/>
  <layer name="Ground1" width="29" height="95">
   <data>
    <tile gid="249"/>
@@ -16624,16 +16617,6 @@
     <property name="dest_tile_y" value="92"/>
    </properties>
   </object>
-  <object name="priest" type="animato" x="227" y="582">
-   <properties>
-    <property name="attendi_evento" value="True"/>
-    <property name="durata_pausa" value="10"/>
-    <property name="id" value="interlocutore"/>
-    <property name="sottotipo" value="parlante"/>
-    <property name="vai_incontro" value="True"/>
-   </properties>
-   <polyline points="11,78 11,-10"/>
-  </object>
   <object name="evento1" type="evento" x="63" y="532" width="678" height="31">
    <properties>
     <property name="azione" value="attiva_animato"/>
@@ -16642,14 +16625,6 @@
     <property name="sottotipo" value="AttivaAnimato"/>
    </properties>
   </object>
-  <object name="boar" type="animato" x="499" y="1260">
-   <properties>
-    <property name="durata_pausa" value="1000"/>
-    <property name="id" value="cingia1"/>
-    <property name="sottotipo" value="semplice"/>
-   </properties>
-   <polyline points="0,0 162,0"/>
-  </object>
   <object name="eventoparla" type="evento" x="75" y="358" width="297" height="111">
    <properties>
     <property name="azione" value="parla"/>
@@ -16657,15 +16632,6 @@
     <property name="id_animato" value="aio2"/>
     <property name="sottotipo" value="FaiParlare"/>
    </properties>
-  </object>
-  <object name="aio" type="animato" x="275" y="1239">
-   <properties>
-    <property name="durata_pausa" value="1000"/>
-    <property name="id" value="aio"/>
-    <property name="orientamento" value="front"/>
-    <property name="sottotipo" value="parlantefermo"/>
-   </properties>
-   <polyline points="0,0 119,0"/>
   </object>
   <object name="AlPoligono" type="warp" x="606" y="2237" width="34" height="35">
    <properties>
@@ -16681,22 +16647,6 @@
     <property name="dest_tile_y" value="19"/>
    </properties>
   </object>
-  <object name="boar" type="animato" x="279" y="1297">
-   <properties>
-    <property name="durata_pausa" value="1000"/>
-    <property name="id" value="cingia2"/>
-    <property name="sottotipo" value="semplice"/>
-   </properties>
-   <polyline points="0,0 162,0"/>
-  </object>
-  <object name="elef" type="animato" x="522" y="1340">
-   <properties>
-    <property name="durata_pausa" value="1000"/>
-    <property name="id" value="elef"/>
-    <property name="sottotipo" value="semplice"/>
-   </properties>
-   <polyline points="-332,28 162,5 -339,4"/>
-  </object>
   <object name="msg" type="evento" x="644" y="405" width="78" height="104">
    <properties>
     <property name="id" value="msg1"/>
@@ -16710,21 +16660,6 @@
     <property name="id_animato" value="msg2"/>
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
-  </object>
-  <object name="mucca" type="animato" x="795" y="1237">
-   <properties>
-    <property name="id" value="mucca1"/>
-    <property name="sottotipo" value="catturabile"/>
-   </properties>
-   <polyline points="0,0 -324,-15 -477,96 -2,102"/>
-  </object>
-  <object name="boar" type="animato" x="774" y="1338">
-   <properties>
-    <property name="durata_pausa" value="1500"/>
-    <property name="id" value="boar2"/>
-    <property name="sottotipo" value="morente"/>
-   </properties>
-   <polyline points="0,0 77,-101"/>
   </object>
   <object name="AlArmeria" type="warp" x="318" y="2238" width="34" height="35">
    <properties>
@@ -16747,13 +16682,6 @@
     <property name="dest_tile_y" value="71"/>
    </properties>
   </object>
-  <object name="jaguar" type="animato" x="802" y="1371">
-   <properties>
-    <property name="id" value="jag1"/>
-    <property name="sottotipo" value="attaccante"/>
-   </properties>
-   <polyline points="-51,26 -164,25"/>
-  </object>
   <object name="AllaHall" type="warp" x="384" y="641" width="34" height="23">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
@@ -16775,13 +16703,6 @@
     <property name="dest_tile_y" value="91"/>
    </properties>
   </object>
-  <object name="camel" type="animato" x="460" y="1360">
-   <properties>
-    <property name="id" value="camel1"/>
-    <property name="sottotipo" value="catturabile"/>
-   </properties>
-   <polyline points="138,29 -164,25"/>
-  </object>
   <object name="msginiziale" type="evento" x="461" y="2928" width="73" height="34">
    <properties>
     <property name="id" value="msginiziale"/>
@@ -16796,7 +16717,7 @@
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
-  <object name="femvil" type="animato" gid="1353" x="118" y="380">
+  <object gid="1353" x="118" y="380">
    <properties>
     <property name="durata_pausa" value="1000"/>
     <property name="id" value="aio2"/>
@@ -16813,7 +16734,68 @@
   </object>
   <object gid="1353" x="150" y="2272">
    <properties>
+    <property name="sottotipo" value="parlantefermo"/>
+   </properties>
+  </object>
+  <object gid="1357" x="393" y="1428">
+   <properties>
+    <property name="punto_arrivo" value="4,44"/>
+    <property name="sottotipo" value="catturabile"/>
+   </properties>
+  </object>
+  <object gid="1356" x="190" y="1411">
+   <properties>
+    <property name="punto_arrivo" value="15,39"/>
     <property name="sottotipo" value="semplice"/>
+   </properties>
+  </object>
+  <object gid="1359" x="711" y="1468">
+   <properties>
+    <property name="punto_arrivo" value="15,38"/>
+    <property name="sottotipo" value="semplice"/>
+   </properties>
+  </object>
+  <object gid="1359" x="513" y="1413">
+   <properties>
+    <property name="punto_arrivo" value="15,38"/>
+    <property name="sottotipo" value="semplice"/>
+   </properties>
+  </object>
+  <object gid="1359" x="471" y="1473">
+   <properties>
+    <property name="punto_arrivo" value="26,45"/>
+    <property name="sottotipo" value="semplice"/>
+   </properties>
+  </object>
+  <object gid="1358" x="615" y="1306">
+   <properties>
+    <property name="punto_arrivo" value="13,47"/>
+    <property name="sottotipo" value="catturabile"/>
+   </properties>
+  </object>
+  <object gid="1357" x="386" y="1372">
+   <properties>
+    <property name="punto_arrivo" value="16,38"/>
+    <property name="sottotipo" value="catturabile"/>
+   </properties>
+  </object>
+  <object gid="1360" x="284" y="1279">
+   <properties>
+    <property name="sottotipo" value="parlantefermo"/>
+   </properties>
+  </object>
+  <object gid="1361" x="679" y="1381">
+   <properties>
+    <property name="sottotipo" value="attaccante"/>
+   </properties>
+  </object>
+  <object gid="1362" x="228" y="649">
+   <properties>
+    <property name="attendi_evento" value="True"/>
+    <property name="id" value="interlocutore"/>
+    <property name="punto_arrivo" value="11,19"/>
+    <property name="sottotipo" value="parlante"/>
+    <property name="vai_incontro" value="True"/>
    </properties>
   </object>
  </objectgroup>

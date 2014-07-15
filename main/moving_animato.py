@@ -207,7 +207,7 @@ class AnimatoParlanteAvvicina(MovingBeast):
                     #"destinazione uguale a partenza"
                     self.x=self.x+3
                     self.y=self.y+3
-
+            #print self.lista_destinazioni[self.contatore_destinazioni]
             self.listap=calcola_passi(or_pos=(self.x,self.y),target_pos=self.lista_destinazioni[self.contatore_destinazioni])  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
             pos_da_raggiungere=self.listap[len(self.listap)-1] #legge la posizione finale di destinazione dalla lista delle destinazioni
             self.direzione=self.calcola_direzione((self.x,self.y),pos_da_raggiungere) #calcola la direzione della destinazione da raggiungere
