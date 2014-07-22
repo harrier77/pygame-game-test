@@ -7,7 +7,7 @@ from pygame.locals import *
 from gummworld2 import geometry,model,data
 import copy
 
-
+#from miovardump import miovar_dump
     
     
 #---------------------------------------
@@ -115,7 +115,7 @@ class AnimatoSemplice(MovingBeast):
 
 #-------------------------------------------------------
 #Animazione di unità che cammina per i fatti suoi
-#ma se colpita cambia tipo e segue il catturatore
+#ma se colpita col lasso cambia tipo e segue il catturatore
 #-------------------------------------------------------                 
 class AnimatoCambiaTipo(AnimatoSemplice):
     #----------------------------------------------------
@@ -130,7 +130,7 @@ class AnimatoCambiaTipo(AnimatoSemplice):
     #----------------------------------------------------
     def cambialo(self):
         print "cambialo"
-        newbeast=AnimatoSegue(self.oldanimato)
+        newbeast=AnimatoMandria(self.oldanimato,motore=self.motore)
         newbeast.x=self.x
         newbeast.y=self.y
         newbeast.segui=True
@@ -255,14 +255,16 @@ class AnimatoParlanteAvvicina(MovingBeast):
 #----------------------------------------              
 class AnimatoSegue(MovingBeast):
     #----------------------------------------
-    def __init__(self,animato,segui=False):
+    def __init__(self,animato,motore=None,segui=False):
         MovingBeast.__init__(self,animato,parlante=False)
+        self.ultimo=motore.mag.seguito.ultimo
         self.dialogosemp=Dialogosemplice(self)
         self.in_uscita=False
         self.cliccato=False
         self.draw_fotogramma=True
         self.direzione="right"
         self.segui=segui
+    
     #----------------------------------------
     @property
     def suonato(self):
@@ -272,6 +274,7 @@ class AnimatoSegue(MovingBeast):
             return False
     #----------------------------------------
     def aggiorna_pos_da_seguire(self):
+        #self.posarrivo_rect=self.motore.avatar.hitbox
         pos_partenza=self.x,self.y
         incx=incy=0
         if self.motore.direzione_avatar=='front':
@@ -285,9 +288,8 @@ class AnimatoSegue(MovingBeast):
         elif self.motore.direzione_avatar=='right':
             incx=-32
             incy=+42
-            
-        pos_arrivo_x=self.motore.avatar.hitbox.bottomleft[0]+incx
-        pos_arrivo_y=self.motore.avatar.hitbox.bottomleft[1]+incy
+        pos_arrivo_x=self.posarrivo_rect.bottomleft[0]+incx
+        pos_arrivo_y=self.posarrivo_rect.bottomleft[1]+incy
         pos_da_raggiungere=pos_arrivo_x,pos_arrivo_y
         self.lista_destinazioni=[pos_partenza,pos_da_raggiungere]
         self.listap=self.passi(pos_partenza,pos_da_raggiungere)  #qui viene compilata la lista dei passi da seguire per camminare nel percorso
@@ -302,31 +304,60 @@ class AnimatoSegue(MovingBeast):
                 self.segui=True
                 dict_prop={'nome':self.id}
                 self.motore.mag.seguito.append((dict_prop,self.sprite_fotogrammanew))
+
     #----------------------------------------
     @property
-    def collisione_con_altri(self):
-        if len(self.listap)>0: 
-            pos= self.listap.pop(0)
-            is_walkable=True
-            newhitbox=self.rect.copy()
-            newhitbox.x=pos[0]
-            hits=self.motore.avatar_group.objects.intersect_objects(newhitbox)
-            if not hits: is_walkable=True
-            else: is_walkable=False
-            newhitbox.y=pos[1]
-            hits=self.motore.avatar_group.objects.intersect_objects(newhitbox)
-            if not hits:is_walkable=True
-            else: is_walkable=False
-            return is_walkable
-        else:
-            return True
+    def posarrivo_rect(self):
+        p=self.motore.mag.seguito.get(self.ultimo)
+        if p is not None:
+            id_p=p[0]['nome']
+            if p[0]['nome']!=self.id:
+                return self.motore.lista_beast[id_p].rect
+        return self.motore.avatar.hitbox
+        
+        
+     #--------------------------------------------------------------------------------
+    def scegli_fotogramma_animazione(self,miocing,direzione):
+        self.direzione=direzione
+        if self.listap:  ##inizia la camminata
+            if not self.staifermo:
+                #qui vengono impostati x e y del fotogramma da proiettare prendendoli dalla lista della camminata self.listap
+                if self.listap:
+                    pos= self.listap.pop(0)
+                    self.x,self.y=pos #qui vengono impostati x e y del fotogramma da proiettare sullo schermo prendendoli dalla lista della camminata self.listap
+                    #fine impostazione ---------------------------------------------------------------------------------------------------
+                    """if self.vai_incontro:
+                        if self.motore:
+                                self.lista_destinazioni=[self.lista_destinazioni[0],(self.motore.avatar.hitbox.bottomleft[0],self.motore.avatar.hitbox.bottomleft[1])]"""
+                        #endifclause
+                    #endifclause
+            #end_if_clause
+            #di seguito viene selezionata l'iimmagine a seconda della direzione della camminata; x e y sono già stati impostati
+            if direzione=='left':
+                self.fotogramma=miocing.animObjs['left_walk'].ritorna_fotogramma()
+            elif direzione=='front':
+                self.fotogramma=miocing.animObjs['front_walk'].ritorna_fotogramma()
+            elif direzione=='right':
+                self.fotogramma=miocing.animObjs['right_walk'].ritorna_fotogramma()
+            elif direzione=='back':
+                self.fotogramma=miocing.animObjs['back_walk'].ritorna_fotogramma()
+            elif direzione=='SW':
+                self.fotogramma=miocing.animObjs['SW'].ritorna_fotogramma()
+            elif direzione=='NW':
+                self.fotogramma=miocing.animObjs['NW'].ritorna_fotogramma()
+            elif direzione=='SE':
+                self.fotogramma=miocing.animObjs['SE'].ritorna_fotogramma()
+            elif direzione=='NE':
+                self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
+            #endifclause
+            
     #----------------------------------------
     def muovi_animato(self):
         self.controlla_se_preso()
         if self.segui : self.aggiorna_pos_da_seguire()
         #sezione che effettivamente muove l'animazione, ma solo se la lista delle posizioni da seguire non è vuota
         #print self.collisione_con_altri
-        #if self.collisione_con_altri:
+        #print self.motore.beast_sprite_group
         if self.is_p_in_listap: 
             self.scegli_fotogramma_animazione(self.miocing,self.direzione)
         else:
@@ -336,7 +367,25 @@ class AnimatoSegue(MovingBeast):
                 self.fotogramma=self.miocing.animObjs['left_stand'].ritorna_fotogramma()
         
         return self.fotogramma
+    #----------------------------------------
 #EofClass---------------------------------------------------
+
+
+#---------------------------------------
+# Animazione di unità che segue il personaggio avatar
+# ma solo se presa al lasso non se si avvicina, in modo da poterla sganciare facilmente
+#----------------------------------------              
+class AnimatoMandria(AnimatoSegue):
+    #----------------------------------------
+    def __init__(self,animato,motore=None,segui=False):
+        AnimatoSegue.__init__(self,animato,motore=motore)
+
+    #----------------------------------------
+    def controlla_se_preso(self):
+        pass
+    #----------------------------------------
+#EofClass---------------------------------------------------
+
 
 #---------------------------------------
 #Animazione di unità che attacca il personaggio se attaccata
@@ -397,6 +446,7 @@ class AnimatoAttacca(AnimatoSemplice):
         elif direzione=='NE':
             self.fotogramma=miocing.animObjs['NE'].ritorna_fotogramma()
     
+    #-------------------------------------------------------------------------
     def riduci_lista(self,lista):
         newlista=lista[1::2] 
         return newlista
@@ -556,156 +606,5 @@ class AnimatoFermo(AnimatoParlanteFermo):
 #EofClass---------------------------------------------------
 
 
-#--------------------------------------------
-# Derivato da AnimatoParlanteFermo, con la differenza
-# che comincia a parlare quando il personaggio avatar entra in
-# una zona della mappa senza bisogno di contatto diretto
-#--------------------------------------------
-#Inizio Classe               
-class AnimatoParlanteConEvento(AnimatoParlanteFermo):
-
-    def __init__(self,animato):
-        MovingBeast.__init__(self,animato,parlante=False)
-        self.dialogosemp=Dialogosemplice(self)
-        self.direzione='front'
-    #-------------------------------------------------------------------------
-    @property
-    def is_persona_collide(self):
-        pass
-    #-------------------------------------------------------------------------
-    def fallo_parlare(self):
-        #if self.dialogosemp.dialogo_btn:
-            self.dialogosemp.is_near=True
-            self.fermato=True
-            self.dialogosemp.sequenza_messaggi_noth()
-    #-------------------------------------------------------------------------        
-    def effetto_collisione_con_evento(self,proprieta_oggetto_evento):
-        if proprieta_oggetto_evento['azione']=='parla':
-            #self.dialogosemp.dialogo_btn=True
-            self.dialogosemp.dialogo_show=True
-            #self.dialogosemp.finito_dialogo=False
-            self.dialogosemp.idx_mess=0
-            #print "parla!"
-            self.fallo_parlare()
-        else:
-            print proprieta_oggetto_evento['azione']
-            
-#EofClass
-#---------------------------------------------------
-
-
-#--------------------------------------------
-# Derivato da AnimatoParlanteFermo, quando il personaggio avatar entra in
-# una zona della mappa scattano i messaggi, nessuna animazione, l'animato non esiste
-#--------------------------------------------               
-class MessaggioDaEvento(AnimatoParlanteFermo):
-    def __init__(self,animato):
-        #MovingBeast.__init__(self,animato,parlante=False)
-        self.id=animato['id']
-        self.points = ((0,0),(0,0))
-        self.miosprite=pygame.sprite.Sprite()
-        self.miosprite.rect=animato['og_rect']
-        self.miosprite.image=pygame.Surface((self.miosprite.rect.width, self.miosprite.rect.height))
-        self.miosprite.image.set_alpha(0)
-        self.attendi_evento=False
-        self.finito_evento=False
-        self.dialogosemp=Dialogosemplice(self)
-        self.x=animato['pos'][0]+self.image.get_width()/2
-        self.y=animato['pos'][1]+self.image.get_height()
-
-    @property
-    def fotogramma(self):
-        return self.miosprite.image
-    @property
-    def image(self):
-        #image=self.fotogramma
-        return self.miosprite.image
-    @property
-    def sprite_fotogrammanew(self):
-        return self.miosprite
-    @property
-    def evento_hit_box(self):
-        return self.miosprite.rect
-    
-    #-------------------------------------------------------------------------
-    @property
-    def is_persona_collide(self):
-        #chiamato da self.muovi_animato
-        hits=self.evento_hit_box.colliderect(self.motore.avatar.sprite.rect)
-        #print hits
-        if hits:
-            self.dialogosemp.dialogo_show=True
-        #il dialogo viene chiuso in scrivi_frase quando trova finito_dialogo messo a True da incrementa_idx_mess
-        #quindi dialogo_show non serve torni a False
-
-    #--------------------------------------------------------------------------------
-    def muovi_animato(self):
-        #print self.dialogosemp.dialogo_btn
-        a=self.is_persona_collide
-        pass
-    #-------------------------------------------------------------------------
-    def fallo_parlare(self):
-        #chiamato dal motore draw-<is_talking2->fallo_parlare
-        self.fermato=True
-        self.dialogosemp.dialogo_btn=True
-        self.dialogosemp.is_near=True
-        if not self.dialogosemp.finito_dialogo:
-            self.attendi_evento=False
-            self.dialogosemp.sequenza_messaggi_noth() 
-        pass
-    #-------------------------------------------------------------------------        
-    def effetto_collisione_con_evento(self,proprieta_oggetto_evento):
-        """
-        self.dialogosemp.dialogo_btn=True
-        #self.dialogosemp.finito_dialogo=False
-        self.dialogosemp.idx_mess=0
-        self.fallo_parlare() """
-        pass
-#EofClass
-#---------------------------------------------------
-
-
-
-
-#---------------------------------------------------
-# E' uguale a MessaggioDaEvento, tranne che
-# i messaggi sono quelli associati ad una animazione
-# che parla quando l'avatar entra nell'area dell'evento
-class FaiParlare(MessaggioDaEvento):
-    def __init__(self,animato):
-        MessaggioDaEvento.__init__(self,animato)
-        self.id=animato['id_animato']
-        #print self.id
-#EofClass        
-
-
-
-#---------------------------------------------------
-# E' uguale a FaiParlare, tranne che
-# avvia una animazione
-# che prima  appare quando l'avatar entra nell'area dell'evento
-# e poi si avvicina all'avatae e parla quando raggiunge l'avatar a 
-#--------------------------------------------------              
-class AttivaAnimato(MessaggioDaEvento):
-    def __init__(self,animato):
-        MessaggioDaEvento.__init__(self,animato)
-        #self.id=animato['id_animato']
-        self.id_animato=animato['id_animato']
-        #print "attiva animato"
-    #-------------------------------------------------------------------------
-    def fallo_parlare(self):
-        hits=self.motore.avatar.rect.colliderect(self.talk_box)
-        if hits:
-            self.motore.lista_beast[self.id_animato].attendi_evento=False
-            if self.motore.lista_beast[self.id_animato].dialogosemp.finito_dialogo:
-                self.motore.lista_beast[self.id_animato].dialogosemp.dialogo_show=False
-                self.dialogosemp.dialogo_show=False
-                self.motore.blockedkeys=False
-                #print "collisione con area attiva animato!"+str(self.motore.blockedkeys)
-
-#EofClass
-
-
-    
     
     

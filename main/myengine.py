@@ -19,9 +19,14 @@ from librerie import pyganim,gui
 
 from miovardump import miovar_dump
 from moving_beast import calcola_passi,MovingBeast,Dialogosemplice
+
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
-from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
+
+
+#from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
 from moving_animato import AnimatoSegue,AnimatoAttacca,AnimatoCambiaTipo
+from eventi import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
+
 from armi_utensili import *
 #from miovar_dump import *
 #from dialogosemp import Dialogosemplice
@@ -335,10 +340,13 @@ class AutoDict(dict):
     def __init__(self):
         dict.__init__(self)
         self.id=0
+        self.ultimo=0  
     def append(self,item):
         self.id=self.id+1
         self[self.id]=item
-#EofClass
+        self.ultimo=max(self.keys())
+
+    #EofClass
 
 #-------------------------------------------------------------------------------
 class Magazzino(model.Object):
@@ -752,7 +760,7 @@ class Motore(Engine):
                 elif O.properties['sottotipo']=='morente':
                     beast=AnimatoSemplice(animato)
                 elif O.properties['sottotipo']=='animatosegue':
-                    beast=AnimatoSegue(animato)
+                    beast=AnimatoSegue(animato,motore=self)
                 elif O.properties['sottotipo']=='attaccante':
                     beast=AnimatoAttacca(animato)
                 elif O.properties['sottotipo']=='catturabile':
