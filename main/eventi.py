@@ -1,4 +1,5 @@
 from moving_animato import *
+from moving_beast import Dialogosemplice  
 
 #--------------------------------------------
 # Derivato da AnimatoParlanteFermo, con la differenza
@@ -148,3 +149,42 @@ class AttivaAnimato(MessaggioDaEvento):
                 #print "collisione con area attiva animato!"+str(self.motore.blockedkeys)
 
 #EofClass
+
+#-------------------------
+#Evento che si attiva se nel recinto ci sono almeno x animali
+class EventoRecinto():
+    def __init__(self,oggetto_sulla_mappa,motore):
+        self.motore=motore
+        self.rect=oggetto_sulla_mappa.rect
+        self.mesprite=oggetto_sulla_mappa
+        print self.motore.beast_sprite_group
+        self.id=oggetto_sulla_mappa.properties['id']
+    #-------------------------------------------------------------------------
+    def controlla_se_attivo(self):
+        #hits=self.motore.avatar.rect.colliderect(self.rect)
+        hits=pygame.sprite.spritecollide(self.mesprite,self.motore.beast_sprite_group,False)
+        if hits:
+            print hits
+    #-------------------------------------------------------------------------
+#EofClass
+
+class EventoMessaggio():
+    def __init__(self,oggetto_sulla_mappa,motore):
+        self.motore=motore
+        self.mesprite=oggetto_sulla_mappa
+        self.id=oggetto_sulla_mappa.properties['id']
+        self.attendi_evento=False
+        self.finito_evento=False
+        self.dialogosemp=Dialogosemplice(self)
+        self.dialogosemp.lista_messaggi=self.motore.dic_storia[self.id]['messaggio']
+    def controlla_se_attivo(self):
+        hits=self.mesprite.rect.colliderect(self.motore.avatar.hitbox)
+        if hits:
+            self.attendi_evento=False
+            self.dialogosemp.is_near=True
+            self.dialogosemp.dialogo_show=True
+            #print self.dialogosemp.lista_messaggi
+            self.dialogosemp.sequenza_messaggi_noth() 
+            self.dialogosemp.scrivi_frase()
+     #-------------------------------------------------------------------------
+#EofClass       

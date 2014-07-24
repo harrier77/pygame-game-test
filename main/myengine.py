@@ -25,7 +25,7 @@ from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlan
 
 #from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
 from moving_animato import AnimatoSegue,AnimatoAttacca,AnimatoCambiaTipo
-from eventi import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
+from eventi import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo,EventoRecinto,EventoMessaggio
 
 from armi_utensili import *
 #from miovar_dump import *
@@ -208,6 +208,8 @@ class PguApp():
         #print self.tabella.style.margin_top
         if inizio=="inventario":
             self.inventario()
+        elif inizio=="animali":
+            self.inventario_animali()
         else:
             self.menu()
         
@@ -388,8 +390,10 @@ class Magazzino(model.Object):
     def remove_single_tile(self,obj):
         self.motore.raccolto_spathash.remove(obj)
         self.motore.matr_layer_raccolto[obj.name[0]][obj.name[1]]=0 #azzera anche il corrispondente contenuto della matrice
+    #-------------------------------------------------------
+    def rimuovi_dal_seguito(self,i):
 
-    
+        pass
     #-------------------------------------------------------        
     def is_raccolto_collide(self):
         newsprite=self.motore.avatar.sprite
@@ -606,8 +610,9 @@ class Motore(Engine):
         #xml = open('animazioni\\prova.xml', 'r').read()
         xml = open('animazioni\\beta.xml', 'r').read()
         self.dic_storia=xmltodict.parse(xml)['storia']
-        self.lista_beast=[]
+        #self.lista_beast=[]
         self.lista_beast={}
+        self.lista_eventi={}
         self.godebug=False
         
         #necessario per resettare la condizione messa dalla libreria PGU
@@ -742,7 +747,16 @@ class Motore(Engine):
                         beast=AttivaAnimato(animato)
                         self.lista_beast[beast.id]=beast
                     beast.motore=self
-
+            if O.type=='eventonew':
+                #self.eventi.add(O)
+                if O.name=='recinto':
+                    enew=EventoRecinto(O,self)
+                    self.lista_eventi[enew.id]=enew
+                    #exit()
+                if O.name=='messaggio':
+                    enew=EventoMessaggio(O,self)
+                    self.lista_eventi[enew.id]=enew
+                    
             if O.type=="animato" :
                 dict_animati[animato.get('id')]=animato
                 dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
@@ -789,9 +803,9 @@ class Motore(Engine):
         self.max_speed_box = float(self.speed_box.width) / 2.0
         ## Create the renderer.
         self.mioclock=pygame.time.Clock()
-        self.mioframelimit=50
-        State.clock.max_ups=30
-        State.clock.max_fps=0
+        #self.mioframelimit=30
+        #State.clock.max_ups=10
+        #State.clock.max_fps=10
         toolkit.make_hud()
         self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
         
@@ -822,7 +836,7 @@ class Motore(Engine):
         ## Set render's rect.
         self.renderer.set_rect(center=State.camera.rect.center)
         State.hud.update(dt)
-        self.mioclock.tick(self.mioframelimit)
+        #self.mioclock.tick(self.mioframelimit)
     #------------------------------------------------------------------                      
     @property
     def mio_move_to(self):
@@ -873,9 +887,9 @@ class Motore(Engine):
                 beast.muovi_animato()
                 self.is_talking2(beast)
                 if hasattr(beast.dialogosemp,'scrivi_frase'):
-                #if callable(beast.dialogosemp.scrivi_frase):
                     beast.dialogosemp.scrivi_frase()
-        #self.mag.aggiungi_magazzino()
+        for k,evento in self.lista_eventi.iteritems():
+            evento.controlla_se_attivo()
         
         State.screen.flip()
     #---------------------------------------------------
@@ -1118,7 +1132,7 @@ class Motore(Engine):
             #print 'f7'
             pgu=PguApp(self)
         elif key == pygame.K_e:
-            pgu=PguApp(self,inizio="inventario")
+            pgu=PguApp(self,inizio="animali")
         elif key == pygame.K_F9:
             print 'f9'
             self.lista_beast['jag1'].vaiattacca=True

@@ -134,7 +134,7 @@ class Dialogosemplice():
         #il problema è che la tastiere è unica e sta sul motore e le variabili di tutti i dialoghi vengono controllate ogni volta e ce nè sempre un'altra che sblocca la tastiera
         #serve verificare se è entrato o uscito dalla collisione,  Ma anche se si fa, non esce più perché è bloccato, serve comunque una seconda variabile self.finito_dialogo che metta fine al blocco
         
-        if self.is_near:            
+        if self.is_near:
             if self.dialogo_show==True:
                 if not self.finito_dialogo:
                     self.mywrite()

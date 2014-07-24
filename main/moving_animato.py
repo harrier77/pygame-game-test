@@ -129,7 +129,7 @@ class AnimatoCambiaTipo(AnimatoSemplice):
                 self.cambialo()
     #----------------------------------------------------
     def cambialo(self):
-        print "cambialo"
+        #print "cambialo"
         newbeast=AnimatoMandria(self.oldanimato,motore=self.motore)
         newbeast.x=self.x
         newbeast.y=self.y
@@ -140,6 +140,7 @@ class AnimatoCambiaTipo(AnimatoSemplice):
         self.motore.lista_beast[self.id]=newbeast
         self.motore.avatar_group.add(newbeast)
         self.motore.avatar_group.objects.remove(self)
+        self.motore.beast_sprite_group.remove(self)
         dict_prop={'nome':self.id}
         self.motore.mag.seguito.append((dict_prop,self.sprite_fotogrammanew))
 #------------------------------------------------------------
@@ -252,6 +253,7 @@ class AnimatoParlanteAvvicina(MovingBeast):
 
 #---------------------------------------
 #Animazione di unità che segue il personaggio avatar
+# se si avvicina per prenderla o se la cattura con il lasso
 #----------------------------------------              
 class AnimatoSegue(MovingBeast):
     #----------------------------------------
@@ -373,17 +375,31 @@ class AnimatoSegue(MovingBeast):
 
 #---------------------------------------
 # Animazione di unità che segue il personaggio avatar
-# ma solo se presa al lasso non se si avvicina, in modo da poterla sganciare facilmente
+# ma solo se presa al lasso non se si avvicina, (in modo da poterla sganciare facilmente)
 #----------------------------------------              
 class AnimatoMandria(AnimatoSegue):
     #----------------------------------------
     def __init__(self,animato,motore=None,segui=False):
         AnimatoSegue.__init__(self,animato,motore=motore)
+        self.motore=motore
+        self.motore.beast_sprite_group.add(self.sprite_fotogrammanew) #si deve riaggniungere il nuovo sprite
 
+    #----------------------------------------
+    def evento_colpito(self):
+        print self.motore.mag.seguito.ultimo
+        if not self.segui:
+            if 'lasso' in self.motore.mag.selezionabili:
+                if self.motore.mag.selezionabili['lasso']:
+                    self.motore.mag.suono.play()
+                    self.segui=True
+                    dict_prop={'nome':self.id}
+                    self.motore.mag.seguito.append((dict_prop,self.sprite_fotogrammanew))
+    #----------------------------------------
     #----------------------------------------
     def controlla_se_preso(self):
         pass
-    #----------------------------------------
+    
+    
 #EofClass---------------------------------------------------
 
 
