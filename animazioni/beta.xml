@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <storia>
          <incarico>
-                <messaggio>Se vuoi vivere qui devi lavorare..</messaggio>
-                <messaggio>e come primo incarico devi andare nel deserto</messaggio>
-                <messaggio>a recuperare il bestiame.</messaggio>
-                <messaggio>Esci dalla porta, fuori c'è il serraglio vuoto</messaggio>
-                <messaggio>dove dovrai mettere il bestiame recuperato</messaggio>
-                <messaggio>segui le indicazioni per il deserto sud-ovest, e cerca l'oasi Khaybar</messaggio>
+                <messaggio>Provaprova..</messaggio>
+                <messaggio>prova prova</messaggio>
         </incarico>
-        <sugglasso>
-            <messaggio>Ricordati di prendere il lasso</messaggio>
-            <messaggio>per catturare il bestiame....</messaggio>
-        </sugglasso>
 </storia>

@@ -462,24 +462,15 @@ class MovingBeast(model.Object):
     def is_p_in_listap(self):
         return self.is_walking
         
-    #--------------------------------------------------------------------------------
-    @property
-    def sprite_fotogramma(self):
-        fotog_sprite=self.miosprite
-        #if self.fotogramma is not None:
-        fotog_sprite.image=self.fotogramma
-        fotog_sprite.rect=self.fotogramma.get_rect()
-        fotog_sprite.rect.x=self.x-fotog_sprite.rect.width/2
-        fotog_sprite.rect.y=self.y-fotog_sprite.rect.height
-        return fotog_sprite
-    
     @property
     def sprite_fotogrammanew(self):
         #fotog_sprite=pygame.sprite.Sprite()
         #fotog_sprite=self.miosprite
         self.miosprite.image=self.fotogramma
         self.miosprite.rect=self.fotogramma.get_rect()
-        self.miosprite.rect.x=self.x-self.miosprite.rect.width/2
+        #self.miosprite.rect.width=32
+        #self.miosprite.rect.height=32
+        self.miosprite.rect.x=self.x-self.miosprite.rect.width
         self.miosprite.rect.y=self.y-self.miosprite.rect.height
         self.miosprite.id=self.id
         return self.miosprite
@@ -487,7 +478,7 @@ class MovingBeast(model.Object):
     #--------------------------------------------------------------------------------
     @property
     def rect(self):
-        rect=self.sprite_fotogramma.rect
+        rect=self.sprite_fotogrammanew.rect
         return rect
     #--------------------------------------------------------------------------------
     @property

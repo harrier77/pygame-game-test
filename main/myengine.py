@@ -210,6 +210,8 @@ class PguApp():
             self.inventario()
         elif inizio=="animali":
             self.inventario_animali()
+        elif inizio=="mappa":
+            self.mini_mappa()
         else:
             self.menu()
         
@@ -266,7 +268,7 @@ class PguApp():
             self.motore.lista_beast[id_cosa_raccolta].segui=False
             try:del self.motore.mag.seguito[i]
             except:
-                print "i="+str(i),self.motore.mag.seguito
+                #print "i="+str(i),self.motore.mag.seguito
                 exit()
         else:
             obj=pygame.sprite.Sprite()
@@ -329,11 +331,22 @@ class PguApp():
         self.tabella.td(etichetta,colspan=2)
         self.loop_inventario(self.motore.mag.seguito)
     #-------------------------------------------------------------------------------
+    def mini_mappa(self):
+        self.tabella.clear()
+        self.tabella.style.margin_top=90
+        mappa=pygame.image.load('.\\immagini\\minimappa.jpg').convert()
+        mappa=pygame.transform.scale(mappa,(550,400))
+        immagine=gui.Image(mappa)
+        self.tabella.tr()
+        self.tabella.td(immagine)
+        
+    #-------------------------------------------------------------------------------
     def quit(self):
-        for s in self.motore.mag.selezionabili:
-            self.motore.mag.selezionabili[s]=False
-        if self.g.value in self.motore.mag.selezionabili:
-            self.motore.mag.selezionabili[self.g.value]=True
+        if hasattr(self,'g'):
+            for s in self.motore.mag.selezionabili:
+                self.motore.mag.selezionabili[s]=False
+            if self.g.value in self.motore.mag.selezionabili:
+                self.motore.mag.selezionabili[self.g.value]=True
         self.mioloop=False
 #EofCLass-------------------------------------------------------------------------------
 
@@ -1034,7 +1047,7 @@ class Motore(Engine):
                 cx,cy = self.camera.rect.topleft
                 #pygame.draw.rect(self.camera.surface, Color('red'), beast.talk_box.move(-cx,-cy))
                 #pygame.draw.rect(self.camera.surface, Color('red'), beast.beast_hit_box.move(-cx,-cy))
-                pygame.draw.rect(self.camera.surface, Color('red'), beast.sprite_fotogramma.rect.move(-cx,-cy))
+                pygame.draw.rect(self.camera.surface, Color('red'), beast.sprite_fotogrammanew.rect.move(-cx,-cy))
     #------------------------------------------------------------------
     def verifica_residuale_tasti_premuti(self,mio_keydown):
         if not self.blockedkeys:
@@ -1102,7 +1115,7 @@ class Motore(Engine):
             else:
                 self.tipofreccia='l'
         elif key==pygame.K_h:
-            print "h"
+            #print "h"
             selettore=Selettore(motore=self)
         elif key == pygame.K_F2:
             print 'f2'
@@ -1133,9 +1146,13 @@ class Motore(Engine):
             pgu=PguApp(self)
         elif key == pygame.K_e:
             pgu=PguApp(self,inizio="animali")
+        elif key == pygame.K_t:
+            pgu=PguApp(self,inizio="inventario")
+        elif key == pygame.K_m:
+            pgu=PguApp(self,inizio="mappa")
         elif key == pygame.K_F9:
-            print 'f9'
-            self.lista_beast['jag1'].vaiattacca=True
+            #print 'f9'
+            print self.beast_sprite_group
         elif key == K_g:
             State.show_grid = not State.show_grid
         elif key == K_l:
@@ -1172,10 +1189,14 @@ class Motore(Engine):
                 if 'piccone' in self.mag.selezionabili:
                     if self.mag.selezionabili['piccone']:
                         utensile=UtensilePiccone(self,pos)
+                if 'mappa' in self.mag.selezionabili:
+                    if self.mag.selezionabili['mappa']:
+                        pgu=PguApp(self,inizio="mappa")
                 if 'utensile' in locals():
                     utensile.mostra()
                 else:
-                    dialog = DialogoAvvisi(testo="Seleziona un'arma o uno strumento da usare! (tasto E)")
+                    if not 'pgu' in locals():
+                        dialog = DialogoAvvisi(testo="Seleziona un'arma o uno strumento da usare! (tasto T)")
 
     #------------------------------------------------------------------ 
     def on_mouse_button_up(self, pos, button):

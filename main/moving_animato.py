@@ -105,7 +105,7 @@ class AnimatoSemplice(MovingBeast):
             
         if (self.lanciato==False) and (self.is_walking==False) and (self.staifermo==False):
                 self.mio_timer_pausa() #lancia il timer che conta i secondi della pausa passati come parametro a MovingBeast()
-                fotog_sprite=self.sprite_fotogramma
+                fotog_sprite=self.sprite_fotogrammanew
         if self.miotimer: #controlla ad ogni ciclo se è attivo un timer e se la pausa di quel timer è scaduta
             self.miotimer.check_time()
      
@@ -130,6 +130,8 @@ class AnimatoCambiaTipo(AnimatoSemplice):
     #----------------------------------------------------
     def cambialo(self):
         #print "cambialo"
+        self.motore.avatar_group.objects.remove(self)
+        self.motore.beast_sprite_group.remove(self.sprite_fotogrammanew)
         newbeast=AnimatoMandria(self.oldanimato,motore=self.motore)
         newbeast.x=self.x
         newbeast.y=self.y
@@ -139,8 +141,6 @@ class AnimatoCambiaTipo(AnimatoSemplice):
         newbeast.aggiorna_pos_da_seguire()
         self.motore.lista_beast[self.id]=newbeast
         self.motore.avatar_group.add(newbeast)
-        self.motore.avatar_group.objects.remove(self)
-        self.motore.beast_sprite_group.remove(self)
         dict_prop={'nome':self.id}
         self.motore.mag.seguito.append((dict_prop,self.sprite_fotogrammanew))
 #------------------------------------------------------------

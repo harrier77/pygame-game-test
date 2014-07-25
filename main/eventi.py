@@ -1,3 +1,4 @@
+# coding: utf-8
 from moving_animato import *
 from moving_beast import Dialogosemplice  
 
@@ -157,14 +158,23 @@ class EventoRecinto():
         self.motore=motore
         self.rect=oggetto_sulla_mappa.rect
         self.mesprite=oggetto_sulla_mappa
-        print self.motore.beast_sprite_group
         self.id=oggetto_sulla_mappa.properties['id']
+        self.attendi_evento=False
+        self.finito_evento=False
+        self.dialogosemp=Dialogosemplice(self)
+        self.dialogosemp.lista_messaggi=['Hai radunato tutto il bestiame!','liberalo nel recinto usando il selettore..']
     #-------------------------------------------------------------------------
     def controlla_se_attivo(self):
         #hits=self.motore.avatar.rect.colliderect(self.rect)
         hits=pygame.sprite.spritecollide(self.mesprite,self.motore.beast_sprite_group,False)
         if hits:
-            print hits
+            if len(hits)>=3:
+                self.attendi_evento=False
+                self.dialogosemp.is_near=True
+                self.dialogosemp.dialogo_show=True
+                #print self.dialogosemp.lista_messaggi
+                self.dialogosemp.sequenza_messaggi_noth() 
+                self.dialogosemp.scrivi_frase()
     #-------------------------------------------------------------------------
 #EofClass
 
@@ -176,7 +186,12 @@ class EventoMessaggio():
         self.attendi_evento=False
         self.finito_evento=False
         self.dialogosemp=Dialogosemplice(self)
-        self.dialogosemp.lista_messaggi=self.motore.dic_storia[self.id]['messaggio']
+        if 'messaggi' in oggetto_sulla_mappa.properties:
+            lista_messaggi=oggetto_sulla_mappa.properties['messaggi'].split(';')
+            self.dialogosemp.lista_messaggi=lista_messaggi
+        else:
+            self.dialogosemp.lista_messaggi=self.motore.dic_storia[self.id]['messaggio']
+    #-------------------------------------------------------------------------        
     def controlla_se_attivo(self):
         hits=self.mesprite.rect.colliderect(self.motore.avatar.hitbox)
         if hits:
@@ -186,5 +201,5 @@ class EventoMessaggio():
             #print self.dialogosemp.lista_messaggi
             self.dialogosemp.sequenza_messaggi_noth() 
             self.dialogosemp.scrivi_frase()
-     #-------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 #EofClass       
