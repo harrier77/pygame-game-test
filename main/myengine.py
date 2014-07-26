@@ -26,8 +26,8 @@ from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlan
 #from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
 from moving_animato import AnimatoSegue,AnimatoAttacca,AnimatoCambiaTipo
 from eventi import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo,EventoRecinto,EventoMessaggio
-
 from armi_utensili import *
+from salvataggi import *
 #from miovar_dump import *
 #from dialogosemp import Dialogosemplice
 from librerie import xmltodict
@@ -46,6 +46,7 @@ except:
     except:
         #print 'cambio dir a '+os.getcwd()
         os.chdir('..\\') 
+
 
 class DialogoAvvisi(gui.Dialog):
     def __init__(self,**params):
@@ -370,9 +371,6 @@ class Magazzino(model.Object):
         self.raccolti=AutoDict()
         self.seguito=AutoDict()
         self.selezionabili=dict()
-        #square=pygame.image.load('.\\immagini\\square1.png').convert_alpha()
-        #self.background_magazzino =pygame.transform.scale(square,(State.screen.size[0]-1,100))
-        #self.backvuoto=self.background_magazzino.copy()
         self.suono=pygame.mixer.Sound('suoni/message.wav')
     #-------------------------------------------------------        
     def azzera_layer_raccolto(self):
@@ -386,7 +384,6 @@ class Magazzino(model.Object):
         alt_tile=int(self.motore.tiled_map.tile_height)
         for r,row in enumerate(content2D):
             for c,cell in enumerate(row):
-                #print r,c," ",cell
                 myobj=pygame.sprite.Sprite()
                 myobj.name=(r,c)
                 myobj.img_idx=long(cell)
@@ -403,10 +400,7 @@ class Magazzino(model.Object):
     def remove_single_tile(self,obj):
         self.motore.raccolto_spathash.remove(obj)
         self.motore.matr_layer_raccolto[obj.name[0]][obj.name[1]]=0 #azzera anche il corrispondente contenuto della matrice
-    #-------------------------------------------------------
-    def rimuovi_dal_seguito(self,i):
 
-        pass
     #-------------------------------------------------------        
     def is_raccolto_collide(self):
         newsprite=self.motore.avatar.sprite
@@ -771,37 +765,8 @@ class Motore(Engine):
                     self.lista_eventi[enew.id]=enew
                     
             if O.type=="animato" :
-                dict_animati[animato.get('id')]=animato
-                dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
+                self.popola_lista_beast(O,dict_animati,animato,miodebug)
                 
-                if O.properties['sottotipo']=='semplice':
-                    beast=AnimatoSemplice(animato)
-                elif O.properties['sottotipo']=='parlante':
-                    beast=AnimatoParlanteAvvicina(animato)
-                elif O.properties['sottotipo']=='parlanteconevento':
-                    beast=AnimatoParlanteConEvento(animato)
-                elif O.properties['sottotipo']=='parlantefermo':
-                    beast=AnimatoParlanteFermo(animato)
-                elif O.properties['sottotipo']=='semplicefermo':
-                    beast=AnimatoFermo(animato)
-                elif O.properties['sottotipo']=='morente':
-                    beast=AnimatoSemplice(animato)
-                elif O.properties['sottotipo']=='animatosegue':
-                    beast=AnimatoSegue(animato,motore=self)
-                elif O.properties['sottotipo']=='attaccante':
-                    beast=AnimatoAttacca(animato)
-                elif O.properties['sottotipo']=='catturabile':
-                    beast=AnimatoCambiaTipo(animato)
-
-                self.beast_sprite_group.add(beast.sprite_fotogrammanew)
-                beast.debug=miodebug
-                beast.dic_storia=animato['dic_storia']
-                beast.staifermo=animato['staifermo']
-                beast.orientamento=animato['orientamento']
-                beast.motore=self
-                self.lista_beast[beast.id]=beast
-                self.avatar_group.add(beast)
-        
         ## Insert avatar into the Fringe layer.
         self.avatar.rect.x=hero_ini_pos[0]
         self.avatar.rect.y=hero_ini_pos[1]
@@ -821,7 +786,39 @@ class Motore(Engine):
         #State.clock.max_fps=10
         toolkit.make_hud()
         self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
+    #------------------------------------------------------------------ 
+    def popola_lista_beast(self,O,dict_animati,animato,miodebug):
+        dict_animati[animato.get('id')]=animato
+        dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
         
+        if O.properties['sottotipo']=='semplice':
+            beast=AnimatoSemplice(animato)
+        elif O.properties['sottotipo']=='parlante':
+            beast=AnimatoParlanteAvvicina(animato)
+        elif O.properties['sottotipo']=='parlanteconevento':
+            beast=AnimatoParlanteConEvento(animato)
+        elif O.properties['sottotipo']=='parlantefermo':
+            beast=AnimatoParlanteFermo(animato)
+        elif O.properties['sottotipo']=='semplicefermo':
+            beast=AnimatoFermo(animato)
+        elif O.properties['sottotipo']=='morente':
+            beast=AnimatoSemplice(animato)
+        elif O.properties['sottotipo']=='animatosegue':
+            beast=AnimatoSegue(animato,motore=self)
+        elif O.properties['sottotipo']=='attaccante':
+            beast=AnimatoAttacca(animato)
+        elif O.properties['sottotipo']=='catturabile':
+            beast=AnimatoCambiaTipo(animato)
+
+        self.beast_sprite_group.add(beast.sprite_fotogrammanew)
+        beast.debug=miodebug
+        beast.dic_storia=animato['dic_storia']
+        beast.staifermo=animato['staifermo']
+        beast.orientamento=animato['orientamento']
+        beast.classe=O.properties['sottotipo']
+        beast.motore=self
+        self.lista_beast[beast.id]=beast
+        self.avatar_group.add(beast)
     
     #------------------------------------------------------------------ 
     def update(self, dt):
@@ -998,6 +995,7 @@ class Motore(Engine):
                         self.nuova_mappa_caricare=True
                         #self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)
                         self.init_mappa(dir_mappa=dir+mappa,hero_ini_pos=(destx,desty),resolution=(800,600),dormi=False,miodebug=False)
+                        self.warp_del_seguito() #verifica se nel passaggio di mappa deve portarsi dietro il cane o altro seguito
     #------------------------------------------------------
     def is_walkable2(self):
         if self.ignora_collisioni:
@@ -1117,18 +1115,19 @@ class Motore(Engine):
         elif key==pygame.K_h:
             #print "h"
             selettore=Selettore(motore=self)
-        elif key == pygame.K_F2:
-            print 'f2'
-            lista_matrice_gids(self.matr_layer_raccolto)
-            itemlist=self.matr_layer_raccolto
-            filename="saved\\raccolti.txt"
-            pickle.dump( itemlist, open(filename,"wb" ) )
-        elif key == pygame.K_F3:
-            print 'f3'
-            filename="saved\\raccolti.txt"
-            nuovamatrice=pickle.load(open( filename, "rb" ))
-            lista_matrice_gids(nuovamatrice)
-            self.mag.ricostruisci_layer_raccolto(nuovamatrice)
+        elif key == pygame.K_F2:  #salva la situazione del gioco nel file salvataggio,txt
+            #lista_matrice_gids(self.matr_layer_raccolto) #stampa sulla console i dati
+            salvataggio=Salvataggio()
+            #salvataggio.matr_layer_raccolto=self.matr_layer_raccolto
+            #salvataggio.avatar_pos=self.avatar.position
+            #filename="saved\\salvataggio.txt"
+            #pickle.dump(salvataggio, open(filename,"wb" ) )
+            salvataggio.salva(motore=self)
+            del salvataggio
+        elif key == pygame.K_F3: #ricarica la situazione del gioco dal file salvataggio,txt
+            salvato=Salvataggio()
+            salvato.ricarica(motore=self)
+            del salvato
         elif key == pygame.K_F4:
             print 'f4'
             dialog = DialogoAvvisi(testo='pippo F4')

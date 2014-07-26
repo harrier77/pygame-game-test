@@ -127,7 +127,7 @@
  </layer>
  <layer name="Fringe" width="29" height="95">
   <data encoding="base64" compression="zlib">
-   eJzt1MkJwkAYBeBhAqnAi1qBWoFagCVYi0sDLm2oTXgQ9Bj3UzRJIZ58RxEnxGGWoO+Dh2jMvH8mECE+qyI1pI5UFOkp7tXVQJpIK6ezb7izjXSQruF1yyxC9sjBYWeCpEjmsJN+08P3AEREf2YQCBG/ZIiMkHFgr3OCtadvmSFzi50uLaQQS6n+XEnfExIRERER2bEO/XUn6E6RrMAMMf5zQ+4e59X1zT5dKct5bhz3m+jLe55Fz3WL6ztLe3d9pr6Y3Kfqual+L8MZ582gM5/Jd4LOWqp7jvh+Qs7IBbmG5uclIiIiIiIiu54wRELa
+   eJzt1MkJwkAYBeAhgVTgRa1ArUAtwBKsxaUBlzbUJjwIenT3FE1SiCffUcQ/xGGWIO+Dh1sy758JqNR3VaSG1JGKkJ5wr64G0kRaOZ19w51tpIN0Da9bZnvkgBwddiZIimQOO+l/PIX3RERk3yBUKn7LEBkh49Be5wRrTz8yQ+YWO11aBEotA/l1FfiekIiIiIjIjnXkrztBd4pkBWaIcc0deXicV9cv+3SlLOe5cdxvoi/veRY91y1+31nau+sz9cXkPqXnJn1fhjPOm0FnPpP/CTprSfec8PmMXJArcovMz0tERERERER2vQCwF0PU
   </data>
  </layer>
  <layer name="Over" width="29" height="95">
@@ -142,11 +142,11 @@
  </layer>
  <layer name="Collision" width="29" height="95">
   <data encoding="base64" compression="zlib">
-   eJzt1ksOgCAMAFHj/Q/tXjGm/KryJumGIAMILdt2ZS+03RHp+zROJHo5R/Tl5OTs47y7+6NywtM8AMwh+iboFTXzjLSX1vcVZ82eZeTPzJwdrZUt57Fmna17wlnvzPifM5zn70c5Z9+VVmY7s2pmZgDAiqyQczk5OTk5Of/i/HO9BgAAAIC3cwAUQgJj
+   eJztllsKgCAQAKX7H7rfqJXYd+kMLIRY4yN3HePJIbTN0PR9+44mopwZfXHixBnjvJ536Tk6J0juLAcAzNHeCaLCMk5NuzS/vzgta9aRPztztrZWev5Hyzy9a4LT7uzYzwrn/f0sZ/VZ8VLt7KqZnQEAsCM75FycOHHixIlzFefK9RoAAAAAAODrnKsaAmc=
   </data>
  </layer>
- <objectgroup name="Object Layer 1">
-  <object name="inizio" gid="1370" x="545" y="1612"/>
+ <objectgroup name="Object Layer 1" width="0" height="0">
+  <object name="inizio" gid="1370" x="229" y="304"/>
   <object gid="1378" x="316" y="134">
    <properties>
     <property name="sottotipo" value="semplicefermo"/>
@@ -180,13 +180,13 @@
     <property name="sottotipo" value="nulla"/>
    </properties>
   </object>
-  <object gid="1373" x="661.333" y="1729.33">
+  <object gid="1373" x="524" y="1804">
    <properties>
     <property name="punto_arrivo" value="15,55"/>
     <property name="sottotipo" value="catturabile"/>
    </properties>
   </object>
-  <object gid="1373" x="772" y="1924.67">
+  <object gid="1373" x="660" y="1784">
    <properties>
     <property name="punto_arrivo" value="12,62"/>
     <property name="sottotipo" value="catturabile"/>
@@ -222,11 +222,18 @@
     <property name="id" value="recinto1"/>
    </properties>
   </object>
-  <object name="messaggio" type="eventonew" x="659" y="1038.5" width="192" height="45">
+  <object name="messaggio" type="eventonew" x="643" y="1011" width="192" height="45">
    <properties>
     <property name="id" value="suggmappa"/>
     <property name="messaggi" value="Devi prendere la mappa dal tavolo...; altrimenti ti perderai nel deserto!"/>
     <property name="sottotipo" value="nulla"/>
+   </properties>
+  </object>
+  <object name="aldeserto" type="warp" x="257" y="320" width="27" height="32">
+   <properties>
+    <property name="dest_map" value="imbocco-deserto-monte-città"/>
+    <property name="dest_tile_x" value="58"/>
+    <property name="dest_tile_y" value="14"/>
    </properties>
   </object>
  </objectgroup>

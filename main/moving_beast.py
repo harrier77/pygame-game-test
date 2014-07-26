@@ -371,6 +371,8 @@ class MovingBeast(model.Object):
             self.vai_incontro=animato['vai_incontro']
         if parlante:self.dialogosemp=Dialogosemplice(self)
         
+        self.segui=False
+        
         
     #--------------------------------------------------------------------------------
     def calcola_points(self,points,position):
