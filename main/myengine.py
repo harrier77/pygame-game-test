@@ -608,7 +608,7 @@ def lista_matrice_gids(matrice):
 
 #-------------------------------------------------------------------------------
 class Motore(Engine):
-    def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="betatest.tmx",\
+    def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="test1.tmx",\
                             coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True):
         self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
         self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito2.wav')
@@ -716,6 +716,7 @@ class Motore(Engine):
         self.State=State
         self.avatar.position=hero_ini_pos
         for index,O in enumerate(self.prima_lista_ogg):
+            
             if O.name==None:
                 if hasattr(O,'gid'):
                     gid=int(O.gid)
@@ -765,6 +766,8 @@ class Motore(Engine):
                     self.lista_eventi[enew.id]=enew
                     
             if O.type=="animato" :
+                #miovar_dump(O)
+                #exit()
                 self.popola_lista_beast(O,dict_animati,animato,miodebug)
                 
         ## Insert avatar into the Fringe layer.
@@ -787,10 +790,9 @@ class Motore(Engine):
         toolkit.make_hud()
         self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
     #------------------------------------------------------------------ 
-    def popola_lista_beast(self,O,dict_animati,animato,miodebug):
+    def popola_lista_beast(self,O,dict_animati,animato,miodebug=False):
         dict_animati[animato.get('id')]=animato
         dict_animati[animato.get('id')]['dic_storia'] = self.dic_storia.get(animato.get('id'),{})
-        
         if O.properties['sottotipo']=='semplice':
             beast=AnimatoSemplice(animato)
         elif O.properties['sottotipo']=='parlante':
@@ -816,6 +818,12 @@ class Motore(Engine):
         beast.staifermo=animato['staifermo']
         beast.orientamento=animato['orientamento']
         beast.classe=O.properties['sottotipo']
+        beast.properties=O.properties
+        beast.gid=O.gid
+        beast.type=O.type
+        beast.name=O.name
+        #beast.image=O.image
+        beast.image_source=O.image_source
         beast.motore=self
         self.lista_beast[beast.id]=beast
         self.avatar_group.add(beast)
