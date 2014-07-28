@@ -145,11 +145,18 @@
    eJxjYBgFwwkwDRAmx52kiGPz31Cxk5wwo8ROcsFA2IlsNylqKUmP5PiT0jAZtZN8OwciPulhJ7p+WtlJ77xCKaC3nQNVZw4kHgWjYBQQBwAVYwFX
   </data>
  </layer>
- <objectgroup name="Object Layer 1" width="29" height="29">
+ <objectgroup name="Object Layer 1">
   <object name="inizio" gid="1370" x="678" y="379"/>
   <object gid="1371" x="578" y="417">
    <properties>
     <property name="sottotipo" value="animatosegue"/>
+   </properties>
+  </object>
+  <object name="totest2" type="warp" x="705" y="614" width="94" height="25">
+   <properties>
+    <property name="dest_map" value="test2"/>
+    <property name="dest_tile_x" value="25"/>
+    <property name="dest_tile_y" value="6"/>
    </properties>
   </object>
  </objectgroup>

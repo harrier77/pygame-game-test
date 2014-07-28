@@ -618,8 +618,7 @@ class Motore(Engine):
         xml = open('animazioni\\beta.xml', 'r').read()
         self.dic_storia=xmltodict.parse(xml)['storia']
         #self.lista_beast=[]
-        self.lista_beast={}
-        self.lista_eventi={}
+
         self.godebug=False
         
         #necessario per resettare la condizione messa dalla libreria PGU
@@ -658,6 +657,8 @@ class Motore(Engine):
     #EofInit------------------------------------------------------------------ 
     
     def init_mappa(self,dir_mappa='',coll_invis=True,hero_ini_pos=(0,0),resolution=(800,600),dormi=True,miodebug=True):
+        self.lista_beast={}
+        self.lista_eventi={}
         self.warps=[]
         self.eventi=pygame.sprite.Group()
         self.beast_sprite_group=pygame.sprite.Group()
@@ -807,6 +808,7 @@ class Motore(Engine):
             beast=AnimatoSemplice(animato)
         elif O.properties['sottotipo']=='animatosegue':
             beast=AnimatoSegue(animato,motore=self)
+            if 'is_segui' in animato: beast.segui=animato['is_segui']
         elif O.properties['sottotipo']=='attaccante':
             beast=AnimatoAttacca(animato)
         elif O.properties['sottotipo']=='catturabile':
@@ -998,12 +1000,20 @@ class Motore(Engine):
                         wx = max(min(wx,rect.right), rect.left)
                         wy = max(min(wy,rect.bottom), rect.top)
                         camera.position = wx,wy
-                        self.warp_del_seguito() #verifica se nel passaggio di mappa deve portarsi dietro il cane o altro seguito
+                        self.warp_del_seguito() #posizione sulla nuova mappa il cane o altro seguito
                 else:
                         self.nuova_mappa_caricare=True
-                        #self.__init__(resolution=(800,600),dir=dir,mappa=mappa,hero_ini_pos=(destx,desty),dormi=False)
+                        if self.mag.seguito: #verifica se c'è seguito, in quel caso lo salva in lista_beast_seguito
+                            lista_beast_seguito=dict()
+                            for k,v in self.mag.seguito.iteritems():
+                                lista_beast_seguito[v[0]['nome']]=self.lista_beast[v[0]['nome']]
+                        salvataggio=Salvataggio() #salva lo stato della mappa lasciata
+                        salvataggio.salva(motore=self)
                         self.init_mappa(dir_mappa=dir+mappa,hero_ini_pos=(destx,desty),resolution=(800,600),dormi=False,miodebug=False)
-                        self.warp_del_seguito() #verifica se nel passaggio di mappa deve portarsi dietro il cane o altro seguito
+                        if 'lista_beast_seguito' in locals():
+                            self.lista_beast=dict(self.lista_beast.items()+lista_beast_seguito.items()) #aggiunge alla lista_beast della nuova mappa il seguito raccolto nella mappa lasciata
+                        salvataggio.ricarica(motore=self,qualemappa=self.mappa_dirfile)
+                        self.warp_del_seguito() #posizione sulla nuova mappa il cane o altro seguito
     #------------------------------------------------------
     def is_walkable2(self):
         if self.ignora_collisioni:
@@ -1134,7 +1144,7 @@ class Motore(Engine):
             del salvataggio
         elif key == pygame.K_F3: #ricarica la situazione del gioco dal file salvataggio,txt
             salvato=Salvataggio()
-            salvato.ricarica(motore=self)
+            salvato.ricarica(motore=self,qualemappa=self.mappa_dirfile)
             del salvato
         elif key == pygame.K_F4:
             print 'f4'
