@@ -34,7 +34,7 @@ import pygame
 pygame.init()
 
 from gummworld2 import version
-if __debug__: print 'gummworld2 v%s loading...' % version.version
+#if __debug__: print 'gummworld2 v%s loading...' % version.version
 
 # Classes
 from vec2d import Vec2d
@@ -74,4 +74,4 @@ import basicmap
 import tiledmap
 import supermap
 
-if __debug__: print 'gummworld2 v%s loaded' % version.version
+#if __debug__: print 'gummworld2 v%s loaded' % version.version

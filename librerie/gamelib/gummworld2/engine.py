@@ -161,7 +161,7 @@ class Engine(Context):
         clock.
         """
         
-        if __debug__: print 'Engine: -- new engine --'
+        #if __debug__: print 'Engine: -- new engine --'
         
         Context.__init__(self)
         
@@ -179,21 +179,21 @@ class Engine(Context):
         
         ## Screen.
         if screen_surface:
-            if __debug__: print 'Engine: Screen(surface=screen_surface)'
+            #if __debug__: print 'Engine: Screen(surface=screen_surface)'
             self.screen = Screen(surface=screen_surface)
         elif resolution:
-            if __debug__: print 'Engine: Screen(resolution, display_flags)'
+            #if __debug__: print 'Engine: Screen(resolution, display_flags)'
             self.screen = Screen(resolution, display_flags)
         else:
-            if __debug__: print 'Engine: SKIPPING screen creation: no screen surface or resolution'
+            #if __debug__: print 'Engine: SKIPPING screen creation: no screen surface or resolution'
             self.screen = State.screen
         
         ## BasicMap.
         if map:
-            if __debug__: print 'Engine: using pre-made map'
+            #if __debug__: print 'Engine: using pre-made map'
             self.map = map
         elif tile_size and map_size:
-            if __debug__: print 'Engine: BasicMap(map_size, tile_size)'
+            #if __debug__: print 'Engine: BasicMap(map_size, tile_size)'
             self.map = BasicMap(map_size[0], map_size[1], tile_size[0], tile_size[1])
         else:
             if __debug__: print 'Engine: SKIPPING map creation: no map, tile_size, or map_size'
@@ -203,21 +203,22 @@ class Engine(Context):
         ## not done. This is to allow flexible initialization of the Engine
         ## context.
         if __debug__ and self.camera_target:
-            print 'Engine: using pre-made camera target'
+            #print 'Engine: using pre-made camera target'
+            pass
         if not self.map:
             if __debug__: print 'Engine: SKIPPING world creation: no map'
             pass
         elif world_type == NO_WORLD:
-            if __debug__: print 'Engine: NoWorld(self.map.rect)'
+            #if __debug__: print 'Engine: NoWorld(self.map.rect)'
             self.world = model.NoWorld(self.map.rect)
             if camera_target is None:
                 if __debug__: print 'Engine: making camera target Object()'
                 self.camera_target = model.Object()
         elif world_type == SIMPLE_WORLD:
-            if __debug__: print 'Engine: World(self.map.rect)'
+            #if __debug__: print 'Engine: World(self.map.rect)'
             self.world = model.World(self.map.rect)
             if camera_target is None:
-                if __debug__: print 'Engine: making camera target Object()'
+                #if __debug__: print 'Engine: making camera target Object()'
                 self.camera_target = model.Object()
         
         ## Create the camera.
@@ -226,18 +227,18 @@ class Engine(Context):
                 if __debug__: print 'Engine: using pre-made camera view'
             else:
                 if camera_view_rect:
-                    if __debug__: print 'Engine: making camera view from rect'
+                    #if __debug__: print 'Engine: making camera view from rect'
                     camera_view = View((self.screen or State.screen).surface, camera_view_rect)
                 else:
-                    if __debug__: print 'Engine: making camera view from screen'
+                    #if __debug__: print 'Engine: making camera view from screen'
                     camera_view = self.screen
-            if __debug__: print 'Engine: making camera'
+            #if __debug__: print 'Engine: making camera'
             self.camera = Camera(self.camera_target, camera_view)
         else:
             if __debug__: print 'Engine: SKIPPING camera creation: no camera target, view, or view rect'
         
         ## Create the clock, specifying callbacks for update() and draw().
-        if __debug__: print 'Engine: creating GameClock'
+        #if __debug__: print 'Engine: creating GameClock'
         self.clock = GameClock(
             update_speed, frame_speed,
             update_callback=self._update, frame_callback=self._draw)
@@ -250,7 +251,7 @@ class Engine(Context):
         
         ## Initialize State.
         if set_state:
-            if __debug__: print 'Engine: copying my objects to State'
+            #if __debug__: print 'Engine: copying my objects to State'
             self.set_state()
     
     def enter(self):

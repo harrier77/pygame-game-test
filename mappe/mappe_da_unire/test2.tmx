@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="29" height="29" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="music" value="Faith.ogg"/>
+  <property name="name" value="South Tulimshar Indoor"/>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/raccoglibili.tsx"/>
+ <tileset firstgid="7" source="../tilesets/collision.tsx"/>
+ <tileset firstgid="9" name="desert1" tilewidth="32" tileheight="32">
+  <image source="../graphics/tiles/desert1.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="265" source="../tilesets/tulimshar1.tsx"/>
+ <tileset firstgid="521" source="../tilesets/segnaposti_oggetti.tsx"/>
+ <layer name="Ground" width="29" height="29">
+  <data encoding="base64" compression="zlib">
+   eJztw7ENAAAIA6Cu/v+wNzQuDpCQwM2oqnXgrwV4rhBR
+  </data>
+ </layer>
+ <layer name="Fringe" width="29" height="29">
+  <data encoding="base64" compression="zlib">
+   eJzt0ikOACAMBdH2/idh9SyH4xskQYKYl4yhaVKBGQAA7zU362qo6a+vwQ+C/kFUSWVVVPXz+23vNgOAbQHSRBMb
+  </data>
+ </layer>
+ <layer name="Over" width="29" height="29">
+  <data encoding="base64" compression="zlib">
+   eJztyrEJAAAIA0Gd2+WtbAQn8K76QCIA4IfKe0/vDwD/NOQFAfE=
+  </data>
+ </layer>
+ <layer name="raccolto" width="29" height="29">
+  <data encoding="base64" compression="zlib">
+   eJztwTEBAAAAwqD1T+1lC6AAAAC4AQ0kAAE=
+  </data>
+ </layer>
+ <layer name="Collision" width="29" height="29">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFwwlwDBCmJxi1c3jZCbOX3vaN2jlq56ido3ai2zkS8CgYBaOAOAAAdL0DoQ==
+  </data>
+ </layer>
+ <objectgroup name="Object Layer 1">
+  <object name="totest1" type="warp" x="770" y="162" width="125" height="30">
+   <properties>
+    <property name="dest_map" value="test1"/>
+    <property name="dest_tile_x" value="23"/>
+    <property name="dest_tile_y" value="18"/>
+   </properties>
+  </object>
+  <object gid="527" x="524" y="393">
+   <properties>
+    <property name="punto_arrivo" value="7,11"/>
+    <property name="sottotipo" value="semplice"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

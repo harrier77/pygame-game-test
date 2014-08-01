@@ -36,7 +36,7 @@ class AnimatoSemplice(MovingBeast):
         hits= pygame.sprite.spritecollide(self.motore.avatar.sprite,self.motore.beast_sprite_group, False)
         if hits:
             ogg_colpito=self.motore.lista_beast[hits[0].id]
-            print ogg_colpito.id
+            #print ogg_colpito.id
             return True
         else:
             return False
@@ -122,6 +122,7 @@ class AnimatoCambiaTipo(AnimatoSemplice):
     def __init__(self,animato):
         self.oldanimato=animato
         AnimatoSemplice.__init__(self,animato)
+        
     #---------------------------------------------------
     def evento_colpito(self):
         if 'lasso' in self.motore.mag.selezionabili:
@@ -129,6 +130,7 @@ class AnimatoCambiaTipo(AnimatoSemplice):
                 self.cambialo()
     #----------------------------------------------------
     def cambialo(self):
+        #print self.properties
         #print "cambialo"
         self.motore.avatar_group.objects.remove(self)
         self.motore.beast_sprite_group.remove(self.sprite_fotogrammanew)
@@ -136,6 +138,12 @@ class AnimatoCambiaTipo(AnimatoSemplice):
         newbeast.x=self.x
         newbeast.y=self.y
         newbeast.segui=True
+        newbeast.properties=self.properties
+        newbeast.properties['sottotipo']='mandria'
+        newbeast.classe=self.classe
+        newbeast.name=self.name
+        newbeast.type=self.type
+        newbeast.image_source=self.image_source
         self.motore.mag.suono.play()
         newbeast.motore=self.motore
         newbeast.aggiorna_pos_da_seguire()
@@ -266,6 +274,8 @@ class AnimatoSegue(MovingBeast):
         self.draw_fotogramma=True
         self.direzione="right"
         self.segui=segui
+        self.coda=None
+        self.sfasamento=self.ultimo*26
     
     #----------------------------------------
     @property
@@ -274,6 +284,8 @@ class AnimatoSegue(MovingBeast):
             return True
         else:
             return False
+            
+        
     #----------------------------------------
     def aggiorna_pos_da_seguire(self):
         #self.posarrivo_rect=self.motore.avatar.hitbox
@@ -310,12 +322,17 @@ class AnimatoSegue(MovingBeast):
     #----------------------------------------
     @property
     def posarrivo_rect(self):
-        p=self.motore.mag.seguito.get(self.ultimo)
-        if p is not None:
-            id_p=p[0]['nome']
-            if p[0]['nome']!=self.id:
-                return self.motore.lista_beast[id_p].rect
-        return self.motore.avatar.hitbox
+        self.coda=self.motore.avatar.hitbox
+        self.coda.x=self.coda.x-self.sfasamento
+        """p=self.motore.mag.seguito.get(self.ultimo)
+        if self.coda==None:
+            if p is not None:
+                id_p=p[0]['nome']
+                if p[0]['nome']!=self.id:
+                    self.coda=self.motore.lista_beast[id_p].rect
+            else:
+                self.coda=self.motore.avatar.hitbox"""
+        return self.coda
         
         
      #--------------------------------------------------------------------------------
@@ -383,10 +400,15 @@ class AnimatoMandria(AnimatoSegue):
         AnimatoSegue.__init__(self,animato,motore=motore)
         self.motore=motore
         self.motore.beast_sprite_group.add(self.sprite_fotogrammanew) #si deve riaggniungere il nuovo sprite
+        self.segui=True
+        self.classe='mandria'
+        self.properties['sottotipo']='mandria'
+        
+
 
     #----------------------------------------
     def evento_colpito(self):
-        print self.motore.mag.seguito.ultimo
+        
         if not self.segui:
             if 'lasso' in self.motore.mag.selezionabili:
                 if self.motore.mag.selezionabili['lasso']:

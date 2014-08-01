@@ -56,12 +56,12 @@
    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
   </data>
  </layer>
- <objectgroup name="Objects" width="0" height="0">
+ <objectgroup name="Objects">
   <object name="To South Tulimshar" type="warp" x="1696" y="4672" width="160" height="32">
    <properties>
     <property name="dest_map" value="001-1"/>
     <property name="dest_tile_x" value="44"/>
-    <property name="dest_tile_y" value="21"/>
+    <property name="dest_tile_y" value="22"/>
    </properties>
   </object>
   <object name="To South Tulimshar" type="warp" x="4320" y="4704" width="64" height="32">
@@ -69,38 +69,6 @@
     <property name="dest_map" value="001-1"/>
     <property name="dest_tile_x" value="125"/>
     <property name="dest_tile_y" value="22"/>
-   </properties>
-  </object>
-  <object name="Maggot" type="spawn" x="2848" y="2048" width="128" height="96">
-   <properties>
-    <property name="eA_death" value="30000"/>
-    <property name="eA_spawn" value="100000"/>
-    <property name="max_beings" value="2"/>
-    <property name="monster_id" value="0"/>
-   </properties>
-  </object>
-  <object name="Maggot" type="spawn" x="3008" y="3936" width="128" height="96">
-   <properties>
-    <property name="eA_death" value="30000"/>
-    <property name="eA_spawn" value="100000"/>
-    <property name="max_beings" value="2"/>
-    <property name="monster_id" value="0"/>
-   </properties>
-  </object>
-  <object name="Maggot" type="spawn" x="3200" y="1664" width="224" height="96">
-   <properties>
-    <property name="eA_death" value="30000"/>
-    <property name="eA_spawn" value="100000"/>
-    <property name="max_beings" value="5"/>
-    <property name="monster_id" value="0"/>
-   </properties>
-  </object>
-  <object name="SeaSlime" type="spawn" x="3104" y="736" width="96" height="96">
-   <properties>
-    <property name="eA_death" value="100000"/>
-    <property name="eA_spawn" value="150000"/>
-    <property name="max_beings" value="1"/>
-    <property name="monster_id" value="31"/>
    </properties>
   </object>
   <object name="To Government Building" type="warp" x="1696" y="4288" width="32" height="32">

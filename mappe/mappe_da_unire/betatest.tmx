@@ -145,7 +145,7 @@
    eJztllsKgCAQAKX7H7rfqJXYd+kMLIRY4yN3HePJIbTN0PR9+44mopwZfXHixBnjvJ536Tk6J0juLAcAzNHeCaLCMk5NuzS/vzgta9aRPztztrZWev5Hyzy9a4LT7uzYzwrn/f0sZ/VZ8VLt7KqZnQEAsCM75FycOHHixIlzFefK9RoAAAAAAODrnKsaAmc=
   </data>
  </layer>
- <objectgroup name="Object Layer 1" width="0" height="0">
+ <objectgroup name="Object Layer 1">
   <object name="inizio" gid="1370" x="229" y="304"/>
   <object gid="1378" x="316" y="134">
    <properties>
@@ -168,9 +168,9 @@
   </object>
   <object name="alla" type="warp" x="717" y="1099" width="83" height="51">
    <properties>
-    <property name="dest_map" value="betatest"/>
-    <property name="dest_tile_x" value="23"/>
-    <property name="dest_tile_y" value="50"/>
+    <property name="dest_map" value="001-1"/>
+    <property name="dest_tile_x" value="32"/>
+    <property name="dest_tile_y" value="72"/>
    </properties>
   </object>
   <object name="messaggio" type="eventonew" x="498" y="760" width="192" height="45">
@@ -231,7 +231,7 @@
   </object>
   <object name="aldeserto" type="warp" x="257" y="320" width="27" height="32">
    <properties>
-    <property name="dest_map" value="imbocco-deserto-monte-città"/>
+    <property name="dest_map" value="imbocco-deserto-monte-citta"/>
     <property name="dest_tile_x" value="58"/>
     <property name="dest_tile_y" value="14"/>
    </properties>

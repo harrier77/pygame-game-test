@@ -4,57 +4,17 @@
   <property name="music" value="Faith.ogg"/>
   <property name="name" value="South Tulimshar Indoor"/>
  </properties>
- <tileset firstgid="1" source="../tilesets/collision.tsx"/>
- <tileset firstgid="3" source="../tilesets/inn.tsx"/>
- <tileset firstgid="259" source="../tilesets/inn2.tsx"/>
- <tileset firstgid="515" source="../tilesets/inn_x2.tsx"/>
- <tileset firstgid="547" source="../tilesets/inn_x3.tsx"/>
- <tileset firstgid="579" name="raccoglibili" tilewidth="32" tileheight="32">
-  <image source="../graphics/tiles/raccoglibili.png" width="96" height="64"/>
-  <tile id="0">
-   <properties>
-    <property name="nome" value="birra"/>
-   </properties>
-  </tile>
-  <tile id="1">
-   <properties>
-    <property name="nome" value="arco"/>
-   </properties>
-  </tile>
-  <tile id="2">
-   <properties>
-    <property name="nome" value="frecce"/>
-   </properties>
-  </tile>
-  <tile id="3">
-   <properties>
-    <property name="nome" value="lasso"/>
-   </properties>
-  </tile>
-  <tile id="4">
-   <properties>
-    <property name="nome" value="piccone"/>
-   </properties>
-  </tile>
-  <tile id="5">
-   <properties>
-    <property name="nome" value="spada"/>
-   </properties>
-  </tile>
- </tileset>
- <tileset firstgid="585" name="raccoglibili2" tilewidth="32" tileheight="32">
-  <image source="../graphics/tiles/raccoglibili2.png" width="128" height="128"/>
-  <tile id="0">
-   <properties>
-    <property name="nome" value="mappa"/>
-   </properties>
-  </tile>
- </tileset>
- <tileset firstgid="601" name="desert1" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" source="../tilesets/raccoglibili.tsx"/>
+ <tileset firstgid="7" source="../tilesets/collision.tsx"/>
+ <tileset firstgid="9" source="../tilesets/inn.tsx"/>
+ <tileset firstgid="265" source="../tilesets/inn2.tsx"/>
+ <tileset firstgid="521" source="../tilesets/inn_x2.tsx"/>
+ <tileset firstgid="553" source="../tilesets/inn_x3.tsx"/>
+ <tileset firstgid="585" name="desert1" tilewidth="32" tileheight="32">
   <image source="../graphics/tiles/desert1.png" width="512" height="512"/>
  </tileset>
- <tileset firstgid="857" source="../tilesets/tulimshar1.tsx"/>
- <tileset firstgid="1113" name="mioinn" tilewidth="32" tileheight="32">
+ <tileset firstgid="841" source="../tilesets/tulimshar1.tsx"/>
+ <tileset firstgid="1097" name="mioinn" tilewidth="32" tileheight="32">
   <image source="../graphics/tiles/mioinn.png" width="512" height="512"/>
   <tile id="4">
    <properties>
@@ -62,7 +22,7 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="1369" name="segnaposti_oggetti" tilewidth="32" tileheight="32">
+ <tileset firstgid="1353" name="segnaposti_oggetti" tilewidth="32" tileheight="32">
   <image source="../graphics/tiles/segnaposti_oggetti.png" width="128" height="128"/>
   <tile id="0">
    <properties>
@@ -115,39 +75,39 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="1385" source="../tilesets/desert2.tsx"/>
- <tileset firstgid="1641" source="../tilesets/desert3.tsx"/>
- <tileset firstgid="1721" source="../tilesets/desert_x2.tsx"/>
- <tileset firstgid="1737" source="../tilesets/desert_x3.tsx"/>
- <tileset firstgid="1753" source="../tilesets/desert_x5.tsx"/>
+ <tileset firstgid="1369" source="../tilesets/desert2.tsx"/>
+ <tileset firstgid="1625" source="../tilesets/desert3.tsx"/>
+ <tileset firstgid="1705" source="../tilesets/desert_x2.tsx"/>
+ <tileset firstgid="1721" source="../tilesets/desert_x3.tsx"/>
+ <tileset firstgid="1737" source="../tilesets/desert_x5.tsx"/>
  <layer name="Ground" width="29" height="29">
   <data encoding="base64" compression="zlib">
-   eJztw0EJAAAIBLDDlvYvYgbx42ODJXDTpapuA38NZYek8Q==
+   eJztw0EJAAAIBLDDdvYvZAbx42ODJXDTpapuA38N3yqH8Q==
   </data>
  </layer>
  <layer name="Fringe" width="29" height="29">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AU0ApUMjMw3ETCVUBcDcQ1zLSzsxNodhca7gbiHhraSU+wlImBYRkTbno500C7cBSMglEwCkbBKBgFQx0AAF83Dk0=
+   eJxjYBgFo2AU0ApkMjMwnETCWUCcDcQ5zLSzsxJodhUargbiGhraSU8wlYmBYRoTbno600C7cBSMglEwCkbBKBgFQx0AAFo0DN0=
   </data>
  </layer>
  <layer name="Over" width="29" height="29">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFIx1EMjMwRGHBMcz49T1kYmB4xESenTOBZsdiwbMI2PkRaN8nMu3MBJqdhYazgTiHgJ2MQHkmAmqoDQbCTkGgfUJ0tnMgADnp9iCZaQ4GyEm3Q9FOctItITsJydPCn4TkqeHPGCA/lgm3PDXsXAo0cxkTbno5DcKWUgCz8woQX4XiK2g0NjFi5K6h+YWbGYJ5gNgGiJ8A5Z9C8RM0GpsYMXLP0OyUYUbFo2AUjILBCwCltUyY
+   eJxjYBgFIx14MjMweGHBPsz49V1kYmC4xESenZ1As32x4C4Cdj4E2veITDsjgWZHoeFoII4hYOdHoH2fyLSTXDAQdjICw4GJQFgMB0BOut1IYVyQk26Hop3kpFtCdhKSp4U/CclTw58+QL4vE255atg5Fah+GhNuejoNwpZSALPzCBAfheIjaDQ2MWLkjqH55TcTBP8BYh1g2XcFSF+F4itoNDYxYuSuodnJw4yKR8EoGAWDFwAAHsZR+w==
   </data>
  </layer>
  <layer name="raccolto" width="29" height="29">
   <data encoding="base64" compression="zlib">
-   eJztzjENAAAIA7AFcfiXhAH+Pa2CJgBAw057AMDnAKIxAEk=
+   eJztzjENAAAIA7Ad+NeMjJHQKmgCAHw27QDAMQshhAAF
   </data>
  </layer>
  <layer name="Collision" width="29" height="29">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFwwkwDRAmx52kiGPz31Cxk5wwo8ROcsFA2IlsNylqKUmP5PiT0jAZtZN8OwciPulhJ7p+WtlJ77xCKaC3nQNVZw4kHgWjYBQQBwAVYwFX
+   eJxjYBgFwwlwDBAmx52kiGPz31Cxk5wwo8ROcsFA2IlsNylqKUmP5PiT0jAZtZN8OwciPulhJ7p+WtlJ77xCKaC3nQNVZw4kHgWjYBQQBwAuIAVZ
   </data>
  </layer>
  <objectgroup name="Object Layer 1">
-  <object name="inizio" gid="1370" x="678" y="379"/>
-  <object gid="1371" x="578" y="417">
+  <object name="inizio" gid="1354" x="678" y="379"/>
+  <object gid="1355" x="578" y="417">
    <properties>
     <property name="sottotipo" value="animatosegue"/>
    </properties>

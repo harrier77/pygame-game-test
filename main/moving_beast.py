@@ -372,6 +372,8 @@ class MovingBeast(model.Object):
         if parlante:self.dialogosemp=Dialogosemplice(self)
         
         self.segui=False
+        self.gid=0
+        self.properties=dict()
         
         
     #--------------------------------------------------------------------------------
