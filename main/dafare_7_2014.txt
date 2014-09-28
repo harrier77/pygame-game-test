@@ -16,3 +16,10 @@ un po' fatto, #piccone che scava rimuovendo le collisioni
 da fare #quando parli con uno si gira verso di te
 
 #aggiustare un po tutto
+
+#-------------------------------------
+
+8-8-2014
+#FATTO evento recinto che scatta quando si porta bestiame all'interno
+#FATTO sistema che trasporta il seguito di bestie da una mappa all'altra
+#FATTO sistema che salva lo stato degli oggetti di una mappa e lo riprende quando ci si rientra

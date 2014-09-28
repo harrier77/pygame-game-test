@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="29" height="95" tilewidth="32" tileheight="32">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="29" height="95" tilewidth="32" tileheight="32">
  <properties>
   <property name="music" value="Faith.ogg"/>
   <property name="name" value="South Tulimshar Indoor"/>
@@ -132,7 +132,7 @@
  </layer>
  <layer name="Over" width="29" height="95">
   <data encoding="base64" compression="zlib">
-   eJzt0rsNwjAUhWFjl9BAzSgsAkoG4LEQ9MAc7BDoQYEeJuBKJAWWgyPjECL9n3RkkRt85MhKAQAAdNvUKDVzJDGf/3fWSl10WOda9k4d2Xg679L3COycy94LK0vJytPZk7n2vBNbG51D6Rv9uLMNIff2EHjnSiH3toudIffW1+mbN3FO3zzGORP5nerqeYzOrey509XrvoFv+62yM5Mci2TW6npWZ3ayztI3rwwkE0ku82uR3Fpdz+rMblbn2LwHAAAAAAAAAAAA+BdPHOZMmA==
+   eJzt0t0NgjAUhuHaXuqNXjuKi2hgAH8W0nt1DnfAATQ4gEzgMaEXkOJJKogk75N8qXCwXyA1BgAAYNiWzphVIIn7/L+bNeZu4zr3sncayEHpfEpfEdm5lr03tWwlO6VzJHOrPNO2Pjqn0jf7cWcfYs7tJfLMeTHndoidMedW69TmXbynNm/jPRO5Tm3zvI3Oo+x5ss3ruYNv+y3fmUmuZbLaGrqnzbyxq/5+ZyJZSHJ57lEmr62he9os1Dl31QAAAAAAAAAAAAD/4gV28Ek2
   </data>
  </layer>
  <layer name="raccolto" width="29" height="95">
@@ -146,13 +146,13 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1">
-  <object name="inizio" gid="1370" x="229" y="304"/>
+  <object name="inizio" gid="1370" x="334" y="238"/>
   <object gid="1378" x="316" y="134">
    <properties>
     <property name="sottotipo" value="semplicefermo"/>
    </properties>
   </object>
-  <object name="messaggio" type="eventonew" x="251" y="115" width="171" height="115">
+  <object name="messaggio" type="eventonew" x="251" y="115" width="169" height="142">
    <properties>
     <property name="id" value="incarico"/>
     <property name="messaggi" value="Se vuoi vivere qui devi lavorare...;e come primo incarico devi andare nel deserto a recuperare il mio bestiame...;Esci dalla porta, fuori c'è il serraglio vuoto;dove dovrai mettere il bestiame recuperato; cercalo nell'oasi Khaybar."/>
@@ -166,7 +166,7 @@
     <property name="dest_tile_y" value="24"/>
    </properties>
   </object>
-  <object name="alla" type="warp" x="717" y="1099" width="83" height="51">
+  <object name="alla" type="warp" x="738" y="1102" width="63" height="44">
    <properties>
     <property name="dest_map" value="001-1"/>
     <property name="dest_tile_x" value="32"/>
@@ -234,6 +234,13 @@
     <property name="dest_map" value="imbocco-deserto-monte-citta"/>
     <property name="dest_tile_x" value="58"/>
     <property name="dest_tile_y" value="14"/>
+   </properties>
+  </object>
+  <object name="alloasiinterno" type="warp" x="642" y="1105" width="63" height="44">
+   <properties>
+    <property name="dest_map" value="betatest"/>
+    <property name="dest_tile_x" value="23"/>
+    <property name="dest_tile_y" value="50"/>
    </properties>
   </object>
  </objectgroup>

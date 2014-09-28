@@ -63,15 +63,17 @@ class Proiettile(object):
             self.rect.y=self.rect.y+self.dy*10
             hits= pygame.sprite.spritecollide(self.sprite,self.motore.beast_sprite_group, False)
             if hits:
-                ogg_colpito=self.motore.lista_beast[hits[0].id]
-                if ogg_colpito.id<>'Wolf':
-                    #if hasattr(ogg_colpito,'miocingdying'):
-                    if hasattr(ogg_colpito,'evento_colpito'):
-                        ogg_colpito.evento_colpito()
-                    self.colpito=True
-                    self.motore.avatar_group.objects.remove(self)
-                if self.motore.lista_beast[hits[0].id].sottotipo=='attaccante':
-                    self.motore.lista_beast[hits[0].id].vaiattacca=True
+                if hits[0].id in self.motore.lista_beast:
+                    ogg_colpito=self.motore.lista_beast[hits[0].id]
+                    if ogg_colpito.id<>'Wolf':
+                        #if hasattr(ogg_colpito,'miocingdying'):
+                        if hasattr(ogg_colpito,'evento_colpito'):
+                            ogg_colpito.evento_colpito()
+                        self.colpito=True
+                        #if self.motore.lista_beast[hits[0].id].segui:self.colpito=False
+                        self.motore.avatar_group.objects.remove(self)
+                    if self.motore.lista_beast[hits[0].id].sottotipo=='attaccante':
+                        self.motore.lista_beast[hits[0].id].vaiattacca=True
             hitsover=pygame.sprite.spritecollide(self.sprite,self.motore.over_group,False)
             if hitsover:
                 if hitsover[0].img_idx in self.motore.dict_gid_to_properties:

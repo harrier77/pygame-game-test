@@ -51,13 +51,17 @@ except:
 
 #-------------------------------------------------------------------------------
 class Motore(Engine):
-    def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="imbocco-deserto-monte-citta.tmx",\
-                            coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True):
+    def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="001-1.tmx",\
+                            coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True,inizia_con_menu=False):
         try:
             filename="saved\\salvataggio.txt"
             os.remove(filename)
         except:
             pass
+        #inizia_con_menu=True
+        if inizia_con_menu:
+            menuscreen = pygame.display.set_mode((800, 600))
+            pgu=PguApp(self,inizio="salvataggi")
         self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
         self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito2.wav')
         self.suono_cilecca=pygame.mixer.Sound('suoni/cilecca.wav')
@@ -100,6 +104,9 @@ class Motore(Engine):
         self.direzione_avatar='front'
         self.imm_fermo=self.avatar.sit_standing
         dir_mappa=dir+mappa
+
+            
+            
         self.init_mappa(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
 
     #EofInit------------------------------------------------------------------ 
@@ -630,14 +637,9 @@ class Motore(Engine):
         elif key == pygame.K_m:
             pgu=PguApp(self,inizio="mappa")
         elif key == pygame.K_F9:
-            #print 'f9'
-            inc=0
-            for k,b in self.lista_beast.iteritems():
-                try:
-                    inc=inc+16
-                    b.sfasamento=b.sfasamento+inc
-                except:
-                    pass
+            print 'f9'
+            self.beast_sprite_group.empty()
+            
         elif key == K_g:
             State.show_grid = not State.show_grid
         elif key == K_l:
@@ -729,7 +731,13 @@ def miomain(debug=True,hero_ini_pos1=(0,0)):
     pygame.display.set_icon(icon)
     gummworld2.run(oggetto)
     return oggetto
-        
+
+def newmain(debug=True,hero_ini_pos1=(0,0),mappa='betatest.tmx',inizia_con_menu=True):
+    oggetto=Motore(resolution=(800,600),miodebug=debug,hero_ini_pos=hero_ini_pos1,mappa=mappa,inizia_con_menu=True)
+    icon=pygame.image.load(".\immagini\\icona2.gif")
+    pygame.display.set_icon(icon)
+    gummworld2.run(oggetto)
+    return oggetto
 
 if __name__ == '__main__':
 

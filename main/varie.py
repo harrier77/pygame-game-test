@@ -171,6 +171,8 @@ class PguApp():
             self.inventario_animali()
         elif inizio=="mappa":
             self.mini_mappa()
+        elif inizio=='salvataggi':
+            self.menu_salvataggi()
         else:
             self.menu()
         
@@ -221,6 +223,21 @@ class PguApp():
         self.tabella.td(tornabtn)
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
+        
+    def menu_salvataggi(self):
+        self.tabella.tr()
+        nuova=gui.Button(value='Nuova partita')
+        nuova.connect(gui.CLICK,self.quit)
+        self.tabella.td(nuova)
+        
+        self.tabella.tr()
+        riprendi=gui.Button(value='Riprendi partita')
+        riprendi.connect(gui.CLICK,self.inventario_animali)
+        self.tabella.td(riprendi)
+        nrighe=self.tabella.getRows()
+        self.tabella.style.height=nrighe*50
+        
+        
     #-------------------------------------------------------------------------------
     def scarica(self,id_cosa_raccolta,i,tab_riga,eti,immagine,idx_img,sel):
         if id_cosa_raccolta in self.motore.lista_beast:
@@ -539,12 +556,12 @@ def filter_dic_for_json(dic):
 #eofunction
 #function
 def lista_matrice_gids(matrice):
-    #le mattonelle del livello sono contenute in cell_ids che però non si può salvare perché contiene surfaces
+    #le mattonelle del livello sono contenute in cell_ids che perÃ² non si puÃ² salvare perchÃ© contiene surfaces
     #cell_ids=self.tiled_map.layers[5].objects.cell_ids
-    #come cancellare una singola cella sul livello 0; inutile perché non ha alcun effetto sulla lista degli sprite
+    #come cancellare una singola cella sul livello 0; inutile perchÃ© non ha alcun effetto sulla lista degli sprite
     #self.tiled_map.raw_map.layers[0].content2D[0][1]=0
-    #print self.tiled_map.raw_map.layers[5].content2D[7][7] #così si estrae il gid della mattonella alla posizione 7,7
-    #print self.tiled_map.mio_resource.indexed_tiles[580][2] #così si può ottenere l'immagine della mattonella con gid 580
+    #print self.tiled_map.raw_map.layers[5].content2D[7][7] #cosÃ¬ si estrae il gid della mattonella alla posizione 7,7
+    #print self.tiled_map.mio_resource.indexed_tiles[580][2] #cosÃ¬ si puÃ² ottenere l'immagine della mattonella con gid 580
     r=0
     c=0
     for riga in matrice:

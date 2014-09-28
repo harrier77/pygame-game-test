@@ -6,6 +6,7 @@ from pygame.locals import *
 from pygame import sprite,time
 from miovardump import miovar_dump
 from moving_beast import MovingBeast
+from weakref import WeakKeyDictionary
 
 class Salvataggio():
     def __init__(self):
@@ -136,7 +137,7 @@ class Salvataggio():
         motore.avatar.dormi=dati['dormi']
         motore.avatar_group.add(motore.avatar)
         
-    def reset_animati(self,motore,dati):
+    def reset_animati_old(self,motore,dati):
         del motore.lista_beast
         motore.lista_beast=dict()
         for layer in motore.overlays:
@@ -146,7 +147,21 @@ class Salvataggio():
                     motore.avatar_group.objects.remove(s)
         animati_caricati=dati['animati']
         self.ricostruisci_animati(animati_caricati,motore)
-
+    
+    def reset_animati(self,motore,dati):
+        del motore.lista_beast
+        motore.lista_beast=dict()
+        rect = pygame.Rect(0,0, motore.tiled_map.pixel_width+1, motore.tiled_map.pixel_height+1)
+        #cell_size = max(motore.tiled_map.tile_width, motore.tiled_map.tile_height)
+        #motore.avatar_group.objects.__init__(rect,cell_size) #azzera tutto il layer
+        for layer in motore.overlays:
+            sprites = layer.objects.intersect_objects(rect)
+            motore.beast_sprite_group.empty()
+            for s in sprites:
+                if isinstance(s,MovingBeast):
+                    motore.avatar_group.objects.remove(s)
+        animati_caricati=dati['animati']
+        self.ricostruisci_animati(animati_caricati,motore)
         
     def reset_utensili(self,motore,dati):
         nuovamatrice=dati['matr_layer_raccolto']

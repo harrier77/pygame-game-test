@@ -43,7 +43,7 @@
  </layer>
  <layer name="raccolto" width="167" height="114">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3BgQAAAADDoPlTX+EAVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArwGvRNMneCkBAA==
+   H4sIAAAAAAAAC+3OIQEAAAwCMMT7Z34HDGZLsAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAhVsHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqDyfV/AeeCkBAA==
   </data>
  </layer>
  <objectgroup name="Objects">
@@ -83,5 +83,6 @@
     <property name="dest_tile_y" value="72"/>
    </properties>
   </object>
+  <object name="inizio" gid="1024" x="1404" y="2534"/>
  </objectgroup>
 </map>
