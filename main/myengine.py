@@ -98,7 +98,7 @@ class Motore(Engine):
         self.mouse_down = False
         self.grid_cache = {}
         self.label_cache = {}
-        self.dict_gid_to_properties={}
+        self.dict_gid_to_properties={0:' '}
         self.arma=Arma(self)
         self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
         self.direzione_avatar='front'
