@@ -323,7 +323,8 @@ class PguApp():
     def mini_mappa(self):
         self.tabella.clear()
         self.tabella.style.margin_top=90
-        mappa=pygame.image.load('.\\immagini\\minimappa.jpg').convert()
+        #mappa=pygame.image.load('.\\immagini\\minimappa.jpg').convert()
+        mappa=pygame.image.load(os.path.join('immagini','minimappa.jpg')).convert()
         mappa=pygame.transform.scale(mappa,(550,494))
         immagine=gui.Image(mappa)
         self.tabella.tr()
