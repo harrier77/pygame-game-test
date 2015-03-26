@@ -77,19 +77,27 @@ class Theme:
         #or c:\python23\lib\site-packages\pgu\
         #the data is in ... lib/../share/ ...
         dnames.append(os.path.dirname(os.path.abspath('.\\new-trunk'))+"\\librerie\\data\\default")
-
+        pardir=os.path.abspath(os.path.dirname('..'))
+	#print pardir
+	#exit()
+	linuxpath=os.path.join(pardir,'librerie','data','default')
+        dnames.append(linuxpath)
         #dnames.append(os.path.join(os.path.dirname(__file__),"..","..","..","..","share","pgu","themes",name))
         #dnames.append(os.path.join(os.path.dirname(__file__),"..","..","..","..","..","share","pgu","themes",name))
         #dnames.append(os.path.join(os.path.dirname(__file__),"..","..","share","pgu","themes",name)) 
+	#print dnames
+	#exit()
         for dname in dnames:
-            if os.path.isdir(dname): break
+            if os.path.isdir(dname): 
+		break
 
         if not os.path.isdir(dname): 
             raise Exception('could not find theme '+name)
 
         # Normalize the path to make it look nicer (gets rid of the ..'s)
         dname = os.path.normpath(dname)
-
+        
+        
         # Try parsing the theme in the custom txt file format
         fname = os.path.join(dname,"config.txt")
         if os.path.isfile(fname):

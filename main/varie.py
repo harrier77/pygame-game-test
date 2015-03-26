@@ -1,4 +1,5 @@
 # coding: utf-8
+import os
 from os.path import relpath
 import pygame
 from pygame.locals import *
@@ -162,7 +163,8 @@ class PguApp():
         self.app.connect(gui.QUIT,self.app.quit,None)
         self.tabella = gui.Table(width=200,height=300,valign=-1,y=50)
         self.tabella.style.margin_top=150
-        selezionatoimg=pygame.image.load('.\\immagini\\selezionato.png').convert_alpha()
+        #selezionatoimg=pygame.image.load('.\\immagini\\selezionato.png').convert_alpha()
+        selezionatoimg=pygame.image.load(os.path.join('immagini','selezionato.png')).convert_alpha()
         self.selezionatoimg=pygame.transform.scale(selezionatoimg,(28,28))
         #print self.tabella.style.margin_top
         if inizio=="inventario":
@@ -279,7 +281,8 @@ class PguApp():
             if self.motore.mag.selezionabili[s] ==True:sel_val=s
         
         self.g = gui.Group(name='armi',value=sel_val)
-        unchainimg=pygame.image.load('.\\immagini\\unchain.png').convert_alpha()
+        #unchainimg=pygame.image.load('.\\immagini\\unchain.png').convert_alpha()
+        unchainimg=pygame.image.load(os.path.join('immagini','unchain.png')).convert_alpha()
         unchainimg=pygame.transform.scale(unchainimg,(20,20))
         iconunchain=gui.Image(unchainimg)
         for i,cosa in lista_oggetti.iteritems():

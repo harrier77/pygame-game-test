@@ -1,5 +1,6 @@
 import pygame
 import math
+import os
 from miovardump import miovar_dump
 from gummworld2 import geometry
 
@@ -17,8 +18,10 @@ def prima_cella_in_collisione(tiled_map,rect):
 class Proiettile(object):
     #------------------------------------
     def __init__(self,motore,mouse_position):
-        self.freccia1=pygame.image.load('immagini/frnera.png')
-        lasso=pygame.image.load('immagini/lasso.png')
+        #self.freccia1=pygame.image.load('immagini/frnera.png')
+        self.freccia1=pygame.image.load(os.path.join('immagini','frnera.png'))
+        #lasso=pygame.image.load('immagini/lasso.png')
+        lasso=pygame.image.load(os.path.join('immagini','lasso.png'))
         self.lasso=pygame.transform.scale(lasso,(64,15))
         pygame.mixer.init()
         self.motore=motore

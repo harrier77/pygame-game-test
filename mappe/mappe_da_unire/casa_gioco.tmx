@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="29" height="95" tilewidth="32" tileheight="32">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="29" height="95" tilewidth="32" tileheight="32" nextobjectid="30">
  <properties>
   <property name="music" value="Faith.ogg"/>
   <property name="name" value="South Tulimshar Indoor"/>
@@ -16609,15 +16609,15 @@
    <tile gid="0"/>
   </data>
  </layer>
- <objectgroup name="Objects" width="29" height="95">
-  <object name="To Outside" type="warp" x="224" y="640" width="32" height="32">
+ <objectgroup name="Objects">
+  <object id="1" name="To Outside" type="warp" x="224" y="640" width="32" height="32">
    <properties>
     <property name="dest_map" value="021-1"/>
     <property name="dest_tile_x" value="83"/>
     <property name="dest_tile_y" value="92"/>
    </properties>
   </object>
-  <object name="evento1" type="evento" x="63" y="532" width="678" height="31">
+  <object id="2" name="evento1" type="evento" x="63" y="532" width="678" height="31">
    <properties>
     <property name="azione" value="attiva_animato"/>
     <property name="id" value="attivatore1"/>
@@ -16625,7 +16625,7 @@
     <property name="sottotipo" value="AttivaAnimato"/>
    </properties>
   </object>
-  <object name="eventoparla" type="evento" x="75" y="358" width="297" height="111">
+  <object id="3" name="eventoparla" type="evento" x="75" y="358" width="297" height="111">
    <properties>
     <property name="azione" value="parla"/>
     <property name="id" value="eventoparla1"/>
@@ -16633,91 +16633,92 @@
     <property name="sottotipo" value="FaiParlare"/>
    </properties>
   </object>
-  <object name="AlPoligono" type="warp" x="606" y="2237" width="34" height="35">
+  <object id="4" name="AlPoligono" type="warp" x="606" y="2237" width="34" height="35">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="19"/>
     <property name="dest_tile_y" value="48"/>
    </properties>
   </object>
-  <object name="tohouse" type="warp" x="128" y="1151" width="127" height="15">
+  <object id="5" name="tohouse" type="warp" x="128" y="1151" width="127" height="15">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="17"/>
     <property name="dest_tile_y" value="19"/>
    </properties>
   </object>
-  <object name="msg" type="evento" x="644" y="405" width="78" height="104">
+  <object id="6" name="msg" type="evento" x="644" y="405" width="78" height="104">
    <properties>
     <property name="id" value="msg1"/>
     <property name="id_animato" value="msg1"/>
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
-  <object name="msg2" type="evento" x="197" y="2438" width="529" height="16">
+  <object id="7" name="msg2" type="evento" x="197" y="2438" width="529" height="16">
    <properties>
     <property name="id" value="msg2"/>
     <property name="id_animato" value="msg2"/>
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
-  <object name="AlArmeria" type="warp" x="318" y="2238" width="34" height="35">
+  <object id="8" name="AlArmeria" type="warp" x="318" y="2238" width="34" height="35">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="12"/>
     <property name="dest_tile_y" value="19"/>
    </properties>
   </object>
-  <object name="AlPoligono" type="warp" x="545" y="640" width="34" height="25">
+  <object id="9" name="AlPoligono" type="warp" x="545" y="640" width="34" height="25">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="5"/>
     <property name="dest_tile_y" value="37"/>
    </properties>
   </object>
-  <object name="AllaHall" type="warp" x="590" y="1566" width="67" height="21">
+  <object id="10" name="AllaHall" type="warp" x="590" y="1566" width="67" height="21">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="20"/>
     <property name="dest_tile_y" value="71"/>
    </properties>
   </object>
-  <object name="AllaHall" type="warp" x="384" y="641" width="34" height="23">
+  <object id="11" name="AllaHall" type="warp" x="384" y="641" width="34" height="23">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="11"/>
     <property name="dest_tile_y" value="71"/>
    </properties>
   </object>
-  <object name="tohall" type="warp" x="485" y="2880" width="24" height="22">
+  <object id="12" name="tohall" type="warp" x="485" y="2880" width="24" height="22">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="14"/>
     <property name="dest_tile_y" value="77"/>
    </properties>
   </object>
-  <object name="toroom" type="warp" x="415" y="2505" width="93" height="20">
+  <object id="13" name="toroom" type="warp" x="415" y="2505" width="93" height="20">
    <properties>
     <property name="dest_map" value="casa_gioco"/>
     <property name="dest_tile_x" value="15"/>
     <property name="dest_tile_y" value="91"/>
    </properties>
   </object>
-  <object name="msginiziale" type="evento" x="461" y="2928" width="73" height="34">
+  <object id="14" name="msginiziale" type="evento" x="461" y="2928" width="73" height="34">
    <properties>
     <property name="id" value="msginiziale"/>
     <property name="id_animato" value="msginiziale"/>
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
-  <object name="msg3" type="evento" x="590" y="1503" width="61" height="17">
+  <object id="15" name="msg3" type="evento" x="590" y="1503" width="61" height="17">
    <properties>
     <property name="id" value="msg3"/>
     <property name="id_animato" value="msg3"/>
+    <property name="messaggi" value="Messaggio3;messaggio3"/>
     <property name="sottotipo" value="MessaggioDaEvento"/>
    </properties>
   </object>
-  <object gid="1353" x="118" y="380">
+  <object id="16" gid="1353" x="118" y="380">
    <properties>
     <property name="durata_pausa" value="1000"/>
     <property name="id" value="aio2"/>
@@ -16725,71 +16726,71 @@
     <property name="sottotipo" value="parlanteconevento"/>
    </properties>
   </object>
-  <object name="Inizio" gid="1354" x="478" y="2332"/>
-  <object name="wolf" type="animato" gid="1355" x="418" y="3007">
+  <object id="17" name="Inizio" gid="1354" x="478" y="2332"/>
+  <object id="18" name="wolf" type="animato" gid="1355" x="418" y="3007">
    <properties>
     <property name="id" value="Wolf"/>
     <property name="sottotipo" value="animatosegue"/>
    </properties>
   </object>
-  <object gid="1353" x="150" y="2272">
+  <object id="19" gid="1353" x="150" y="2272">
    <properties>
     <property name="sottotipo" value="parlantefermo"/>
    </properties>
   </object>
-  <object gid="1357" x="393" y="1428">
+  <object id="20" gid="1357" x="393" y="1428">
    <properties>
     <property name="punto_arrivo" value="4,44"/>
     <property name="sottotipo" value="catturabile"/>
    </properties>
   </object>
-  <object gid="1356" x="190" y="1411">
+  <object id="21" gid="1356" x="190" y="1411">
    <properties>
     <property name="punto_arrivo" value="15,39"/>
     <property name="sottotipo" value="semplice"/>
    </properties>
   </object>
-  <object gid="1359" x="711" y="1468">
+  <object id="22" gid="1359" x="711" y="1468">
    <properties>
     <property name="punto_arrivo" value="15,38"/>
     <property name="sottotipo" value="semplice"/>
    </properties>
   </object>
-  <object gid="1359" x="513" y="1413">
+  <object id="23" gid="1359" x="513" y="1413">
    <properties>
     <property name="punto_arrivo" value="15,38"/>
     <property name="sottotipo" value="semplice"/>
    </properties>
   </object>
-  <object gid="1359" x="471" y="1473">
+  <object id="24" gid="1359" x="471" y="1473">
    <properties>
     <property name="punto_arrivo" value="26,45"/>
     <property name="sottotipo" value="semplice"/>
    </properties>
   </object>
-  <object gid="1358" x="615" y="1306">
+  <object id="25" gid="1358" x="615" y="1306">
    <properties>
     <property name="punto_arrivo" value="13,47"/>
     <property name="sottotipo" value="catturabile"/>
    </properties>
   </object>
-  <object gid="1357" x="386" y="1372">
+  <object id="26" gid="1357" x="386" y="1372">
    <properties>
     <property name="punto_arrivo" value="16,38"/>
     <property name="sottotipo" value="catturabile"/>
    </properties>
   </object>
-  <object gid="1360" x="284" y="1279">
+  <object id="27" gid="1360" x="284" y="1279">
    <properties>
     <property name="sottotipo" value="parlantefermo"/>
    </properties>
   </object>
-  <object gid="1361" x="679" y="1381">
+  <object id="28" gid="1361" x="679" y="1381">
    <properties>
     <property name="sottotipo" value="attaccante"/>
    </properties>
   </object>
-  <object gid="1362" x="228" y="649">
+  <object id="29" gid="1362" x="228" y="649">
    <properties>
     <property name="attendi_evento" value="True"/>
     <property name="id" value="interlocutore"/>

@@ -75,8 +75,11 @@ class Dialogosemplice():
         self.moving_beast_genitore=moving_beast_genitore
         self.screen=pygame.display.get_surface()
         #self.background_txt = pygame.Surface((self.screen.get_size()[0]-1,self.text_altezza))
-        square=pygame.image.load('.\\immagini\\square.png').convert_alpha()
-        triangle=pygame.image.load('.\\immagini\\triangle.png').convert_alpha()
+        dir='.\\immagini\\'
+        if sys.platform=='linux2':
+            dir=dir.replace('\\', '/');
+        square=pygame.image.load(dir+'square.png').convert_alpha()
+        triangle=pygame.image.load(dir+'triangle.png').convert_alpha()
         self.triangle=pygame.transform.scale(triangle,(15,10))
         self.background_txt =pygame.transform.scale(square,(self.screen.get_size()[0]-1,self.text_altezza))
         self.backvuoto=self.background_txt.copy()
@@ -194,7 +197,7 @@ class Beast2():
         
         self.motore=None
         #anim_file_name=dir_name
-        variable_path_name=dir_name
+        variable_path_name=dir_name.lower()
         self.animatlabel=variable_path_name
         self.front_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'front_walk.001.png')
         self.back_standing = pygame.image.load('animazioni/animation/'+variable_path_name+'back_walk.001.png')

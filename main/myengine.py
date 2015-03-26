@@ -46,7 +46,8 @@ except:
         os.stat('animation')
     except:
         #print 'cambio dir a '+os.getcwd()
-        os.chdir('..\\') 
+        #os.chdir('..\\') 
+        os.chdir(os.pardir)
 
 
 #-------------------------------------------------------------------------------
@@ -54,7 +55,8 @@ class Motore(Engine):
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="001-1.tmx",\
                             coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True,inizia_con_menu=False):
         try:
-            filename="saved\\salvataggio.txt"
+            #filename="saved\\salvataggio.txt"
+            filename=os.path.join("saved","salvataggio.txt")
             os.remove(filename)
         except:
             pass
@@ -67,7 +69,10 @@ class Motore(Engine):
         self.suono_cilecca=pygame.mixer.Sound('suoni/cilecca.wav')
         self.fringe_i=1
         #xml = open('animazioni\\prova.xml', 'r').read()
-        xml = open('animazioni\\beta.xml', 'r').read()
+        sep=os.sep
+
+        #xml = open('animazioni'+sep+'beta.xml', 'r').read()
+        xml = open('animazioni'+sep+'prova.xml', 'r').read()
         self.dic_storia=xmltodict.parse(xml)['storia']
         #self.lista_beast=[]
 
@@ -98,14 +103,16 @@ class Motore(Engine):
         self.mouse_down = False
         self.grid_cache = {}
         self.label_cache = {}
-        self.dict_gid_to_properties={0:' '}
+        self.dict_gid_to_properties={0:''}
         self.arma=Arma(self)
         self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
         self.direzione_avatar='front'
         self.imm_fermo=self.avatar.sit_standing
-        dir_mappa=dir+mappa
-
-            
+        
+	if sys.platform=='linux2':
+		dir=dir.replace('\\', '/');
+		
+        dir_mappa=dir+mappa    
             
         self.init_mappa(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
 
@@ -117,6 +124,7 @@ class Motore(Engine):
         self.warps=[]
         self.eventi=pygame.sprite.Group()
         self.beast_sprite_group=pygame.sprite.Group()
+        
         self.mappa_dirfile=dir_mappa
     
         self.tiled_map = TiledMap(dir_mappa)
@@ -447,8 +455,14 @@ class Motore(Engine):
                 centerpos=State.screen.center[0]-scritta.get_width()/2,State.screen.center[1]-scritta.get_height()/2
                 State.screen.blit(scritta,centerpos)
                 State.screen.flip()
-                try:dir=warp.properties['dir']
-                except:dir=".\\mappe\\mappe_da_unire\\"
+                try:
+                    dir=warp.properties['dir']
+                    if sys.platform=='linux2':
+                        dir=dir.replace('\\', '/');
+                except:
+                    dir=".\\mappe\\mappe_da_unire\\"
+                    if sys.platform=='linux2':
+                        dir=dir.replace('\\', '/');
                 mappa=warp.properties['dest_map']+".tmx"
                 destx=int(warp.properties['dest_tile_x'])*32
                 desty=int(warp.properties['dest_tile_y'])*32
@@ -476,6 +490,7 @@ class Motore(Engine):
                             #lista_beast_seguito=dict()
                         salvataggio=Salvataggio() #salva lo stato della mappa lasciata
                         salvataggio.salva(motore=self)
+                        
                         self.init_mappa(dir_mappa=dir+mappa,hero_ini_pos=(destx,desty),resolution=(800,600),dormi=False,miodebug=False)
                         #if 'lista_beast_seguito' in locals():
                             #self.lista_beast=dict(self.lista_beast.items()+lista_beast_seguito.items()) #aggiunge alla lista_beast della nuova mappa il seguito raccolto nella mappa lasciata
@@ -660,7 +675,9 @@ class Motore(Engine):
             self.suono_cilecca.play()
             return False
     #------------------------------------------------------------------ 
-    def on_mouse_button_down(self, pos, button):                
+    def on_mouse_button_down(self, pos, button): 
+        if button==3:
+            self.blockedkeys=False
         if button==1:
             if self.intervallo_mouse:
                 self.mousenow=time.time()
@@ -726,15 +743,22 @@ class Motore(Engine):
 #Eofclass#-----------------------------------------------------------------------------------			
 
 def miomain(debug=True,hero_ini_pos1=(0,0)):
-    oggetto=Motore(resolution=(800,600),miodebug=debug,hero_ini_pos=hero_ini_pos1)
-    icon=pygame.image.load(".\immagini\\icona2.gif")
+    oggetto=Motore(resolution=(800,600),miodebug=debug,hero_ini_pos=hero_ini_pos1,mappa='casa_gioco.tmx')
+    iconimg=".\immagini\\icona2.gif"
+    if sys.platform=='linux2':
+        iconimg=iconimg.replace('\\', '/');
+    icon=pygame.image.load(iconimg)
+    #icon=pygame.image.load(".\immagini\\icona2.gif")
     pygame.display.set_icon(icon)
     gummworld2.run(oggetto)
     return oggetto
 
 def newmain(debug=True,hero_ini_pos1=(0,0),mappa='betatest.tmx',inizia_con_menu=True):
     oggetto=Motore(resolution=(800,600),miodebug=debug,hero_ini_pos=hero_ini_pos1,mappa=mappa,inizia_con_menu=True)
-    icon=pygame.image.load(".\immagini\\icona2.gif")
+    iconimg=".\immagini\\icona2.gif"
+    if sys.platform=='linux2':
+        iconimg=iconimg.replace('\\', '/');
+    icon=pygame.image.load(iconimg)
     pygame.display.set_icon(icon)
     gummworld2.run(oggetto)
     return oggetto

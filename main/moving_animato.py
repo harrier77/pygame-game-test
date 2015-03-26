@@ -237,7 +237,7 @@ class AnimatoParlanteAvvicina(MovingBeast):
         
         if (self.lanciato==False) and (self.is_walking==False) and (self.staifermo==False):
                 self.mio_timer_pausa() #lancia il timer che conta i secondi della pausa passati come parametro a MovingBeast()
-                fotog_sprite=self.sprite_fotogramma
+                fotog_sprite=self.sprite_fotogrammanew
         
         if self.miotimer: #controlla ad ogni ciclo se è attivo un timer e se la pausa di quel timer è scaduta
             self.miotimer.check_time()
