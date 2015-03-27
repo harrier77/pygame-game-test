@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import miopaths
 import gummworld2
 import __builtin__

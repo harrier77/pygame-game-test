@@ -58,8 +58,12 @@ class Motore(Engine):
             os.remove(filename)
         except:
             pass
+        x = 20
+        y = 80
+        
         #inizia_con_menu=True
         if inizia_con_menu:
+            #os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y) 
             menuscreen = pygame.display.set_mode((800, 600))
             pgu=PguApp(self,inizio="salvataggi")
         self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
@@ -78,8 +82,7 @@ class Motore(Engine):
         
         #necessario per resettare la condizione messa dalla libreria PGU
         pygame.key.set_repeat()
-        x = 20
-        y = 80
+        
         self.cammina=False   
         self.corsa=False
         #import os
