@@ -63,8 +63,9 @@ class Motore(Engine):
         
         #inizia_con_menu=True
         if inizia_con_menu:
-            #os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y) 
+            os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)
             menuscreen = pygame.display.set_mode((800, 600))
+            State.mioevento=None
             pgu=PguApp(self,inizio="salvataggi")
         self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
         self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito2.wav')
@@ -86,7 +87,8 @@ class Motore(Engine):
         self.cammina=False   
         self.corsa=False
         #import os
-        os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)    
+        #print os.environ
+       #os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)    
         resolution = Vec2d(resolution)
         self.mag=Magazzino(self)
         self.app_salvata=None
@@ -109,10 +111,11 @@ class Motore(Engine):
         self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
         self.direzione_avatar='front'
         self.imm_fermo=self.avatar.sit_standing
-        
-	if sys.platform=='linux2':
-		dir=dir.replace('\\', '/');
-		
+        #miovar_dump(State)
+        #exit()
+        if sys.platform=='linux2':
+            dir=dir.replace('\\', '/');
+            
         dir_mappa=dir+mappa    
             
         self.init_mappa(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)

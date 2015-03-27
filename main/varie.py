@@ -237,22 +237,22 @@ class PguApp():
         riprendi.connect(gui.CLICK,self.inventario_animali)
         self.tabella.td(riprendi,colspan=3)
         
-        self.tabella.tr()
+        """self.tabella.tr()
         etichetta=gui.Label("   ")
-        self.tabella.td(etichetta,colspan=3)
+        self.tabella.td(etichetta,colspan=3)"""
         
         self.tabella.tr()
         etichettacomandi=gui.Label("Comandi da tastiera",color=(255,0,0,1))
         #etichettacomandi.style.font.size=" "
-        self.tabella.td(etichettacomandi,colspan=3)
+        self.tabella.td(etichettacomandi,colspan=2)
+
         
         self.tabella.tr()
-        etichetta=gui.Label("Selettore armi: ")
+        etichetta=gui.Label("Selettore armi:",align=0)
         self.tabella.td(etichetta)
-        etichetta1=gui.Label("tasto h  ")
+        etichetta1=gui.Label("tasto h + rotellina")
         self.tabella.td(etichetta1)
-        etichetta2=gui.Label("(rotella mouse per cambiare)")
-        self.tabella.td(etichetta2)
+
         
         self.tabella.tr()
         etichetta=gui.Label("Inventario oggetti:")
@@ -264,6 +264,12 @@ class PguApp():
         etichetta=gui.Label("Animali catturati:")
         self.tabella.td(etichetta)
         etichetta1=gui.Label("tasto e")
+        self.tabella.td(etichetta1)
+        
+        self.tabella.tr()
+        etichetta=gui.Label("Visualizza mappa:")
+        self.tabella.td(etichetta)
+        etichetta1=gui.Label("tasto m")
         self.tabella.td(etichetta1)
         
         nrighe=self.tabella.getRows()
