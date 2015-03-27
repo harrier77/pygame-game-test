@@ -92,7 +92,8 @@ class Salvataggio():
         
     #-----------------------------
     def salva(self,motore=None,manuale=False):
-        filename="saved\\salvataggio.txt"
+        #filename="saved\\salvataggio.txt"
+        filename=os.path.join("saved","salvataggio.txt")
         try:
             root_dati=pickle.load(open( filename, "rb" ))
         except:
@@ -173,7 +174,8 @@ class Salvataggio():
     
     #-----------------------------
     def ricarica(self,motore=None,qualemappa=None):
-        filename="saved\\salvataggio.txt"
+        #filename="saved\\salvataggio.txt"
+        filename=os.path.join("saved","salvataggio.txt")
         root_dati=pickle.load(open( filename, "rb" ))
 
         if qualemappa is None : qualemappa=root_dati['quale_mappa']
