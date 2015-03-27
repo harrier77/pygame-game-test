@@ -230,12 +230,42 @@ class PguApp():
         self.tabella.tr()
         nuova=gui.Button(value='Nuova partita')
         nuova.connect(gui.CLICK,self.quit)
-        self.tabella.td(nuova)
+        self.tabella.td(nuova,colspan=3)
         
         self.tabella.tr()
         riprendi=gui.Button(value='Riprendi partita')
         riprendi.connect(gui.CLICK,self.inventario_animali)
-        self.tabella.td(riprendi)
+        self.tabella.td(riprendi,colspan=3)
+        
+        self.tabella.tr()
+        etichetta=gui.Label("   ")
+        self.tabella.td(etichetta,colspan=3)
+        
+        self.tabella.tr()
+        etichettacomandi=gui.Label("Comandi da tastiera",color=(255,0,0,1))
+        #etichettacomandi.style.font.size=" "
+        self.tabella.td(etichettacomandi,colspan=3)
+        
+        self.tabella.tr()
+        etichetta=gui.Label("Selettore armi: ")
+        self.tabella.td(etichetta)
+        etichetta1=gui.Label("tasto h  ")
+        self.tabella.td(etichetta1)
+        etichetta2=gui.Label("(rotella mouse per cambiare)")
+        self.tabella.td(etichetta2)
+        
+        self.tabella.tr()
+        etichetta=gui.Label("Inventario oggetti:")
+        self.tabella.td(etichetta)
+        etichetta1=gui.Label("tasto t")
+        self.tabella.td(etichetta1)
+        
+        self.tabella.tr()
+        etichetta=gui.Label("Animali catturati:")
+        self.tabella.td(etichetta)
+        etichetta1=gui.Label("tasto e")
+        self.tabella.td(etichetta1)
+        
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
         

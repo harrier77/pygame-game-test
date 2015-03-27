@@ -765,6 +765,6 @@ if __name__ == '__main__':
 
 
     
-    miomain(debug=DEBUG,hero_ini_pos1=(0,0))
+    newmain(debug=DEBUG,hero_ini_pos1=(0,0))
         
      
