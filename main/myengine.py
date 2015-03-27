@@ -704,7 +704,7 @@ class Motore(Engine):
                     utensile.mostra()
                 else:
                     if not 'pgu' in locals():
-                        dialog = DialogoAvvisi(testo="Seleziona un'arma o uno strumento da usare! (tasto T)")
+                        dialog = DialogoAvvisi(testo="Seleziona un'arma o uno strumento da usare! (tasto T) (tasto H)")
 
     #------------------------------------------------------------------ 
     def on_mouse_button_up(self, pos, button):

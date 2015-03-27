@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="29" height="95" tilewidth="32" tileheight="32">
+<map version="1.0" orientation="orthogonal" width="29" height="95" tilewidth="32" tileheight="32">
  <properties>
   <property name="music" value="Faith.ogg"/>
   <property name="name" value="South Tulimshar Indoor"/>
@@ -137,15 +137,15 @@
  </layer>
  <layer name="raccolto" width="29" height="95">
   <data encoding="base64" compression="zlib">
-   eJzt10ENAEAIA0GCOJLzb+hkAGFGwT7bCC562V0AAABsV34FADCATQIAAAAAfPV5ANw=
+   eJzt18EJACAMA8DQ2VRw/4UcwodF7iYIeSVJX6OSWa9T/GnrFQAAuLT8CgCgAZsEAAAAADhVcQFp
   </data>
  </layer>
  <layer name="Collision" width="29" height="95">
   <data encoding="base64" compression="zlib">
-   eJztllsKgCAQAKX7H7rfqJXYd+kMLIRY4yN3HePJIbTN0PR9+44mopwZfXHixBnjvJ536Tk6J0juLAcAzNHeCaLCMk5NuzS/vzgta9aRPztztrZWev5Hyzy9a4LT7uzYzwrn/f0sZ/VZ8VLt7KqZnQEAsCM75FycOHHixIlzFefK9RoAAAAAAODrnKsaAmc=
+   eJztl9EOgCAIAF3//9G9toIVIGJ6t7E1c11awGztySGMaVjmvj3nHl/uRZ0Zc3HixNnHec136bp3TZDcWQ4A0NFyMDs872kZl9b3F6dnzyrqZ2XNtvbKyP/oWWd0T3D6nRXfc4RTOrNlOEfnSpTRzqqeWRkAADuyQ83FiRMnTpw4V3Gu3K8BAAAAAABm5wQBYgJj
   </data>
  </layer>
- <objectgroup name="Object Layer 1">
+ <objectgroup name="Object Layer 1" width="0" height="0">
   <object name="inizio" gid="1370" x="334" y="238"/>
   <object gid="1378" x="316" y="134">
    <properties>
