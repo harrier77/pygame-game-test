@@ -22,7 +22,6 @@ from moving_beast import calcola_passi,MovingBeast,Dialogosemplice
 
 from moving_animato import AnimatoSemplice,AnimatoParlanteAvvicina,AnimatoParlanteFermo
 
-
 #from moving_animato import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo
 from moving_animato import AnimatoSegue,AnimatoAttacca,AnimatoCambiaTipo,AnimatoMandria
 from eventi import AnimatoParlanteConEvento,MessaggioDaEvento,FaiParlare,AttivaAnimato,AnimatoFermo,EventoRecinto,EventoMessaggio
