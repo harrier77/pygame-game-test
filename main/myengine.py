@@ -12,7 +12,6 @@ from pygame.locals import *
 from pygame import sprite,time
 import paths
 import gummworld2
-#import cProfile, pstats
 from gummworld2 import context, data, model, geometry, toolkit
 from gummworld2 import Engine, State, TiledMap, BasicMapRenderer, Vec2d
 from librerie import pyganim,gui
