@@ -2,6 +2,7 @@ import pickle
 import pygame
 import array
 import copy
+import os
 from pygame.locals import *
 from pygame import sprite,time
 from miovardump import miovar_dump
