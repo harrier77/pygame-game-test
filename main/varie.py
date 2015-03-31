@@ -226,6 +226,20 @@ class PguApp():
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
         
+    def menu_riprendi(self):
+        self.tabella.clear()
+        self.tabella.tr()
+        etichettacomandi=gui.Label("Partite salvate:",color=(255,0,0,1))
+        self.tabella.td(etichettacomandi,colspan=2)
+        miopath=os.path.join('saved','')
+        lista_file=os.listdir(miopath)
+        for filename in lista_file:
+             self.tabella.tr()
+             etif=gui.Link(filename)
+             self.tabella.td(etif)
+        nrighe=self.tabella.getRows()
+        self.tabella.style.height=nrighe*50
+    
     def menu_salvataggi(self):
         self.tabella.tr()
         nuova=gui.Button(value='Nuova partita')
@@ -234,7 +248,7 @@ class PguApp():
         
         self.tabella.tr()
         riprendi=gui.Button(value='Riprendi partita')
-        riprendi.connect(gui.CLICK,self.inventario_animali)
+        riprendi.connect(gui.CLICK,self.menu_riprendi)
         self.tabella.td(riprendi,colspan=3)
         
         """self.tabella.tr()

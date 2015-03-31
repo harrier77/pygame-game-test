@@ -621,18 +621,16 @@ class Motore(Engine):
         elif key==pygame.K_h:
             #print "h"
             selettore=Selettore(motore=self)
-        elif key == pygame.K_F2:  #salva la situazione del gioco nel file salvataggio,txt
-            #lista_matrice_gids(self.matr_layer_raccolto) #stampa sulla console i dati
+        elif key == pygame.K_F2:  #salva la situazione del gioco 
+            print 'salvato'
             salvataggio=Salvataggio()
-            #salvataggio.matr_layer_raccolto=self.matr_layer_raccolto
-            #salvataggio.avatar_pos=self.avatar.position
-            #filename="saved\\salvataggio.txt"
-            #pickle.dump(salvataggio, open(filename,"wb" ) )
-            salvataggio.salva(motore=self)
+            salvataggio.salva(motore=self,target_file='prova_salvato.txt')
             del salvataggio
-        elif key == pygame.K_F3: #ricarica la situazione del gioco dal file salvataggio,txt
+        elif key == pygame.K_F3: #ricarica la situazione del gioco dal file 
+            print "ricarica"
             salvato=Salvataggio()
-            salvato.ricarica(motore=self,qualemappa=self.mappa_dirfile)
+            salvato.ricarica_manuale(motore=self,target_file='prova_salvato.txt')
+            print salvato.root['mappa_attuale']
             del salvato
         elif key == pygame.K_F4:
             print 'f4'

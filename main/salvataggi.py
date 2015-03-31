@@ -92,9 +92,9 @@ class Salvataggio():
     
         
     #-----------------------------
-    def salva(self,motore=None,manuale=False):
+    def salva(self,motore=None,manuale=False,target_file="salvataggio.txt"):
         #filename="saved\\salvataggio.txt"
-        filename=os.path.join("saved","salvataggio.txt")
+        filename=os.path.join("saved",target_file)
         try:
             root_dati=pickle.load(open( filename, "rb" ))
         except:
@@ -124,6 +124,7 @@ class Salvataggio():
                 dati['animati'].append(dic_da_agg)
 
         root_dati['quale_mappa']=motore.mappa_dirfile
+        root_dati['mappa_attuale']=motore.mappa_dirfile
         root_dati[motore.mappa_dirfile]=dati
         pickle.dump(root_dati, open(filename,"wb" ) )
     
@@ -174,10 +175,11 @@ class Salvataggio():
         
     
     #-----------------------------
-    def ricarica(self,motore=None,qualemappa=None):
+    def ricarica(self,motore=None,qualemappa=None,target_file="salvataggio.txt"):
         #filename="saved\\salvataggio.txt"
-        filename=os.path.join("saved","salvataggio.txt")
+        filename=os.path.join("saved",target_file)
         root_dati=pickle.load(open( filename, "rb" ))
+        self.root=root_dati
 
         if qualemappa is None : qualemappa=root_dati['quale_mappa']
         if qualemappa<>motore.mappa_dirfile:
@@ -198,5 +200,11 @@ class Salvataggio():
 
         #print "listas"+str(lista_seguito)
         self.ricostruisci_animati(lista_seguito,motore)
-
+    
+    
+    def ricarica_manuale(self,motore=None,qualemappa=None,target_file=''):
+        filename=os.path.join("saved",target_file)
+        root_dati=pickle.load(open( filename, "rb" ))
+        self.root=root_dati
+        
 #Eofclass#-------------------------------------------------
