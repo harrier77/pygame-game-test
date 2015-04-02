@@ -6,6 +6,7 @@ from pygame.locals import *
 import librerie
 from gummworld2 import model,State
 from librerie import pyganim,gui
+from salvataggi import *
 
 class DialogoAvvisi(gui.Dialog):
     def __init__(self,**params):
@@ -226,6 +227,13 @@ class PguApp():
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
         
+    def carica_salvato(self,filename):
+        salvato=Salvataggio()
+        salvato.ricarica_manuale(target_file=filename)
+        self.mappa_da_ricaricare=dict()
+        self.mappa_da_ricaricare['quale_mappa']=salvato.root['quale_mappa']
+        self.quit()
+        
     def menu_riprendi(self):
         self.tabella.clear()
         self.tabella.tr()
@@ -236,6 +244,7 @@ class PguApp():
         for filename in lista_file:
              self.tabella.tr()
              etif=gui.Link(filename)
+             etif.connect(gui.CLICK,self.carica_salvato,filename)
              self.tabella.td(etif)
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
@@ -251,16 +260,11 @@ class PguApp():
         riprendi.connect(gui.CLICK,self.menu_riprendi)
         self.tabella.td(riprendi,colspan=3)
         
-        """self.tabella.tr()
-        etichetta=gui.Label("   ")
-        self.tabella.td(etichetta,colspan=3)"""
-        
         self.tabella.tr()
         etichettacomandi=gui.Label("Comandi da tastiera",color=(255,0,0,1))
         #etichettacomandi.style.font.size=" "
         self.tabella.td(etichettacomandi,colspan=2)
 
-        
         self.tabella.tr()
         etichetta=gui.Label("Selettore armi:",align=0)
         self.tabella.td(etichetta)

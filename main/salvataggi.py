@@ -124,7 +124,7 @@ class Salvataggio():
                 dati['animati'].append(dic_da_agg)
 
         root_dati['quale_mappa']=motore.mappa_dirfile
-        root_dati['mappa_attuale']=motore.mappa_dirfile
+        
         root_dati[motore.mappa_dirfile]=dati
         pickle.dump(root_dati, open(filename,"wb" ) )
     

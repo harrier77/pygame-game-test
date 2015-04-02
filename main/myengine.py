@@ -111,13 +111,17 @@ class Motore(Engine):
         self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
         self.direzione_avatar='front'
         self.imm_fermo=self.avatar.sit_standing
-        #miovar_dump(State)
-        #exit()
+        
         if sys.platform=='linux2':
             dir=dir.replace('\\', '/');
             
-        dir_mappa=dir+mappa    
+        #check if it is clicked a reload saved game item
+        if  hasattr(pgu,'mappa_da_ricaricare'):
+            dir_mappa=pgu.mappa_da_ricaricare['quale_mappa']
+        else: #if not, use the params in init as map  to load
+            dir_mappa=dir+mappa
             
+        self.mappa_file=mappa    
         self.init_mappa(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
 
     #EofInit------------------------------------------------------------------ 
@@ -130,6 +134,7 @@ class Motore(Engine):
         self.beast_sprite_group=pygame.sprite.Group()
         
         self.mappa_dirfile=dir_mappa
+        
     
         self.tiled_map = TiledMap(dir_mappa)
         
@@ -630,7 +635,7 @@ class Motore(Engine):
             print "ricarica"
             salvato=Salvataggio()
             salvato.ricarica_manuale(motore=self,target_file='prova_salvato.txt')
-            print salvato.root['mappa_attuale']
+            print salvato.root['quale_mappa']
             del salvato
         elif key == pygame.K_F4:
             print 'f4'
