@@ -51,6 +51,7 @@ except:
 class Motore(Engine):
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="001-1.tmx",\
                             coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True,inizia_con_menu=False):
+        
         try:
             filename=os.path.join("saved","salvataggio.txt")
             os.remove(filename)
@@ -116,6 +117,8 @@ class Motore(Engine):
             self.init_nuova_partita(dir_mappa=dir+mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
         elif pgu.scelta==2:
             dir_mappa=pgu.mappa_da_ricaricare['quale_mappa']
+            if sys.platform=='linux2':
+                dir_mappa=dir_mappa.replace('\\', '/');
             self.init_partita_salvata(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,objsalvataggio=pgu.salvato)
        
         
