@@ -90,6 +90,11 @@ class Salvataggio():
                     motore.matr_layer_raccolto[r][c]=myobj.img_idx
         #print "fine ricostruzione: " +str(self.motore.matr_layer_raccolto[22])
     
+    def estrai_lista_utensili_raccolti(self,lista_raccolti):
+        lista_utensili_senza_sprite=list()
+        for i,ogg in lista_raccolti.iteritems():
+            lista_utensili_senza_sprite.append(ogg[0])
+        return lista_utensili_senza_sprite
         
     #-----------------------------
     def salva(self,motore=None,manuale=False,target_file="salvataggio.txt"):
@@ -104,7 +109,11 @@ class Salvataggio():
         
         #print "sto salvando in "+str(motore.mappa_dirfile)+" "+str(motore.matr_layer_raccolto[22][17])
         
-        if manuale: dati['avatar_pos']=motore.avatar.position
+        if manuale: 
+            dati['avatar_pos']=motore.avatar.position
+            lista_utensili_senza_sprite=self.estrai_lista_utensili_raccolti(motore.mag.raccolti)
+            root_dati['utensili_raccolti_senza_sprite']=lista_utensili_senza_sprite
+            
         dati['dormi']=motore.avatar.dormi
         dati['cammina']=motore.cammina
         
@@ -170,8 +179,11 @@ class Salvataggio():
         nuovamatrice=dati['matr_layer_raccolto']
 
         #print "sto resettando"+str(nuovamatrice[22])
-        self.ricostruisci_layer_raccolto(nuovamatrice,motore)
+        if hasattr(motore,'raccolto_spathash'):
+            self.ricostruisci_layer_raccolto(nuovamatrice,motore)
         #print "matrice resettata "+str(motore.matr_layer_raccolto[22])
+        #motore.mag.selezionabili=dati['lista_utensili']
+
         
     
     #-----------------------------
@@ -204,7 +216,15 @@ class Salvataggio():
     
     def ricarica_manuale(self,motore=None,qualemappa=None,target_file=''):
         filename=os.path.join("saved",target_file)
+        print filename
         root_dati=pickle.load(open( filename, "rb" ))
         self.root=root_dati
         
+    def salvataggio_manuale(self,motore):
+        import time
+        timestr = time.strftime("%Y%m%d_%H%M%S")
+        #print timestr
+        target_file=timestr
+        print "salvato in "+target_file
+        self.salva(motore=motore,target_file=target_file,manuale=True)
 #Eofclass#-------------------------------------------------

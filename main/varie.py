@@ -158,12 +158,13 @@ class Selettore(gui.Container):
 #-------------------------------------------------------------------------------
 class PguApp():
     def __init__(self,motore_genitore,inizio='menu'):
+        self.scelta=0
         self.motore=motore_genitore
         #mytheme = gui.Theme(dirs="gray")
         self.app = gui.Desktop(width=800,height=600)
         self.app.connect(gui.QUIT,self.app.quit,None)
         self.tabella = gui.Table(width=200,height=300,valign=-1,y=50)
-        self.tabella.style.margin_top=150
+        self.tabella.style.margin_top=50
         #selezionatoimg=pygame.image.load('.\\immagini\\selezionato.png').convert_alpha()
         selezionatoimg=pygame.image.load(os.path.join('immagini','selezionato.png')).convert_alpha()
         self.selezionatoimg=pygame.transform.scale(selezionatoimg,(28,28))
@@ -206,6 +207,7 @@ class PguApp():
                         self.app.event(event)
                         self.app.paint()
                         pygame.display.flip()
+                        
 
         pygame.key.set_repeat()
     #-------------------------------------------------------------------------------   
@@ -228,11 +230,16 @@ class PguApp():
         self.tabella.style.height=nrighe*50
         
     def carica_salvato(self,filename):
-        salvato=Salvataggio()
-        salvato.ricarica_manuale(target_file=filename)
+        self.salvato=Salvataggio()
+        self.salvato.ricarica_manuale(target_file=filename)
         self.mappa_da_ricaricare=dict()
-        self.mappa_da_ricaricare['quale_mappa']=salvato.root['quale_mappa']
+        self.mappa_da_ricaricare=self.salvato.root
+        self.scelta=2
+        if self.motore.is_motore_runnig:
+            dirmappa=self.mappa_da_ricaricare['quale_mappa']
+            self.motore.init_partita_salvata(dir_mappa=dirmappa,miodebug=False,objsalvataggio=self.salvato)
         self.quit()
+        
         
     def menu_riprendi(self):
         self.tabella.clear()
@@ -249,16 +256,30 @@ class PguApp():
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
     
+    def new_game(self):
+        self.scelta=1
+        if self.motore.is_motore_runnig:
+            dirmappa=self.motore.dirmappa
+            self.motore.init_nuova_partita(dir_mappa=dirmappa,miodebug=False)
+        self.quit()
+        
     def menu_salvataggi(self):
+        self.tabella.clear()
         self.tabella.tr()
-        nuova=gui.Button(value='Nuova partita')
-        nuova.connect(gui.CLICK,self.quit)
+        nuova=gui.Button(value='Nuova gioco')
+        #nuova.connect(gui.CLICK,self.quit)
+        nuova.connect(gui.CLICK,self.new_game)
         self.tabella.td(nuova,colspan=3)
         
         self.tabella.tr()
-        riprendi=gui.Button(value='Riprendi partita')
+        riprendi=gui.Button(value='Carica gioco salvato')
         riprendi.connect(gui.CLICK,self.menu_riprendi)
         self.tabella.td(riprendi,colspan=3)
+        
+        self.tabella.tr()
+        tornabtn=gui.Button(value='Torna al gioco')
+        tornabtn.connect(gui.CLICK,self.quit)
+        self.tabella.td(tornabtn,colspan=3)
         
         self.tabella.tr()
         etichettacomandi=gui.Label("Comandi da tastiera",color=(255,0,0,1))
@@ -268,30 +289,37 @@ class PguApp():
         self.tabella.tr()
         etichetta=gui.Label("Selettore armi:",align=0)
         self.tabella.td(etichetta)
-        etichetta1=gui.Label("tasto h + rotellina")
+        etichetta1=gui.Label("h + rotellina")
         self.tabella.td(etichetta1)
 
         
         self.tabella.tr()
         etichetta=gui.Label("Inventario oggetti:")
         self.tabella.td(etichetta)
-        etichetta1=gui.Label("tasto t")
+        etichetta1=gui.Label("t")
         self.tabella.td(etichetta1)
         
         self.tabella.tr()
         etichetta=gui.Label("Animali catturati:")
         self.tabella.td(etichetta)
-        etichetta1=gui.Label("tasto e")
+        etichetta1=gui.Label("e")
         self.tabella.td(etichetta1)
         
         self.tabella.tr()
         etichetta=gui.Label("Visualizza mappa:")
         self.tabella.td(etichetta)
-        etichetta1=gui.Label("tasto m")
+        etichetta1=gui.Label("m")
+        self.tabella.td(etichetta1)
+        
+        self.tabella.tr()
+        etichetta=gui.Label("Questo menu':")
+        self.tabella.td(etichetta)
+        etichetta1=gui.Label("F1")
         self.tabella.td(etichetta1)
         
         nrighe=self.tabella.getRows()
         self.tabella.style.height=nrighe*50
+        
         
         
     #-------------------------------------------------------------------------------
@@ -307,7 +335,7 @@ class PguApp():
                 exit()
         else:
             obj=pygame.sprite.Sprite()
-            obj.image=immagine.value
+            obj.image=immagine.value #is a surface, 32x32
             obj.rect=obj.image.get_rect()
             obj.rect.x=self.motore.avatar.rect.x+16
             obj.rect.y=self.motore.avatar.rect.y+16
@@ -342,6 +370,7 @@ class PguApp():
         for i,cosa in lista_oggetti.iteritems():
                 eti=gui.Label(cosa[0]['nome'])
                 immagine=gui.Image(cosa[1].image)
+                #immagine=pygame.sprite.Sprite()
                 self.tabella.tr()
                 self.tabella.td(eti)
                 self.tabella.td(immagine)

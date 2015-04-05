@@ -44,7 +44,6 @@ except:
         os.stat('animation')
     except:
         #print 'cambio dir a '+os.getcwd()
-        #os.chdir('..\\') 
         os.chdir(os.pardir)
 
 
@@ -53,32 +52,30 @@ class Motore(Engine):
     def __init__(self,resolution=(400,200),dir=".\\mappe\\mappe_da_unire\\",mappa="001-1.tmx",\
                             coll_invis=True,ign_coll=False,miodebug=False,hero_ini_pos=None,dormi=True,inizia_con_menu=False):
         try:
-            #filename="saved\\salvataggio.txt"
             filename=os.path.join("saved","salvataggio.txt")
             os.remove(filename)
         except:
             pass
+        self.is_motore_runnig=False
+        self.dirmappa=dir+mappa
         x = 20
         y = 80
         
-        #inizia_con_menu=True
+        #se inizia_con_menu=True
         if inizia_con_menu:
             os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)
             menuscreen = pygame.display.set_mode((800, 600))
             State.mioevento=None
             pgu=PguApp(self,inizio="salvataggi")
+        
         self.suono_colpito=pygame.mixer.Sound('suoni/colpito.wav')
         self.suono_noncolpito=pygame.mixer.Sound('suoni/non_colpito2.wav')
         self.suono_cilecca=pygame.mixer.Sound('suoni/cilecca.wav')
         self.fringe_i=1
-        #xml = open('animazioni\\prova.xml', 'r').read()
         sep=os.sep
-
         #xml = open('animazioni'+sep+'beta.xml', 'r').read()
         xml = open('animazioni'+sep+'prova.xml', 'r').read()
         self.dic_storia=xmltodict.parse(xml)['storia']
-        #self.lista_beast=[]
-
         self.godebug=False
         
         #necessario per resettare la condizione messa dalla libreria PGU
@@ -86,9 +83,7 @@ class Motore(Engine):
         
         self.cammina=False   
         self.corsa=False
-        #import os
-        #print os.environ
-       #os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x,y)    
+
         resolution = Vec2d(resolution)
         self.mag=Magazzino(self)
         self.app_salvata=None
@@ -115,18 +110,46 @@ class Motore(Engine):
         if sys.platform=='linux2':
             dir=dir.replace('\\', '/');
             
-        #check if it is clicked a reload saved game item
-        if  hasattr(pgu,'mappa_da_ricaricare'):
+        if not 'pgu' in locals():   
+            self.init_nuova_partita(dir_mappa=dir+mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
+        elif pgu.scelta==1:
+            self.init_nuova_partita(dir_mappa=dir+mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
+        elif pgu.scelta==2:
             dir_mappa=pgu.mappa_da_ricaricare['quale_mappa']
-        else: #if not, use the params in init as map  to load
-            dir_mappa=dir+mappa
+            self.init_partita_salvata(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,objsalvataggio=pgu.salvato)
+       
+        
             
-        self.mappa_file=mappa    
-        self.init_mappa(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
-
-    #EofInit------------------------------------------------------------------ 
+    #EofInit-----------------------------------------------------------------------------------------
     
+    def init_nuova_partita(self,dir_mappa='',coll_invis=True,hero_ini_pos=(0,0),resolution=(800,600),dormi=True,miodebug=True):
+        self.init_mappa(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
+    
+    def init_partita_salvata(self,dir_mappa='',coll_invis=True,hero_ini_pos=(0,0),resolution=(800,600),miodebug=True,objsalvataggio=None):
+        self.init_mappa(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=False,miodebug=miodebug)
+        qualemappa=objsalvataggio.root['quale_mappa']
+        dati=objsalvataggio.root[qualemappa]
+        motore=self
+        #ressetta la situazione degli oggetti raccolti allo stato precedente
+        objsalvataggio.reset_utensili(motore,dati)
+        #resetta la situazione dell'avatar
+        objsalvataggio.reset_avatar(motore,dati)
+        #resetta la situazione degli animati allo stato precedente
+        objsalvataggio.reset_animati(motore,dati)
+        if len(objsalvataggio.root['utensili_raccolti_senza_sprite'])>0:
+            #mioidximg=objsalvataggio.root['utensili_raccolti_senza_sprite'][0]['numero']
+            for obj_dic in objsalvataggio.root['utensili_raccolti_senza_sprite']:
+                obj_surface=self.tiled_map.mio_resource.indexed_tiles[obj_dic['numero']]
+                obj_sprite=pygame.sprite.Sprite()
+                obj_sprite.image=obj_surface[2]
+                self.mag.raccolti.append((obj_dic,obj_sprite))
+                nomestrumento=obj_dic['nome']
+                self.mag.selezionabili[nomestrumento]=False
+
+        self.avatar.standing_scelta=self.avatar.front_standing
+   #-----------------------------------------------------------------------------------------
     def init_mappa(self,dir_mappa='',coll_invis=True,hero_ini_pos=(0,0),resolution=(800,600),dormi=True,miodebug=True):
+        
         self.lista_beast={}
         self.lista_eventi={}
         self.warps=[]
@@ -135,7 +158,6 @@ class Motore(Engine):
         
         self.mappa_dirfile=dir_mappa
         
-    
         self.tiled_map = TiledMap(dir_mappa)
         
         #lista_matrice_gids(self.tiled_map.raw_map.layers[5].content2D)
@@ -170,7 +192,7 @@ class Motore(Engine):
         #l'attr lista_oggetti in realtà è una lista dei layer con oggetti, che spesso è uno solo
         self.prima_lista_ogg=self.lista_oggetti[0].objects.objects
 
-        ## Save special layers.
+        #Save special layers.
         self.all_groups = self.tiled_map.layers[:]
         self.avatar_group = self.tiled_map.layers[self.fringe_i]
         self.ground_group= self.tiled_map.layers[self.ground_group_i]
@@ -178,13 +200,13 @@ class Motore(Engine):
         self.collision_group = self.tiled_map.layers[self.collision_group_i]
         num_layers=len(self.all_groups)-1
         self.overlays = self.tiled_map.layers[1:num_layers]
-        ## Hide the busy Collision layer. Player can show it by hitting K_3.
+        #Hide the busy Collision layer. Player can show it by hitting K_3.
         self.collision_group.visible = not coll_invis
-        ## Remove above-ground layers so we can give map to the renderer.
+        #Remove above-ground layers so we can give map to the renderer.
         del self.tiled_map.layers[1:]
         dict_animati={}
         self.catturabili=pygame.sprite.Group()
-        #self.avatar = Miohero((hero_ini_pos), resolution//2,parentob=self,dormi=dormi)
+        
         Engine.__init__(self, caption='LandOfFire', resolution=resolution, camera_target=self.avatar,map=self.tiled_map,frame_speed=0)
         self.State=State
         self.avatar.position=hero_ini_pos
@@ -263,6 +285,7 @@ class Motore(Engine):
         #State.clock.max_fps=10
         toolkit.make_hud()
         self.renderer = BasicMapRenderer(self.tiled_map, max_scroll_speed=State.speed)
+        self.is_motore_runnig=True
     #------------------------------------------------------------------ 
     def popola_lista_beast(self,O,dict_animati,animato,miodebug=False):
         dict_animati[animato.get('id')]=animato
@@ -627,16 +650,11 @@ class Motore(Engine):
             #print "h"
             selettore=Selettore(motore=self)
         elif key == pygame.K_F2:  #salva la situazione del gioco 
-            print 'salvato'
             salvataggio=Salvataggio()
-            salvataggio.salva(motore=self,target_file='prova_salvato.txt')
+            salvataggio.salvataggio_manuale(motore=self)
             del salvataggio
         elif key == pygame.K_F3: #ricarica la situazione del gioco dal file 
-            print "ricarica"
-            salvato=Salvataggio()
-            salvato.ricarica_manuale(motore=self,target_file='prova_salvato.txt')
-            print salvato.root['quale_mappa']
-            del salvato
+            print "F3"
         elif key == pygame.K_F4:
             print 'f4'
             dialog = DialogoAvvisi(testo='pippo F4')
@@ -649,9 +667,6 @@ class Motore(Engine):
             #self.wx.testo.SetLabel(label=str(self.avatar.hitbox))
             self.wx.Show(True) #mostra la finestra wxpython 
             #print pygame.display.get_wm_info()
-        elif key == pygame.K_F7:
-            #print 'f7'
-            pgu=PguApp(self)
         elif key == pygame.K_e:
             pgu=PguApp(self,inizio="animali")
         elif key == pygame.K_t:
@@ -667,7 +682,10 @@ class Motore(Engine):
         elif key == K_l:
             State.show_labels = not State.show_labels
         elif key >= K_0 and key <= K_9:
-                    self.toggle_layer(key - K_0)                    
+                    self.toggle_layer(key - K_0)
+        elif key == pygame.K_F1:
+            pgu=PguApp(self, inizio="salvataggi")
+            
         elif key == K_ESCAPE: 
                 context.pop()
     #------------------------------------------------------------------ 
