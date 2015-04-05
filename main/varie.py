@@ -236,7 +236,10 @@ class PguApp():
         self.mappa_da_ricaricare=self.salvato.root
         self.scelta=2
         if self.motore.is_motore_runnig:
+            import sys
             dirmappa=self.mappa_da_ricaricare['quale_mappa']
+            if sys.platform=='linux2':
+                dirmappa=dirmappa.replace('\\', '/');
             self.motore.init_partita_salvata(dir_mappa=dirmappa,miodebug=False,objsalvataggio=self.salvato)
         self.quit()
         

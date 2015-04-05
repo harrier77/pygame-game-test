@@ -126,6 +126,8 @@ class Motore(Engine):
     #EofInit-----------------------------------------------------------------------------------------
     
     def init_nuova_partita(self,dir_mappa='',coll_invis=True,hero_ini_pos=(0,0),resolution=(800,600),dormi=True,miodebug=True):
+        if sys.platform=='linux2':
+                dir_mappa=dir_mappa.replace('\\', '/');
         self.init_mappa(dir_mappa=dir_mappa,coll_invis=coll_invis,hero_ini_pos=hero_ini_pos,resolution=resolution,dormi=dormi,miodebug=miodebug)
     
     def init_partita_salvata(self,dir_mappa='',coll_invis=True,hero_ini_pos=(0,0),resolution=(800,600),miodebug=True,objsalvataggio=None):
