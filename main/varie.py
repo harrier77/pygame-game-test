@@ -290,6 +290,12 @@ class PguApp():
         self.tabella.td(etichettacomandi,colspan=2)
 
         self.tabella.tr()
+        etichetta=gui.Label("Salvataggio:",align=0)
+        self.tabella.td(etichetta)
+        etichetta1=gui.Label("F2")
+        self.tabella.td(etichetta1)
+        
+        self.tabella.tr()
         etichetta=gui.Label("Selettore armi:",align=0)
         self.tabella.td(etichetta)
         etichetta1=gui.Label("h + rotellina")
